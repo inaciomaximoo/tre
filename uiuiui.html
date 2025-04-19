@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+ <html lang="pt-BR">
+ <head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+   <title>Simulado</title>
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   <!-- Sons para acerto e erro -->
+  <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
+  <audio id="wrongSound" src="wrong.mp3" preload="auto"></audio>
+ 
+   <style>
+     :root {
+       --bg-gradient-start: #ece9e6;
+       --bg-gradient-end: #ffffff;
+       --primary: #2979ff;
+       --primary-dark: #1c54b2;
+       --accent: #00c853;
+       --accent-light: #0cd85a;
+       --danger: #f44336;
+       --danger-light: #ffebee;
+       --text: #263238;
+       --text-light: #546e7a;
+       --border: #cfd8dc;
+       --card-bg: #ffffff;
+       --shadow-color: rgba(0, 0, 0, 0.1);
+       --disabled-bg: #e0e0e0;
+       --disabled-text: #9e9e9e;
+       --transition-speed: 0.3s;
+     }
+ 
+     * {
+       box-sizing: border-box;
+       margin: 0;
+       padding: 0;
+     }
+ 
+     body {
+       font-family: 'Poppins', sans-serif;
+       background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+       color: var(--text);
+       padding: 30px 15px;
+       min-height: 100vh;
+       display: flex;
+       justify-content: center;
+       align-items: flex-start;
+     }
+ 
+     .main-container {
+       max-width: 850px;
+       width: 100%;
+     }
+ 
+     .quiz-card, .results-card {
+       background-color: var(--card-bg);
+       border-radius: 16px;
+       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+       padding: 35px;
+       margin-bottom: 30px;
+       animation: slideUpFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+       opacity: 0;
+     }
+ 
+     .quiz-header {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       margin-bottom: 25px;
+       padding-bottom: 15px;
+       border-bottom: 1px solid var(--border);
+     }
+ 
+     .quiz-title {
+       font-size: 1.6rem;
+       font-weight: 700;
+       color: var(--primary);
+     }
+ 
+     .question-counter {
+       font-size: 0.9rem;
+       font-weight: 600;
+       background-color: #e3f2fd;
+       color: var(--primary-dark);
+       padding: 5px 12px;
+       border-radius: 15px;
+     }
+ 
+     #question-text {
+       font-size: 1.15rem;
+       margin-bottom: 25px;
+       line-height: 1.6;
+       font-weight: 600;
+     }
+ 
+     .image-container {
+       margin-bottom: 25px;
+       text-align: center;
+     }
+ 
+     .image-container img {
+       max-width: 100%;
+       max-height: 400px;
+       border-radius: 10px;
+       border: 1px solid var(--border);
+       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+       transition: transform 0.3s ease, box-shadow 0.3s ease;
+       cursor: zoom-in;
+     }
+ 
+     .image-container img:hover {
+       transform: scale(1.03);
+       box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+     }
+ 
+     .image-modal {
+       display: none;
+       position: fixed;
+       z-index: 1001;
+       padding-top: 50px;
+       left: 0;
+       top: 0;
+       width: 100%;
+       height: 100%;
+       overflow: auto;
+       background-color: rgba(0,0,0,0.9);
+       animation: fadeInModal 0.3s ease;
+     }
+ 
+     .modal-content {
+       margin: auto;
+       display: block;
+       max-width: 90%;
+       max-height: 90vh;
+       animation: zoomInModal 0.3s ease;
+     }
+ 
+     .close-modal {
+       position: absolute;
+       top: 15px;
+       right: 35px;
+       color: #f1f1f1;
+       font-size: 40px;
+       font-weight: bold;
+       transition: 0.3s;
+       cursor: pointer;
+     }
+ 
+     .close-modal:hover, .close-modal:focus {
+       color: #bbb;
+       text-decoration: none;
+     }
+ 
+     .options {
+       list-style: none;
+       margin-top: 20px;
+     }
+ 
+     .options li {
+       margin-bottom: 15px;
+     }
+ 
+     .option {
+       background-color: #f1f3f5;
+       padding: 15px 20px;
+       border-radius: 10px;
+       cursor: pointer;
+       transition: all 0.2s ease-in-out;
+       border: 2px solid transparent;
+       display: flex;
+       align-items: baseline;
+     }
+ 
+     .option-letter {
+       font-weight: 700;
+       margin-right: 10px;
+       color: var(--primary);
+     }
+ 
+     .option:hover {
+       background-color: #e9ecef;
+       border-color: var(--primary);
+       transform: translateX(5px);
+     }
+ 
+     .option.selected {
+       border-color: var(--primary-dark);
+       background-color: #d1e3ff;
+     }
+ 
+     .option.correct {
+       border-color: var(--accent) !important;
+       background-color: var(--accent-light) !important;
+       color: #1b5e20;
+       font-weight: 600;
+     }
+ 
+     .option.correct .option-letter {
+       color: var(--accent);
+     }
+ 
+     .option.incorrect {
+       border-color: var(--danger) !important;
+       background-color: var(--danger-light) !important;
+       color: #c62828;
+       font-weight: 600;
+     }
+ 
+     .option.incorrect .option-letter {
+       color: var(--danger);
+     }
+ 
+     .options.disabled .option {
+       pointer-events: none;
+       opacity: 0.8;
+     }
+ 
+     .options.disabled .option:not(.selected):not(.correct) {
+       background-color: #f8f9fa;
+       opacity: 0.7;
+     }
+ 
+     .button-container {
+       text-align: right;
+       margin-top: 30px;
+     }
+ 
+     .button {
+       background-color: var(--primary);
+       color: white;
+       padding: 12px 30px;
+       border: none;
+       border-radius: 8px;
+       cursor: pointer;
+       font-weight: 600;
+       font-size: 1rem;
+       transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+       box-shadow: 0 4px 10px rgba(41, 121, 255, 0.3);
+     }
+ 
+     .button:hover {
+       background-color: var(--primary-dark);
+       transform: translateY(-2px);
+       box-shadow: 0 6px 15px rgba(41, 121, 255, 0.4);
+     }
+ 
+     .button:active {
+       transform: translateY(0);
+       box-shadow: 0 4px 10px rgba(41, 121, 255, 0.3);
+     }
+ 
+     .button:disabled {
+       background-color: var(--disabled-bg);
+       color: var(--disabled-text);
+       cursor: not-allowed;
+       box-shadow: none;
+       transform: none;
+     }
+ 
+     .results-card h2 {
+       color: var(--primary);
+       margin-bottom: 15px;
+       text-align: center;
+       font-size: 1.8rem;
+     }
+ 
+     .results-card p {
+       text-align: center;
+       font-size: 1.1rem;
+       margin-bottom: 30px;
+       color: var(--text-light);
+     }
+ 
+     .chart-container {
+       width: 100%;
+       max-width: 400px;
+       margin: 0 auto 30px auto;
+     }
+ 
+     .congrats-popup {
+       position: fixed;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100%;
+       background-color: rgba(0,0,0,0.8);
+       display: flex;
+       flex-direction: column;
+       justify-content: center;
+       align-items: center;
+       z-index: 2000;
+       animation: fadeIn 0.5s;
+     }
+ 
+     .congrats-content {
+       background-color: white;
+       padding: 30px;
+       border-radius: 15px;
+       max-width: 90%;
+       text-align: center;
+       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+     }
+ 
+     .congrats-message {
+       font-size: 1.5rem;
+       margin-bottom: 20px;
+       color: var(--primary);
+       font-weight: bold;
+     }
+ 
+     .close-popup {
+       margin-top: 20px;
+       padding: 10px 20px;
+       background-color: var(--primary);
+       color: white;
+       border: none;
+       border-radius: 8px;
+       cursor: pointer;
+       font-weight: 600;
+     }
+ 
+     @keyframes slideUpFadeIn {
+       from {
+         opacity: 0;
+         transform: translateY(40px);
+       }
+       to {
+         opacity: 1;
+         transform: translateY(0);
+       }
+     }
+ 
+     @keyframes fadeInModal {
+       from { opacity: 0; }
+       to { opacity: 1; }
+     }
+ 
+     @keyframes zoomInModal {
+       from { transform: scale(0.7); }
+       to { transform: scale(1); }
+     }
+ 
+     @keyframes fadeIn {
+       from { opacity: 0; }
+       to { opacity: 1; }
+     }
+ 
+     @media (max-width: 600px) {
+       body { padding: 20px 10px; }
+       .quiz-card, .results-card { padding: 20px; }
+       .quiz-title { font-size: 1.4rem; }
+       #question-text { font-size: 1.05rem; }
+       .option { padding: 12px 15px; }
+       .button { padding: 10px 20px; font-size: 0.95rem;}
+       .results-card h2 { font-size: 1.5rem; }
+       .results-card p { font-size: 1rem; }
+     }
+   </style>
+ </head>
+ <body>
+   <div class="main-container">
+     <div id="quiz-container"></div>
+     <div id="results-container" style="display: none;"></div>
+   </div>
+ 
+   <div id="imageModal" class="image-modal">
+     <span class="close-modal" id="closeModalBtn">&times;</span>
+     <img class="modal-content" id="modalImageContent">
+   </div>
+ 
+   <script>
+     // =============================================
+     // BANCO DE QUESTÕES
+     // =============================================
+    const sampleQuestions = [
+  {
+    "enunciado": "Com relação à importância do saneamento básico, é correto afirmar que:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O saneamento faz parte da promoção de saúde e independe da superação dos entraves políticos e de gestão, devendo ser uma ação oriunda dos profissionais de saúde.",
+      "b": "A maior dos problemas e desafios sanitários mundiais não se relacionam ao meio ambiente, mas às condições socioeconômicas das populações.",
+      "c": "Habitação segura e serviços sanitários básicos, condições ausentes a milhares de pessoas no mundo, estão relacionados ao saneamento.",
+      "d": "Doenças como cólera, dengue, esquistossomose e leptospirose estão associadas à falta de saneamento, principalmente em áreas pobres do Brasil."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Meio ambiente, ações governamentais e das sociedades se relacionam ao potencial de saneamento. Neste sentido, assinale a alternativa correta:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Estima-se que os investimentos em saneamento básico representem uma economia de 10% nos gastos com medicina curativa, o que desencoraja o investimento do poder público.",
+      "b": "O consumo racional de produtos de origem natural é uma forma de evitar a degradação da fauna, da flora e a escassez de água e de outras fontes de matérias-primas.",
+      "c": "O desenvolvimento sustentável se baseia no atendimento às necessidades do presente com o menor comprometimento possível das necessidades das gerações futuras.",
+      "d": "Conferência da ONU sobre o Meio Ambiente e o Desenvolvimento (Eco-92) resultou no comprometimento de cerca de 80 países com medidas para melhoria da qualidade de vida no planeta."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "O conceito “conjunto de ações para alcançar a salubridade ambiental, por meio de água potável, coleta e destinação de resíduos sólidos, líquidos e gasosos, uso correto do solo, drenagem urbana, controle de doenças transmissíveis e demais serviços de proteção e melhoria da vida” é compatível com:",
+    "imagem": null,
+    "alternativas": {
+      "a": "saneamento ambiental.",
+      "b": "meio ambiente.",
+      "c": "salubridade ambiental.",
+      "d": "bem-estar ambiental."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Em 1993, o Banco Mundial apresentou uma estimativa do impacto da doença devido à precariedade do ambiente doméstico em países em desenvolvimento. Com relação à terminação, o problema ambiental está relacionado a:",
+    "imagem": null,
+    "alternativas": {
+      "a": "poluição de ar em recinto fechado e superlotação populacional.",
+      "b": "incorreta deposição do lixo, foco de vetores de doenças nas redondezas.",
+      "c": "falta de saneamento, de abastecimento de água e de higiene.",
+      "d": "manejo incorreto do solo e da água que apresentam contaminação."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta que contém, respectivamente, o grupo etário mais comum, o modo de transmissão com as principais fontes e o reservatório do Vibrio cholerae, agente etiológico da cólera.",
+    "imagem": null,
+    "alternativas": {
+      "a": "crianças; fecal-oral, alimento, água, pessoa a pessoa; humanos.",
+      "b": "adultos; fecal-oral, alimento, água; ambiente.",
+      "c": "crianças; alimentos; aves, bovinos e ambiente.",
+      "d": "adultos; fecal-oral, alimento, água, animais domésticos; primatas."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Protozoário com transmissão fecal-oral via alimentos ou água contaminados, mas também de pessoa a pessoa ou por animais domésticos é compatível com a alternativa que apresenta o agente etiológico e a doença, respectivamente:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Cryptosporidium, Criptosporidíase.",
+      "b": "Giardia lamblia, Giardíase.",
+      "c": "Vibrio cholerae, Cólera.",
+      "d": "Ascaris lumbricoides, Ascaridíase."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "O homem é o reservatório, seu modo de transmissão é a ingestão de ovos infectantes do parasita, procedentes do solo, água ou alimentos contaminados com fezes humanas. O período de incubação desde a infecção dos com ovos até a presença nas fezes do hospedeiro é de 60 a 75 dias. Transmissibilidade é durante todo o período em que o indivíduo portar o parasita e estiver eliminando ovos pelas fezes. Assinale a alternativa cujo helminto apresenta as características relatadas.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Ancylostoma duodenale.",
+      "b": "Enterobius vermicularis.",
+      "c": "Ascaris lumbricoides.",
+      "d": "Taenia solium."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta sobre as características típicas da serpente do gênero Bothrops.",
+    "imagem": null,
+    "alternativas": {
+      "a": "fosseta loreal ausente, cauda com chocalho e dentes inoculadores pouco desenvolvidos.",
+      "b": "fosseta loreal ausente e cauda com escamas eriçadas e dentes inoculadores bem desenvolvidos.",
+      "c": "fosseta loreal presente e cauda com chocalho e dentes inoculadores pouco desenvolvidos.",
+      "d": "fosseta loreal presente, cauda lisa e dentes inoculadores bem desenvolvidos."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Com relação a ambiente, hábitos mais comuns e características da serpente do gênero Bothrops, assinale a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "zona rural e centros urbanos, ambiente úmido, presença de roedores, ação noturna não produz ruído típico.",
+      "b": "campos abertos, áreas secas, arenosas e pedregosas, rara em faixa litorânea, não ataca e produz ruído típico.",
+      "c": "zona rural e de mata, ambiente seco, presença de aves, ação diurna, produz ruído típico.",
+      "d": "centros urbanos, ambiente úmido, presença de insetos e roedores, ação diurna, não produz ruído típico."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta sobre as características típicas do escorpião Tityus serrulatus.",
+    "imagem": null,
+    "alternativas": {
+      "a": "tronco marrom-escuro, patas com manchas escuras, cauda escura, mancha clara no ventre vesicular, mede 6 a 7 cm.",
+      "b": "tronco amarelo-escuro, patas amarelas-escuras, triângulo negro no cefalotórax, manchas laterais escuras, mede 6 a 7 cm.",
+      "c": "tronco marrom-escuro, patas amarelas, cauda amarela serrilhada nos dois últimos segmentos, mancha escura no ventre vesicular, mede 6 a 7 cm.",
+      "d": "tronco vermelho-escuro, patas amarelas, cauda vermelho-escuro com espessamento nos dois últimos artículos, manchas amarelo-avermelhadas no tronco, mede 6 a 7 cm."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Com relação à distribuição geográfica do escorpião Tityus serrulatus, é correto afirmar que sua presença ocorre nos Estados:",
+    "imagem": null,
+    "alternativas": {
+      "a": "SE, GO, MS, MG, MT, RS, SC.",
+      "b": "ES, GO, MG, BA, PR, RJ, SE.",
+      "c": "SE, AL, BA, PE, PA, RN, CE, PI.",
+      "d": "AC, AM, PA, RO, RR, TO, MA."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta sobre os efeitos decorrentes do ataque por escorpião Tityus serrulatus.",
+    "imagem": null,
+    "alternativas": {
+      "a": "alterações em canais de potássio, com inibição de catecolaminas e estímulo dos efeitos parassimpáticos.",
+      "b": "alterações em canais de sódio, com inibição de catecolaminas e estímulo dos efeitos parassimpáticos.",
+      "c": "alterações em canais de sódio, com liberação de catecolaminas e acetilcolina e efeitos simpáticos ou parassimpáticos.",
+      "d": "alterações em canais de potássio, com liberação de catecolaminas e acetilcolina e efeitos simpáticos ou parassimpáticos."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Assinale a alternativa incorreta sobre os efeitos decorrentes do ataque por serpente do gênero Bothrops.",
+    "imagem": null,
+    "alternativas": {
+      "a": "ação de hemorraginas sobre a membrana basal dos capilares, favorecendo a ação hemorrágica.",
+      "b": "estímulo à ação de proteases, hialuronidases e fosfolipases oriundas do processo inflamatório agudo.",
+      "c": "instituição de fator X e de protrombina, impedindo a conversão de fibrinogênio em fibrina.",
+      "d": "plaquetopenia e alterações de coagulação que favorecem manifestações com perda sanguínea."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "A produção de resíduos domiciliares tem sido alvo de projetos de educação ambiental que estimulam atividades, dentre as quais podemos incluir:",
+    "imagem": null,
+    "alternativas": {
+      "a": "o repensar de hábitos de consumo e o descarte com aumento de custos e preservação dos recursos naturais.",
+      "b": "o reutilizar de material ao máximo antes de descartá-lo com reaproveitamento para outras funções.",
+      "c": "o incentivar de consumo de produtos que prejudiquem o meio ambiente a fim de analisar o consumo desnecessário.",
+      "d": "o descarte de materiais que se transformam em novos produtos para reintroduzi-lo no ciclo produtivo."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Com relação ao acondicionamento de resíduos domiciliares, é responsabilidade do gerador de atentar para o recipiente apresentar algumas características, exceto:",
+    "imagem": null,
+    "alternativas": {
+      "a": "ter capacidade para conter os resíduos.",
+      "b": "possibilitar manipulação segura na coleta.",
+      "c": "ter aparência repulsiva.",
+      "d": "permitir uma coleta rápida."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Você foi convidado(a) a ministrar palestra educativa numa Unidade Básica de Saúde sobre o correto acondicionamento e descarte de resíduos domiciliares. Dentre os pontos a serem abordados e esclarecidos, assinale a alternativa que apresenta um tópico não adequado ou desnecessário:",
+    "imagem": null,
+    "alternativas": {
+      "a": "higienização do local de acondicionamento.",
+      "b": "aspectos positivos e negativos do controle de vetores.",
+      "c": "características dos recipientes.",
+      "d": "funcionamento do serviço de coleta."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "A coleta seletiva é um sistema de recolhimento de resíduos recicláveis inertes e orgânicos, previamente separados nas fontes geradoras. Segundo a CONAMA, a cor marrom do recipiente é utilizada para resíduo do tipo:",
+    "imagem": null,
+    "alternativas": {
+      "a": "perigoso.",
+      "b": "radioativo.",
+      "c": "madeira.",
+      "d": "orgânico."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Segundo a lei federal nº 6514, de 1977, que trata da segurança e medicina do trabalho, no que tange ao equipamento de proteção individual (EPI), é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A empresa deve oferecer EPI em perfeito estado de conservação a um funcionário, mesmo quando alguns EPI foram utilizados por outro funcionário.",
+      "b": "A empresa pode oferecer EPI com custo do funcionário, desde que se trate de adaptação do EPI às condições de necessidades especiais individuais.",
+      "c": "É permitida a dispensa do certificado de aprovação do ministério do trabalho, desde que seja EPI não profissional, como luvas de procedimento e óculos de proteção.",
+      "d": "É obrigatório o fornecimento de EPI pela empresa, mesmo quando medidas de ordem geral ofereçam completa proteção contra os riscos de acidentes e danos à saúde dos empregados."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Com relação à lipofilicidade dos solventes, assinale a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Diminui com o aumento do peso molecular.",
+      "b": "Aumenta com o aumento do peso molecular.",
+      "c": "É independente do peso molecular e da presença de carga.",
+      "d": "Aumenta com o aumento do peso molecular e diminuição da volatilidade."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Duas crianças, após brincarem em um ambiente recentemente pintado, apresentaram irritação ocular. A investigação revela que este sintoma pode ser devido à exposição a substâncias voláteis presentes na tinta fresca. Assinale a alternativa correta em relação às possíveis consequências que podem ocorrer mediante a exposição a substâncias voláteis para o ser humano.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Exposição a substâncias tóxicas com baixa volatilidade produz danos à saúde.",
+      "b": "Exposição aguda a substâncias muito voláteis causa graves lesões na pele.",
+      "c": "Exposição a substâncias consideradas muito voláteis causa menos danos ao corpo humano.",
+      "d": "Exposição aguda a qualquer tipo de substância volátil causa doenças hematopoiéticas."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta em relação à principal fonte de exposição a substâncias tóxicas voláteis em ambientes internos.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Pinturas e solventes.",
+      "b": "Tráfego de veículos.",
+      "c": "Churrasco.",
+      "d": "Queima de diesel."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "A imagem abaixo mostra uma radiografia de criança, com acentuado remodelamento da cartilagem, com calcificação nas epífises (setas) do punho, ou seja, aumento acentuado em sua radiodensidade. O metal tóxico mais provável associado a essa manifestação é:",
+    "imagem": "https://imgur.com/cyJpBEo.png",
+    "alternativas": {
+      "a": "cádmio.",
+      "b": "prata.",
+      "c": "chumbo.",
+      "d": "arsênico."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "João, que trabalha em um ambiente contaminado por mercúrio, apresenta sintomas neurológicos, gastrointestinais e cardíacos. Análises clínicas identificaram altos níveis de metilmercúrio em seu organismo. Devido aos achados dos exames do paciente, provavelmente ele tenha se contaminado por meio:",
+    "imagem": null,
+    "alternativas": {
+      "a": "das emissões da mineração.",
+      "b": "da fundição de metais leves.",
+      "c": "da evaporação de rios e oceanos.",
+      "d": "da cadeia alimentar aquática."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta em relação à forma do mercúrio mais perigosa e bioacumulativa que é transformada nos mares e oceanos:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Solitário de mercúrio.",
+      "b": "Metilmercúrio e etilmercúrio.",
+      "c": "Mercúrio elementar como os vapores de mercúrio.",
+      "d": "Mercúrio orgânico principalmente o cloreto mercúrico."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Assinale a alternativa que apresenta uma informação correta sobre a exposição de crianças a metais tóxicos por meio da alimentação.",
+    "imagem": null,
+    "alternativas": {
+      "a": "As crianças apresentam menor absorção gastrintestinal de metais tóxicos do que os adultos, o que reduz sua exposição a essas substâncias pela alimentação.",
+      "b": "A exposição de crianças a metais tóxicos pela alimentação é irrelevante, já que as quantidades dessas substâncias presentes nos alimentos são sempre baixas.",
+      "c": "A exposição de crianças a metais tóxicos pela alimentação depende do tipo de metal e do país onde a criança vive, não apresentando uma relação direta com o consumo de calorias ou com a absorção gastrintestinal.",
+      "d": "As crianças consomem mais calorias por quilo de peso corporal do que os adultos, o que aumenta sua exposição a metais tóxicos pela alimentação."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta em relação ao grupo que apresenta maior absorção gastrintestinal de metais.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Crianças.",
+      "b": "Idosos.",
+      "c": "Homens e idosos.",
+      "d": "Idosos e mulheres."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Com relação ao arsênio, assinale a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Os compostos inorgânicos do arsênio incluem ácido arsenioso e várias formas metiladas produzidas como uma consequência da biotransformação do arsênio orgânico em vários organismos.",
+      "b": "Os compostos inorgânicos do arsênio como o ácido arsenioso resulta da biotransformação do arsênio orgânico e de outros compostos arsenicais trivalentes também inorgânicos mais comuns são o arsenato de sódio, e o ácido arsênico.",
+      "c": "Os compostos orgânicos do arsênio incluem o arseno-açúcares e várias formas metiladas produzidas como uma consequência da biotransformação do arsênio orgânico em vários animais.",
+      "d": "Os compostos orgânicos do arsênio incluem o arseno-açúcares e várias formas metiladas produzidas como uma consequência da biotransformação do arsênio inorgânico em vários organismos."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Com relação aos sintomas de intoxicação crônica por arsênio, assinale a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Característico da exposição a longo prazo ao arsênio temos as alterações no fígado, que se manifestam inicialmente por hepatomegalia, icterícia, e pode progredir para cirrose e ascite.",
+      "b": "O comprometimento do fígado, característico da exposição a longo prazo ao arsênio, manifesta-se inicialmente por icterícia, hepatomegalia e pode progredir para cirrose e ascite.",
+      "c": "Os sintomas característicos de intoxicação a longo prazo, incluem febre e anorexia.",
+      "d": "Os sintomas característicos de intoxicação a longo prazo, incluem febre e melanose."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Com relação aos sintomas de intoxicação aguda por arsênio, assinale a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Pode ocorrer anemia e leucopenia, especialmente granulocitopenia, alguns dias após a exposição a altas doses de arsênio e são reversíveis.",
+      "b": "Observa-se anemia e leucopenia, especialmente granulocitopenia, que ocorrem algumas semanas após a exposição a altas doses de arsênio e são irreversíveis.",
+      "c": "Ocorre neuropatia que se inicia geralmente com mudanças sensoriais, tais como dormência das mãos e dos pés.",
+      "d": "Observa-se que tanto os nervos sensoriais quanto os motores podem ser afetados e mais tarde pode se desenvolver uma dolorosa sensação de “agulhadas”, com dormência nos pés."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Depois de analisar os exames de Juca (3 anos), o médico explica à mãe que as alterações nos ossos de sua criança, provavelmente são devidas à contaminação por um metal pesado, onde as maiores fontes de contaminação para crianças dessa idade é a transferência do metal presente em lascas de tinta e na poeira de casas antigas devido ao hábito delas levarem demasiadamente as mãos à boca. Assinale a alternativa correta, em relação ao tipo de metal que é mais comumente encontrado nestes cenários citados pelo médico.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Intoxicação por cádmio.",
+      "b": "Intoxicação por cobre.",
+      "c": "Intoxicação por chumbo.",
+      "d": "Intoxicação por arsênio."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Em várias partes do mundo, o mercúrio utilizado na mineração de ouro contaminou rios e córregos. A principal rota de exposição ao metilmercúrio se dá por meio:",
+    "imagem": null,
+    "alternativas": {
+      "a": "do consumo de peixe.",
+      "b": "das queimas de baterias.",
+      "c": "de produtos agrícolas.",
+      "d": "de lascas de tintas."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "De acordo com a Norma Regulamentadora nº 6 (NR-6), qual é a responsabilidade dos empregados em relação ao uso de Equipamentos de Proteção Individual (EPI)?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Os empregados são isentos de responsabilidade pela guarda e conservação dos EPI, cabendo exclusivamente aos empregadores essa obrigação.",
+      "b": "Os empregados são responsáveis apenas pelo uso adequado dos EPI, não tendo responsabilidade pela guarda e conservação desses equipamentos.",
+      "c": "Os empregados são obrigados a usar os EPI, mas a responsabilidade pela guarda e conservação é exclusiva dos supervisores de segurança.",
+      "d": "Os empregados devem usar os EPI e são responsáveis pela guarda e conservação desses equipamentos, conforme estabelecido pela NR-6."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta em relação à exposição do chumbo em seres humanos.",
+    "imagem": null,
+    "alternativas": {
+      "a": "É muito comum ocorrer a exposição massiva aguda ao chumbo nos adolescentes podendo resultar em edema cerebral grave.",
+      "b": "Não se sabe ao certo, mas o edema cerebral é o sintoma mais frequente em adolescentes que foram expostos uma única vez a metais tóxicos como o chumbo.",
+      "c": "É muito comum ocorrer exposição massiva aguda ao chumbo em crianças com cerca de 3 anos de idade, resultando em edema cerebral.",
+      "d": "O edema cerebral é o sintoma mais comum presente nos homens entre 30 e 40 anos, advindo da exposição aguda a metais tóxicos como o chumbo."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Há relatos de muitos metais produzirem toxicidade significante em humanos. Dentre os principais metais tóxicos destacam-se o:",
+    "imagem": null,
+    "alternativas": {
+      "a": "mercúrio e o zinco.",
+      "b": "chumbo e o cádmio.",
+      "c": "cobre e a prata.",
+      "d": "bismuto e o cobre."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Com relação aos metais tóxicos, assinale a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Os metais tóxicos se assemelham a outras substâncias pois, como elementos, podem ser criados e destruídos por meio da participação humana.",
+      "b": "Os metais diferem de outras substâncias tóxicas, pois são criados e destruídos por meio da participação humana, dessa forma o homem pode alterar o seu potencial tóxico.",
+      "c": "O uso humano dos metais tóxicos influencia seus níveis ambientais no ar, na água e no solo. A utilização dos metais pelo homem pode também alterar a sua forma química.",
+      "d": "O ser humano nunca será capaz de alterar a forma química de um metal. Essa indestrutibilidade contribui para aumentar a nossa preocupação com relação a estes agentes tóxicos."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta sobre a legislação de Poluentes Orgânicos Persistentes (POPs) no Brasil.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Os agrotóxicos POPs de uso agrícola, atualmente proibidos, foram utilizados de maneira legal na produção agropecuária brasileira e mundial a partir da década de 1940, principalmente como inseticidas.",
+      "b": "Os agrotóxicos POPs de uso agrícola, atualmente liberados, foram utilizados de maneira legal na produção agropecuária brasileira e mundial a partir da década de 1940, principalmente como inseticidas.",
+      "c": "Os herbicidas POPs de uso agrícola, atualmente proibidos, foram utilizados de maneira legal na produção agropecuária brasileira a partir da década de 1985, principalmente como inseticidas nas lavouras de algodão.",
+      "d": "Os organofosforados POPs de uso agrícola, atualmente proibidos, foram utilizados de maneira legal na produção agropecuária brasileira a partir da década de 1985, principalmente como inseticidas em todo o território nacional."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Para causarem efeitos nocivos, os agentes tóxicos deverão acessar o organismo por vias já conhecidas, e seus efeitos são dependentes tanto da via como do veículo (material que o produto está dissolvido). Assinale a alternativa correta a respeito das vias de acesso para causarem efeitos nocivos.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Cutânea e óssea.",
+      "b": "Gastrointestinal e cutânea.",
+      "c": "Pulmonar e ocular.",
+      "d": "Sistema Nervoso e Ossos."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "A maneira/modo que uma pessoa se expõe a um agente tóxico, está diretamente relacionado com a duração e a frequência de exposição. Tal fato, levou os toxicologistas a dividirem a exposição em categorias. Assinale a alternativa correta sobre a forma de exposição.",
+    "imagem": null,
+    "alternativas": {
+      "a": "A exposição aguda é definida como a exposição a uma substância química por mais de meses.",
+      "b": "A exposição sincrônica é definida como a exposição a uma substância química de 3 a 6 meses.",
+      "c": "A exposição subaguda é definida como a exposição a uma substância química por menos de 24 horas.",
+      "d": "A exposição crônica é definida como a exposição a uma substância química por mais de meses."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "O DDT, hoje não mais utilizado, foi um pesticida utilizado como controle de vetores transmissores de diversas doenças de risco à população. Hoje sabemos a respeito dos efeitos negativos causados com o seu uso. Assinale a alternativa do efeito negativo do DDT.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Apresenta bioacumulação ambiental produzindo efeito na reprodução das aves.",
+      "b": "É um agrotóxico que permite que frutas e verduras tenham boa qualidade aumentando o preço de mercado.",
+      "c": "É um agrotóxico que tem bioacumulação no sistema nervoso das crianças, levando a um déficit no desenvolvimento neurológico dos afetados.",
+      "d": "É um agrotóxico que tem bioacumulação ambiental produzindo efeito no controle negativo sob as ervas daninhas."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta sobre a legislação para uso dos praguicidas.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Existem legislações que asseguram que os resíduos de praguicidas devem ser mantidos em concentrações inferiores àquelas que possam causar efeitos específicos e listados no CID – (Código Internacional de Doenças).",
+      "b": "Os resíduos de praguicidas deverão ser mantidos em concentrações inferiores àquelas que possam causar qualquer efeito adverso.",
+      "c": "Existem legislações que asseguram que os resíduos de praguicidas não precisam ser controlados, se a área de plantação for fora de áreas urbanas.",
+      "d": "Não existem legislações que assegurem a utilização de praguicidas, cada agricultor utiliza o bom senso dentro de suas plantações."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Os compostos organoclorados como exemplo DDT, Aldrin, lindano entre outros, apresentam toxicidade aguda moderada em relação a outras classificações de agrotóxicos, possuindo efeito adverso importante. Assinale a alternativa correta deste efeito.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Em exposições agudas agem no fígado, interferem nos sistemas endócrino e reprodutor.",
+      "b": "Em exposições crônicas agem inibindo os canais de Na+ dificultando as sinapses nervosas.",
+      "c": "Em exposições crônicas agem no fígado, interferem nos sistemas endócrino e reprodutor.",
+      "d": "Em exposições agudas inibem a enzima acetilcolinesterase permanentemente."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "A toxicidade causada pelo DDT e seu subproduto após biotransformação, o DDE, atua em um órgão alvo importante, o fígado. Assinale a alternativa correta sobre os efeitos tóxicos deste produto no órgão alvo.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Este produto é um potente indutor das enzimas do citocromo P450, em particular CYP2B e CYP3A, aumentando a probabilidade de tumores hepáticos.",
+      "b": "Este produto é um potente indutor das enzimas do citocromo P450, importante catalisadora e biotransformadora da maioria das drogas.",
+      "c": "Este produto é um potente indutor das enzimas do citocromo P450, em particular CYP1A2 que metaboliza quase a totalidade das drogas existentes.",
+      "d": "Este produto é um potente indutor das enzimas do citocromo P450, em particular CYP2B que é inibida pela CYP3A, aumentando a probabilidade de tumores hepáticos."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Aumento na densidade óssea, alterações nas gengivas, como resultado da hiperpigmentação, diminuição da consolidação das fraturas através do aumento da condrogênese e do retardo na mineralização da cartilagem, além de diminuição da atividade de duas enzimas envolvidas na síntese do heme, ácido 6-aminolevulínico desidratase e ferroquelatase. Estas manifestações são características de intoxicação por:",
+    "imagem": null,
+    "alternativas": {
+      "a": "zinco.",
+      "b": "arsênico.",
+      "c": "chumbo.",
+      "d": "mercúrio."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "O vigia noturno trabalhando há 15 anos na indústria química de agrotóxico, passou pelo médico do trabalho por apresentar sintomas “segundo ele esquisitos”. Após a anamnese o médico suspeitou de intoxicação crônica por organoclorados. Assinale a alternativa dos sintomas relacionados a este tipo de intoxicação.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Pneumonia aguda, hiperexcitabilidade, lesão renal, cirrose.",
+      "b": "Adormecimento de extremidades, lesão hepática, convulsão, câncer.",
+      "c": "Edema pulmonar, adormecimento da língua, irritabilidade, sonolência.",
+      "d": "Irritação nos olhos, náuseas, vômito, diarreia, tosse."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Para o controle de pacientes intoxicados por substâncias químicas, como os inseticidas, é necessário o uso de biomarcadores. Assinale a alternativa correta que define biomarcador.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Substâncias presentes no sangue que determinam a toxicodinâmica dos agentes químicos e avalia o efeito sobre os tecidos humanos.",
+      "b": "Produto de exposição aos agentes toxicantes e que podem ser medidos de tempo em tempo avaliando a ação destes nos fluidos biológicos.",
+      "c": "Substância ou seu produto de biotransformação, que possam ser detectados nos fluidos biológicos e avalie a intensidade da exposição e o risco à saúde.",
+      "d": "Produto da biotransformação após intoxicação aguda, que determinem os efeitos dos agentes químicos, sua intensidade e risco."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Os agrotóxicos são classificados em grupos distintos. Assinale a alternativa que melhor caracteriza um agrotóxico organoclorado.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Todos os tipos são tóxicos, contaminam o ar, solo, água superficiais e subterrâneas, atuam sobre as pragas nas lavouras.",
+      "b": "De todos os tipos existentes, somente o DDT é tóxico, contaminam o ar, solo, água superficiais e subterrâneas, atuam sobre as pragas nas lavouras.",
+      "c": "Todos os tipos são tóxicos quando as contaminações foram agudos; contaminam o ar, solo, água superficiais e subterrâneas, atuam sobre as pragas nas lavouras.",
+      "d": "De todos os tipos somente o DDE é tóxico, contaminando o ar, solo, água superficiais e subterrâneas, atuam sobre as pragas nas lavouras."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Diversos toxicantes são altamente lipofílicos armazenando-se na gordura corporal. A perda de peso ou a rápida mobilização de gordura em um indivíduo intoxicado pode levar ao aumento da intoxicação. Assinale a alternativa correta do toxicante e sua forma de excreção.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Orgânicos voláteis, em poucos dias, pelas fezes.",
+      "b": "Metais pesados, em poucos dias, por via urinária.",
+      "c": "Monóxido de nitrogênio, em meses ou anos, pela pele.",
+      "d": "Organoclorados, em meses ou anos, pelas fezes."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "De acordo com a legislação vigente, as embalagens de agrotóxicos vazias, devem ser:",
+    "imagem": null,
+    "alternativas": {
+      "a": "devolvidas aos estabelecimentos comerciais e recolhidas pelas empresas que promovem o destino adequado das embalagens.",
+      "b": "devolvidas aos estabelecimentos comerciais e encaminhadas aos aterros sanitários mais próximo da indústria.",
+      "c": "recolhidas pelas empresas produtoras e reutilizadas para o envase de produtos da mesma classificação.",
+      "d": "devolvidas aos estabelecimentos comerciais e recolhidas pelas empresas que promovem a limpeza para posterior descarte."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "A Política Nacional de Vigilância a Saúde tem um documento norteador do planejamento das ações de vigilância em saúde nas três ofertas de gestão do SUS, caracterizado pela definição das responsabilidades, princípios, diretrizes e estratégias dessa vigilância. Baseado neste documento assinale a alternativa correta para o seu papel quando se trata de agrotóxicos organoclorados.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Controlar a utilização dos organoclorados, proibidos no Brasil, mesmo estes não sendo de notificação compulsória.",
+      "b": "Controlar a utilização dos agrotóxicos, devem ser notificados somente os casos comprovados de organoclorados.",
+      "c": "Reduzir a morbimortalidade pelo agravo, e é de notificação compulsória, investigados e encerrados os casos.",
+      "d": "Reduzir a mortalidade por organoclorados, de notificação compulsória, porém somente nos casos de morte."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "A exposição aos agrotóxicos organoclorados, pode ser considerada uma das condições potencialmente associadas ao desenvolvimento de câncer, por sua possível atuação como indicadores ou substâncias capazes de alterar o DNA de uma célula. Com base neste enunciado assinale a alternativa correta sobre sua ação.",
+    "imagem": null,
+    "alternativas": {
+      "a": "O agrotóxico não é proibido no Brasil, porém, por ser um produto altamente tóxico para os trabalhadores, o consumo é baixo.",
+      "b": "Os organoclorados são agrotóxicos de rápida degradação para plantas. A contaminação humana se dá pela ingestão.",
+      "c": "No segundo estágio de intoxicação, pode acontecer paralisia distal flácida de membros inferiores e superiores.",
+      "d": "Uma das ações dos organoclorados é que em altas doses promove a indução de enzimas microsômicas hepáticas."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta do mecanismo de ação, por contaminação com inseticida sobre o neurotransmissor GABA.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Alteração da homeostase do potássio, que bloqueia sua abertura e antagonizando a ação inibitória do GABA.",
+      "b": "Alteração da homeostase de Ca²⁺, bloqueia a sua abertura e antagonizando a ação inibitória do GABA, prejudicando a neurotransmissão.",
+      "c": "Alteração da abertura dos canais de cálcio, bloqueando sua abertura e promovendo a agopização com a ação do GABA.",
+      "d": "Alteração nos canais de Ca²⁺, bloqueia sua abertura aumentando a ação do GABA, favorecendo a neurotransmissão."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta sobre o mecanismo de ação tóxico do DDT.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Possui ação de hiperexcitabilidade do sistema nervoso central devido ao aumento do influxo de Na+ no axônio.",
+      "b": "Possui ação de hiperexcitabilidade do sistema nervoso central devido ao aumento da atividade do GABA.",
+      "c": "Possui ação de hipoexcitabilidade do sistema nervoso central devido ao aumento da atividade do GABA.",
+      "d": "Possui ação de hipoexcitabilidade do sistema nervoso central devido ao aumento do influxo de Na+ no axônio."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Quaisquer substâncias em quantidade suficiente que, em contato com o organismo, possa provocar uma ação prejudicial, originando um desequilíbrio orgânico são consideradas como agentes tóxicos. Sobre essa afirmação assinale a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Os xenobióticos são de origem vegetal, animal ou mineral, já as toxinas são produzidas por vias artificiais, sendo a base da indústria farmacêutica.",
+      "b": "As toxinas endógenas são de origem vegetal, animal ou mineral, já as toxinas exógenas são produzidas por vias artificiais, sendo a base da indústria farmacêutica.",
+      "c": "As toxinas são de origem vegetal, animal ou mineral, já os xenobióticos são produzidos por vias artificiais, sendo a base da indústria farmacêutica.",
+      "d": "Os xenobióticos endógenos são de origem vegetal, animal ou mineral, já os xenobióticos exógenos são produzidos por vias artificiais, sendo a base da indústria farmacêutica."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Uma indústria de pesticida alegou que a forma para descarte de resíduos industriais, gastaria muito dinheiro, e criou uma maneira “alternativa” para tal. E acabou contaminando o solo de um produtor rural de hortaliças. Após análise e ação judicial foi determinado a indústria a descontaminação do solo. Assinale a alternativa correta da técnica utilizada para descontaminação desta área.",
+    "imagem": null,
+    "alternativas": {
+      "a": "A fitorremediação é um processo no qual os solos contaminados são escavados, removidos do local original, tratados fisicamente e misturados com aditivos preparados para removerem os contaminantes.",
+      "b": "A bioremediação é um método que se baseia na utilização de microrganismos no solo contaminado de forma que esses promovam a degradação dos contaminantes.",
+      "c": "A lanciformine é uma técnica de remediação usada para o tratamento de hidrocarbonetos e utilizada sempre in situ.",
+      "d": "A lavagem de solos é um método que utiliza plantas na descontaminação de solos poluídos, principalmente com metais pesados e poluentes orgânicos."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "A intoxicação é a interação de um toxicante com o organismo pode ocorrer em diferentes níveis, órgãos, tecidual, celular e molecular, causando uma intoxicação. A este mecanismo é dado o nome de:",
+    "imagem": null,
+    "alternativas": {
+      "a": "toxicodinâmica.",
+      "b": "toxicocinética.",
+      "c": "metabolização.",
+      "d": "biotransformação."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Existem vários pesticidas, e estes são organizados em classes para um melhor enquadramento. Considerando um pesticida organoclorado, assinale a alternativa correta desta classe de pesticida.",
+    "imagem": null,
+    "alternativas": {
+      "a": "São poluentes degradáveis, pois apresentam características como reversibilidade da área contaminada e bioacumulação-reversível.",
+      "b": "São pesticidas biodegradáveis com meia vida-curta, pois apresentam características como baixa toxicidade e poluição ambiental reversível.",
+      "c": "São poluentes voláteis, baixa acumulação, sem efeito direto no solo e pouco impacto na atmosfera e de média e baixa toxicidade.",
+      "d": "São poluentes persistentes, pois apresentam características básicas como alta toxicidade, bioacumulação e poluição ambiental."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta dos passos de desenvolvimento da toxicidade.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Absorção, distribuição em direção ao alvo, reabsorção, intoxicação.",
+      "b": "Absorção, distribuição em direção ao alvo, reabsorção, detoxificação.",
+      "c": "Absorção, distribuição em direção ao alvo, eliminação pré-sistemica, intoxicação.",
+      "d": "Absorção, distribuição para fora do alvo, reabsorção, intoxicação."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta do mecanismo que facilita a distribuição do toxicante para os tecidos alvos.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Quanto menor as frestas dos capilares hepáticos e renais, menor será o acúmulo de substâncias xenobióticas.",
+      "b": "O acúmulo de xenobióticos lipofílicos nos lisossomos e nas mitocôndrias.",
+      "c": "A principal responsabilidade do transporte dos toxicantes são os canais de Na.",
+      "d": "Substâncias hidrofílicas tendem a passar mais rapidamente aumentando a toxicidade."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Alguns órgãos são elegíveis como especializados na sua via de exposição. Assinale a alternativa correta do compartimento.",
+    "imagem": null,
+    "alternativas": {
+      "a": "O fígado por apresentar uma via primária de passagem, fazendo com que ocorra a primeira metabolização dos compostos tóxicos.",
+      "b": "O rim por ser um órgão filtrante será o responsável pela destruição das principais substâncias que entram na circulação.",
+      "c": "Para diminuir a intoxicação existe um sinergismo entre, pulmão, fígado e rins para diminuírem rapidamente os xenobióticos.",
+      "d": "Os pulmões por apresentarem uma via de exposição muito comum a inalação, as vias aéreas carregam os vapores para região de trocas gasosas."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Assinale a alternativa que não é inerente à toxicidade por solventes.",
+    "imagem": null,
+    "alternativas": {
+      "a": "O número de átomos de carbonos.",
+      "b": "Existência de ligações duplas ou triplas com átomos de carbonos adjacentes.",
+      "c": "Estrutura química característica para intoxicações.",
+      "d": "Configuração da cadeia, linear, cíclica ou ramificada."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Uma fábrica de solventes descarta seus resíduos voláteis de duas maneiras para não chamar atenção da fiscalização. Y é descartado no mar X descartado em uma tubulação clandestina em um lago nas proximidades. Assinale a alternativa mais correta quanto à contaminação.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Os resíduos tóxicos lançados ao mar, terão maior predisposição para evaporarem pela movimentação das ondas.",
+      "b": "Os resíduos tóxicos lançados no lago, terão maior predisposição para evaporar mais rapidamente, pela ausência de movimentação da água.",
+      "c": "Os resíduos tóxicos lançados ao mar, terão maior predisposição para permanecerem na água pela salinidade existente, retendo por maior tempo estes compostos.",
+      "d": "Os resíduos tóxicos lançados no lago, terão maior predisposição para permanecerem na água por conta da sua baixa salinidade."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "O material particulado consiste em uma combinação de partículas líquidas e sólidas que se encontram em suspensão na atmosfera. Entre as diferentes categorias de material particulado, baseadas em seu tamanho aerodinâmico, encontra-se o material particulado inalável. Com relação a esse material particulado, pode-se afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "São partículas de menor acidez, derivadas da combustão de fontes móveis, como automóveis, caminhões, incineradores, com diâmetro < 2,5 μm, podendo atingir as porções mais inferiores do trato respiratório, prejudicando as trocas gasosas.",
+      "b": "Apresenta como importante característica transportar gases adsorvidos em sua superfície até as porções mais distais das vias aéreas, onde ocorrem as trocas de gases no pulmão.",
+      "c": "São partículas de maior acidez, derivadas da combustão de fontes estacionárias, como termoelétricas e hidroelétricas, com diâmetro entre 2,5 e 10 μm, atingindo as porções mais sugestivas do trato respiratório, sem prejuízo das trocas gasosas.",
+      "d": "Apresenta como importante característica transportar gases adsorvidos em sua superfície até as porções maximais das vias aéreas, prejudicando a condução do ar nas trocas gasosas."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Com relação a intoxicação por monóxido de carbono (CO), sua afinidade com a hemoglobina e a curva de dissociação da oxi-hemoglobina é correto afirmar que:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O CO se liga à hemoglobina com uma afinidade maior que o oxigênio deslocando a curva de dissociação da oxi-hemoglobina para esquerda.",
+      "b": "O CO se liga à hemoglobina com uma afinidade maior que o oxigênio deslocando a curva de dissociação da oxi-hemoglobina para direita.",
+      "c": "O CO se liga à hemoglobina com uma afinidade maior que o oxigênio deslocando a curva de dissociação da oxi-hemoglobina para esquerda.",
+      "d": "O CO se liga à hemoglobina com uma afinidade maior que o oxigênio deslocando a curva de dissociação da oxi-hemoglobina para direita."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Com relação aos dois tipos de poluentes, os redutores e os oxidantes é correto afirmar que:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Na poluição fotoquímica do ar, os produtos da reação atmosférica da exaustão de automóveis (NOx) e da combustão completa de carvão (SO₂), resultam na formação de chuva ácida.",
+      "b": "Na poluição fotoquímica do ar, os produtos da reação atmosférica da exaustão de automóveis são SO2 e muitos redutores fotoquímicos secundários, como por exemplo o O3.",
+      "c": "A atmosfera do tipo oxidante é mais associada aos processos nos quais NOx e fumaça, provenientes da combustão incompleta de carvão, acumulam-se na forma de névoa ácida.",
+      "d": "A atmosfera do tipo redutora está mais associada aos processos nos quais o SO2 e a fumaça, provenientes da combustão incompleta de carvão, acumulam-se na forma de névoa ácida."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "O dióxido de enxofre (SO2) presente na poluição atmosférica é capaz de induzir efeitos deletérios para a saúde humana. Com relação a resposta pulmonar a inalação deste poluente é correto afirmar que ocorre broncoconstrição:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Leve que se reflete em um aumento mensurável da resistência ao fluxo de ar devido ao estreitamento das vias aéreas.",
+      "b": "Leve que se reflete em uma baixa resistência ao fluxo de ar devido ao estreitamento das vias aéreas.",
+      "c": "Grave que se reflete em um aumento mensurável da resistência ao fluxo de ar devido ao estreitamento das vias aéreas.",
+      "d": "Grave que se reflete em uma baixa resistência ao fluxo de ar devido ao estreitamento das vias aéreas."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "A Síndrome do Edifício Doente (SED) é uma condição médica em que as pessoas que residem ou trabalham em uma edificação sofrem com sintomas de doenças, ou se sentem mal por nenhum motivo aparente. A respeito da SED é correto afirmar que:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Os sintomas tendem a diminuir em quantidade com o tempo que as pessoas passam no prédio e alguns sinais como dor de cabeça, agitação e cansaço podem estar presente.",
+      "b": "Os sintomas tendem a aumentar em gravidade com o tempo que as pessoas passam no prédio e alguns sinais como dor de cabeça, sonolência e cansaço podem estar presente.",
+      "c": "Os sintomas tendem a se estabilizar em gravidade com o tempo que as pessoas passam no prédio e alguns sinais como dor de cabeça, sonolência e falta de concentração podem estar presente.",
+      "d": "Os sintomas tendem a se estabilizar em quantidade com o tempo que as pessoas passam no prédio e alguns sinais como agitação, fraqueza e urticária podem estar presente."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Com relação aos efeitos do ácido sulfúrico, um composto derivado do SO2, que no meio ambiente pode causar uma série de danos à saúde é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Ao ser inalado, deposita-se ao longo do trato respiratório e sua acidez promove efeitos crônicos devido aos grandes danos provocados nos fagócitos e nas células epiteliais, além de estimular a inflamação neutrofílica básica.",
+      "b": "É irritante para as vias aéreas devido a sua habilidade em se ligar a receptores e outras biomoléculas podendo causar danos às membranas e desencadear respostas inflamatórias.",
+      "c": "É irritante ao ser inalado e estimula a produção de muco, tornando-se mais ácido e espesso, resultando em uma maior diluição nas vias aéreas e uma diminuição do efeito bronoconstritor.",
+      "d": "Após sua inalação, se deposita e solubiliza-se nos fluidos das vias aéreas e nos pulmões, na forma de sulfatos, diminuindo a produção de muco e promovendo a remoção destes compostos por meio da mucosa mucociliar."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "A Poluição fotoquímica do ar advém de uma série de complexas reações na troposfera, ela consiste em uma mistura que contém entre outros ozônio, nitrogênio e grande quantidade de radicais hidrocarboneto reativos. Com relação as concentrações dos precursores de hidrocarbonetos no ar ambiente são correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Exercem um papel fundamental nas cadeias de reações orgânicas que levam à formação de smog ou nevoa oxidante.",
+      "b": "Exercem um papel fundamental nas cadeias de reações fotoquímicas que levam à formação de smog ou neblina anti-oxidante.",
+      "c": "Exercem um papel fundamental nas cadeias de reações orgânicas que levam à formação de smog ou nevoa anti-oxidante.",
+      "d": "Exercem um papel fundamental nas cadeias de reações fotoquímicas que levam à formação de smog ou neblina oxidante."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Dados epidemiológicos mostram que em uma população de idosos, nos meses de agosto, essa população tem apresentado sintomas como tosse seca e cansaço, devido a qualidade do ar, embora a população em geral não tem apresentado quaisquer sintomas. Neste caso o índice de qualidade do ar mais provável seria:",
+    "imagem": null,
+    "alternativas": {
+      "a": "M",
+      "b": "M",
+      "c": "N3",
+      "d": "N2"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Na cidade de São Paulo muitas vezes conseguimos observar a inversão térmica. Com relação a inversão térmica e suas consequências para a saúde humana, é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Nessa situação, o ar frio fica aprisionado próximo ao solo, pressionado por camadas de ar quente, impedindo assim dispersão dos poluentes levando ao agravamento de doenças respiratórias em crianças e idosos.",
+      "b": "Nessa situação, o ar quente fica aprisionado próximo ao solo, pressionado por camadas de ar frio, impedindo assim dispersão dos poluentes levando ao agravamento de doenças respiratórias em crianças e idosos.",
+      "c": "Nessa situação, o ar quente fica aprisionado próximo ao solo, pressionado por camadas de ar frio, facilitando a dispersão dos poluentes e assim, aliviando os sintomas respiratórios em idosos e crianças.",
+      "d": "Nessa situação, o ar frio fica aprisionado próximo ao solo, pressionado por camadas de ar quente, facilitando a dispersão dos poluentes e assim, aliviando os sintomas respiratórios em idosos e crianças."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Com relação as recomendações para os dias em que as concentrações de poluentes atmosféricos estiverem elevadas é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Nos dias com baixa concentrações de poluentes e alta umidade do ar é recomendado evitar ou suspender exercícios físicos entre 10 e 16 horas.",
+      "b": "Nos dias com baixa concentrações de poluentes e alta umidade do ar é recomendado umidificar ambientes através de vaporizadores.",
+      "c": "Nos dias com alta concentrações de poluentes e baixa umidade do ar é recomendado evitar ou suspender exercícios físicos entre 10 e 16 horas.",
+      "d": "Nos dias com baixa concentrações de poluentes e umidade do ar é recomendado evitar ou suspender exercícios físicos."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Para garantir a proteção da saúde e do bem-estar nas pessoas, legalmente o padrão de qualidade do ar define as concentrações máximas de um componente gasoso presente na atmosfera garantindo a proteção da saúde e do bem-estar nas pessoas. Em relação as medidas que podem ser tomadas para diminuição da emissão de poluentes, é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A transformação de gases em resíduos líquidos e despejo aos rios.",
+      "b": "O uso de combustíveis fósseis como principal fonte de energia.",
+      "c": "Utilização de veículos com motores à diesel.",
+      "d": "Utilização de biocombustíveis."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "O Material Particulado (MP) proveniente de poeiras, fumaças e todo tipo de material sólido e líquido suspenso na atmosfera apresenta efeitos no sistema respiratório. A respeito desse MP é correta afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "As partículas inaláveis grossas MP10 podem ficar retidas na parte superior do trato respiratório e necessitar de um sistema mucociliar eficaz para a sua eliminação.",
+      "b": "As partículas inaláveis finas, conhecidas como MP2,5, podem atingir os alvéolos pulmonares, causando uma reação inflamatória levando ao estresse oxidativo.",
+      "c": "As partículas inaláveis finas MP2,5 e as grossas, MP10 conseguem ser completamente eliminadas pelo organismo por meio do sistema mucociliar.",
+      "d": "Por serem mais finas e frágeis, as partículas inaláveis finas, conhecidas como MP2,5, ficam retidas no muco e podem ser facilmente eliminadas."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Alguns poluentes atmosféricos emitidos por diversas fontes podem ter efeitos deletérios para a saúde humana. Assinale a alternativa correta com relação ao poluente e seus efeitos.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Os aldeídos, como a formaldeído e o acetaldeído, são compostos potencialmente carcinogênicos, emitidos pelos veículos automotores.",
+      "b": "O dióxido-de-nitrogênio pode levar a formação de ácido nítrico, nitratos. Esses compostos podem levar a melhora de pessoas sensíveis a alérgenos e asmáticos.",
+      "c": "Gases com enxofre podem causar chuva ácida e consequentemente doenças como a tuberculose e aumento das internações hospitalares.",
+      "d": "O monóxido de carbono pode atuar aumentando a oxigenação pois tem uma afinidade química com a hemoglobina muito maior que o oxigênio."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "A respeito dos metais, considerados materiais particulados, que quando inalados de forma aguda podem trazer toxicidade ao pulmão é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Podem estar na forma combinada com silicatos o que diminui a sua biodisponibilidade e toxicidade.",
+      "b": "A solubilidade do metal influencia na sua toxicidade e biodisponibilidade.",
+      "c": "A insolubilidade do metal diminui seu tempo de retenção no pulmão.",
+      "d": "O metal não possui a capacidade de transferir elétrons, dessa forma não induz a formação de oxidantes."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Segundo o CONAMA (Conselho Nacional do Meio Ambiente) por meio da Resolução nº 03/1990, são estabelecidos limites permitidos de poluentes atmosféricos para diversos ambientes e finalidades. Com relação a esses limites é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "São estabelecidos limites mínimo permitidos de poluentes atmosféricos e esses valores podem variar conforme a localização e a finalidade do ambiente em questão.",
+      "b": "São estabelecidos limites mínimos permitidos de poluentes atmosféricos e esses valores não variam conforme a localização e a finalidade do ambiente em questão.",
+      "c": "São estabelecidos limites máximos permitidos de poluentes atmosféricos e esses valores podem variar conforme a localização e a finalidade do ambiente em questão.",
+      "d": "São estabelecidos limites máximos permitidos de poluentes atmosféricos e esses valores podem variar conforme a finalidade do ambiente em questão mas não quanto a localização."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Jorge 35 anos, foi diagnosticado com intoxicação crônica por benzeno. Assinale a alternativa correta em relação a principal fonte dessa substância em ambientes interno e residências:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Tabaco, tanto em fumantes ativos como passivos.",
+      "b": "Equipamentos eletrônicos, como computadores e TVs.",
+      "c": "Produtos de limpeza, como detergentes e desinfetantes.",
+      "d": "Materiais de construção, como vernizes e adesivos."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Joana levou seu filho Jonas de 4 anos ao médico relatando que o mesmo levou a boca a tampinha de um produto de limpeza que continha benzeno em sua fórmula, por sorte a criança não chegou a ingerir o produto. Conversando com o médico, Joana foi esclarecida de que a principal via de exposição ao benzeno para a população em geral é:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Mucosa.",
+      "b": "Gástrica.",
+      "c": "Cutânea.",
+      "d": "Respiratória."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "O termo solvente refere-se a uma classe de líquidos orgânicos. E o efeito esperado da sua absorção pelo organismo está relacionado ao aumento do peso molecular. De acordo com esta afirmação, assinale a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "A absorção dos solventes é independente do peso molecular.",
+      "b": "A absorção dos solventes diminui devido à maior volatilidade.",
+      "c": "A absorção dos solventes aumenta devido à maior lipofilicidade, enquanto a volatilidade diminui.",
+      "d": "A absorção dos solventes aumenta devido à maior lipofilicidade, enquanto a volatilidade aumenta."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta em relação aos solventes:",
+    "imagem": null,
+    "alternativas": {
+      "a": "São líquidos orgânicos de variável lipofilicidade e volatilidade, pequeno tamanho molecular e ausência de carga.",
+      "b": "São líquidos inorgânicos de variável lipofilicidade e baixa volatilidade, pequeno tamanho molecular e ausência de carga.",
+      "c": "São solventes hidrocarbonetos alifáticos, que onde os principais são os organofosforados (hidrocarbonetos aromáticos), de pequeno tamanho molecular.",
+      "d": "São líquidos orgânicos solúveis em água como por exemplos hidrocarbonetos halogenados ou lipossolúveis como glicóis e álcoois."
+    },
+    "correta": "a"
+  },
+];
+ 
+     // =============================================
+     // LÓGICA DO QUIZ
+     // =============================================
+     let shuffledQuestions = [];
+     let currentQuestionIndex = 0;
+     let questionsInBatch = 0;
+     let scoreBatch = 0;
+     let resultsHistory = [];
+     let currentChart = null;
+
+
+    const allIframes = [
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lista-mais-g-y-do-planeta-terra-2-0-1308/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eu-quero-comer-voce-99397/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/rat-dance-music-93451/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/pou-estourado-48183/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/sua-mae-sabe-que-voce-gosta-de-rapazes-80078/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/toma-milk-shake-de-morango-59364/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/rojao-super-estourado-44057/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-da-minha-foia-19424/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vai-tomar-no-c-pir4nh444-34654/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-e-neymar-47-40647/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/e-agora-vai-entra-o-grosso-75362/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/caramba-que-p1nto-enorme-42382/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/o-homem-uma-maquina-uma-besta-enjaulada-66045/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/manda-foto-pivete-4508/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/som-do-zap-zap-estourado-15594/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-empurra-mole-59742/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/foi-quando-gyro-finalmente-entendeu-41342/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/uicideboy-intro-gmi2-36329/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/abc-da-amazonia-61531/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/corinthians-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cruzeiro-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eae-mane-cade-o-pix-mwahahaha-8598/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/posso-te-ligar-agora-ou-tua-mulher-54107/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/para-de-mandar-audio-to-na-ucrania-47141/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ponte-preta-radio-globo-91750/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/coritiba-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/dolly-estourado-50496/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/imbroxavel-44092/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-ze-gotinha-26753/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/hino-da-urss-53471/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lobo-pidao-50489/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/voce-vem-almocar-23752/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vinheta-ifood/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/spongebob-fail-11236/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/botao-do-whatsapp-97196/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/1-2-3-4-flamengo-18569/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ai-chavinho-25347/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/tralalero-funk-20181/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/indian-song-7sek-58379/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/hello-moto-estourado-73372/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/plantao-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/aw-shit-here-go-again-cj-from-gta-sa-97151/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cala-a-boca-e-escuta-o-som-da-minha-kombi-ai-2767/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/qui-fase-que-ta-o-curintia-43357/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/musica-triste-meme-41946/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/pare/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-ferrei-amigos-estevao-31478/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ele-ta-pedindo-pra-ser-empurrado-4066/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/papu-papu-papu-58837/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/biometria-13888/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/brasil-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/agostinho-carrara-autonomo-28476/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/freddie/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bem-te-vi-passaro-58874/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/grito-do-tom-35478/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/what-bottom-text-meme-sanctuary-guardian-s-24591/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/acorda-monark-17462/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-mata-de-uma-vez-trio-parada-dura-572/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-mata-de-uma-vez-31687/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/aumenta-o-som-marcelo-dig-dig-dig-74686/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vinheta-jornal-nacional/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cr7-bom-dia-34785/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bad-to-the-bone-meme-22189/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ai-programa-hora-do-faro-melhor-qualidade-5308/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/donald-trump-build-a-wall/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/quien-estaba-hablando-contigo-73597/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bom-dia-sao-10h-silvio-santos/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-de-xampu-de-mulher/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/avocados-fron-mexico-5538/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-globo-1-621/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-globo-2-83971/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/e-o-pintinho-piu-26037/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bilu-o-et-brasileiro/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/som-motor-f1-51289/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/buzina-de-caminhao-byrm-17163/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/caminhao-de-gas/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/re-caminhao-67082/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/o-moco-o-caminhao-tombou-35530/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/toque-do-motorola-28486/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/encara-messi-23845/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cr7-vou-ao-u-ao-messi-36080/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/linkin-park-in-the-end-versao-forro-brazil-79061/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vx-without-me-forro-estourado-27992/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/minha-pomba-forro-21153/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/champions-league-forro-42023/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/tu-conhece-a-paola-63959/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-feijao-puro-34490/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/chora-viola/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/sinonimos-chitaozinho-xororo-brasil-27832/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eu-to-maluco-to-doente-to-doidao-14644/embed/" frameborder="0" scrolling="no"></iframe>'
+];
+let availableIframes = []; // Começa vazia, será preenchida na primeira chamada
+// --- FIM DAS NOVAS VARIÁVEIS ---
+
+// ... resto das suas variáveis globais ...
+     const quizContainer = document.getElementById('quiz-container');
+     const resultsContainer = document.getElementById('results-container');
+     const imageModal = document.getElementById('imageModal');
+     const modalImageContent = document.getElementById('modalImageContent');
+     const closeModalBtn = document.getElementById('closeModalBtn');
+    
+ 
+     // Funções auxiliares
+     function shuffleArray(array) {
+       for (let i = array.length - 1; i > 0; i--) {
+         const j = Math.floor(Math.random() * (i + 1));
+         [array[i], array[j]] = [array[j], array[i]];
+       }
+       return array;
+     }
+ 
+     function playSound(id) {
+       const sound = document.getElementById(id);
+       if (sound) {
+         sound.currentTime = 0;
+         sound.play().catch(e => console.log("Audio play failed:", e));
+       }
+     }
+ 
+     // Funções do modal de imagem
+     function openImageModal(src) {
+       if (!src) return;
+       modalImageContent.src = src;
+       imageModal.style.display = "block";
+     }
+ 
+     function closeImageModal() {
+       imageModal.style.display = "none";
+       modalImageContent.src = "";
+     }
+ 
+     // Lógica principal
+     function startQuiz() {
+       shuffledQuestions = shuffleArray([...sampleQuestions]);
+       currentQuestionIndex = 0;
+       questionsInBatch = 0;
+       scoreBatch = 0;
+       resultsHistory = [];
+       resultsContainer.style.display = 'none';
+       quizContainer.style.display = 'block';
+       renderQuestion(currentQuestionIndex);
+     }
+ 
+     function renderQuestion(index) {
+       if (index >= shuffledQuestions.length) {
+         showFinalResults();
+         return;
+       }
+ 
+       const question = shuffledQuestions[index];
+       const totalQuestions = shuffledQuestions.length;
+ 
+       quizContainer.innerHTML = `
+         <div class="quiz-card">
+           <div class="quiz-header">
+             <span class="quiz-title">Questão ${index + 1}</span>
+             <span class="question-counter">${index + 1} / ${totalQuestions}</span>
+           </div>
+           <p id="question-text">${question.enunciado}</p>
+           ${question.imagem ? `
+             <div class="image-container">
+               <img src="${question.imagem}" alt="Imagem da questão" onclick="openImageModal('${question.imagem}')">
+             </div>
+           ` : ''}
+           <ul class="options">
+             ${Object.entries(question.alternativas).map(([key, value]) => `
+               <li>
+                 <div class="option" data-option="${key}">
+                   <span class="option-letter">${key.toUpperCase()})</span> ${value}
+                 </div>
+               </li>
+             `).join('')}
+           </ul>
+           <div class="button-container">
+             <button class="button" id="next-btn" onclick="handleNext()" disabled>Próxima</button>
+           </div>
+         </div>
+       `;
+ 
+       document.querySelectorAll('.option').forEach(el => {
+         el.addEventListener('click', handleAnswerSelection);
+       });
+     }
+ 
+     function handleAnswerSelection(event) {
+       const selectedOptionElement = event.currentTarget;
+       const optionsContainer = selectedOptionElement.closest('.options');
+ 
+       if (optionsContainer.classList.contains('disabled')) return;
+ 
+       optionsContainer.classList.add('disabled');
+ 
+       const userAnswer = selectedOptionElement.getAttribute('data-option');
+       const currentQuestion = shuffledQuestions[currentQuestionIndex];
+       const correctAnswer = currentQuestion.correta;
+ 
+       selectedOptionElement.classList.add('selected');
+       if (userAnswer === correctAnswer) {
+         selectedOptionElement.classList.add('correct');
+         scoreBatch++;
+         playSound('correctSound');
+       } else {
+         selectedOptionElement.classList.add('incorrect');
+         playSound('wrongSound');
+         const correctOptionElement = optionsContainer.querySelector(`.option[data-option="${correctAnswer}"]`);
+         if (correctOptionElement) {
+           correctOptionElement.classList.add('correct');
+         }
+       }
+ 
+       questionsInBatch++;
+       document.getElementById('next-btn').disabled = false;
+     }
+ 
+     function handleNext() {
+       currentQuestionIndex++;
+       const isEndOfBatch = (questionsInBatch === 10) || (currentQuestionIndex >= shuffledQuestions.length);
+ 
+       if (isEndOfBatch) {
+         showBatchResults();
+       } else {
+         renderQuestion(currentQuestionIndex);
+       }
+     }
+ 
+function showBatchResults() {
+    quizContainer.style.display = 'none';
+    resultsContainer.style.display = 'block';
+
+    const batchNumber = resultsHistory.length + 1;
+    const totalInBatch = questionsInBatch; // Quantas questões foram respondidas neste bloco
+    const percentage = totalInBatch > 0 ? Math.round((scoreBatch / totalInBatch) * 100) : 0;
+    const scoreThreshold = 0.7; // 70% - Limite definido
+
+    resultsHistory.push({ batch: batchNumber, score: scoreBatch, total: totalInBatch });
+
+    resultsContainer.innerHTML = `
+        <div class="results-card">
+            <h2>Resultado - Bloco ${batchNumber}</h2>
+            <p>Você acertou ${scoreBatch} de ${totalInBatch} questões (${percentage}%).</p>
+            <div class="chart-container">
+                <canvas id="resultsChart"></canvas>
+            </div>
+            <div class="button-container">
+                ${currentQuestionIndex < shuffledQuestions.length ?
+                '<button class="button" onclick="continueQuiz()">Continuar</button>' :
+                '<button class="button" onclick="showFinalResults()">Ver Resultado Final</button>'
+                }
+            </div>
+        </div>
+    `;
+
+    renderChart(scoreBatch, totalInBatch - scoreBatch);
+
+    // --- MODIFICAÇÃO ADICIONADA ---
+    // Verifica se o desempenho no bloco atual foi >= 70%
+    if (totalInBatch > 0 && (scoreBatch / totalInBatch) >= scoreThreshold) {
+        // Mostra o popup de parabéns com iframe aleatório
+        // Usamos setTimeout para dar um pequeno tempo para o usuário ver o resultado do bloco antes do popup
+        setTimeout(showRandomCongratsPopup, 500); // Atraso de 0.5 segundos (opcional)
+    }
+    // --- FIM DA MODIFICAÇÃO ---
+
+
+    // Reseta os contadores para o próximo bloco (movido para depois da verificação)
+    scoreBatch = 0;
+    questionsInBatch = 0;
+}
+ 
+     function renderChart(correct, incorrect) {
+       const ctx = document.getElementById('resultsChart').getContext('2d');
+ 
+       if (currentChart) {
+         currentChart.destroy();
+       }
+ 
+       currentChart = new Chart(ctx, {
+         type: 'doughnut',
+         data: {
+           labels: ['Corretas', 'Incorretas'],
+           datasets: [{
+             label: 'Desempenho',
+             data: [correct, incorrect],
+             backgroundColor: [
+               'rgba(75, 192, 192, 0.7)',
+               'rgba(255, 99, 132, 0.7)'
+             ],
+             borderColor: [
+               'rgba(75, 192, 192, 1)',
+               'rgba(255, 99, 132, 1)'
+             ],
+             borderWidth: 1
+           }]
+         },
+         options: {
+           responsive: true,
+           maintainAspectRatio: true,
+           plugins: {
+             legend: {
+               position: 'top',
+             },
+             tooltip: {
+               callbacks: {
+                 label: function(context) {
+                   return `${context.label}: ${context.parsed}`;
+                 }
+               }
+             }
+           }
+         }
+       });
+     }
+ 
+     function continueQuiz() {
+       resultsContainer.style.display = 'none';
+       quizContainer.style.display = 'block';
+       renderQuestion(currentQuestionIndex);
+     }
+ 
+     function showRandomCongratsPopup() {
+       const iframes = [
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lista-mais-g-y-do-planeta-terra-2-0-1308/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eu-quero-comer-voce-99397/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/rat-dance-music-93451/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/pou-estourado-48183/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/sua-mae-sabe-que-voce-gosta-de-rapazes-80078/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/toma-milk-shake-de-morango-59364/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/rojao-super-estourado-44057/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-da-minha-foia-19424/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vai-tomar-no-c-pir4nh444-34654/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-e-neymar-47-40647/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/e-agora-vai-entra-o-grosso-75362/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/caramba-que-p1nto-enorme-42382/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/o-homem-uma-maquina-uma-besta-enjaulada-66045/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/manda-foto-pivete-4508/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/som-do-zap-zap-estourado-15594/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-empurra-mole-59742/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/foi-quando-gyro-finalmente-entendeu-41342/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/uicideboy-intro-gmi2-36329/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/abc-da-amazonia-61531/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/corinthians-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cruzeiro-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eae-mane-cade-o-pix-mwahahaha-8598/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/posso-te-ligar-agora-ou-tua-mulher-54107/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/para-de-mandar-audio-to-na-ucrania-47141/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ponte-preta-radio-globo-91750/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/coritiba-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/dolly-estourado-50496/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/imbroxavel-44092/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-ze-gotinha-26753/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/hino-da-urss-53471/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lobo-pidao-50489/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/voce-vem-almocar-23752/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vinheta-ifood/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/spongebob-fail-11236/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/botao-do-whatsapp-97196/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/1-2-3-4-flamengo-18569/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ai-chavinho-25347/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/tralalero-funk-20181/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/indian-song-7sek-58379/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/hello-moto-estourado-73372/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/plantao-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/aw-shit-here-go-again-cj-from-gta-sa-97151/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cala-a-boca-e-escuta-o-som-da-minha-kombi-ai-2767/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/qui-fase-que-ta-o-curintia-43357/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/musica-triste-meme-41946/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/pare/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-ferrei-amigos-estevao-31478/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ele-ta-pedindo-pra-ser-empurrado-4066/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/papu-papu-papu-58837/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/biometria-13888/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/brasil-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/agostinho-carrara-autonomo-28476/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/freddie/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bem-te-vi-passaro-58874/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/grito-do-tom-35478/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/what-bottom-text-meme-sanctuary-guardian-s-24591/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/acorda-monark-17462/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-mata-de-uma-vez-trio-parada-dura-572/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-mata-de-uma-vez-31687/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/aumenta-o-som-marcelo-dig-dig-dig-74686/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vinheta-jornal-nacional/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cr7-bom-dia-34785/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bad-to-the-bone-meme-22189/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ai-programa-hora-do-faro-melhor-qualidade-5308/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/donald-trump-build-a-wall/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/quien-estaba-hablando-contigo-73597/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bom-dia-sao-10h-silvio-santos/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-de-xampu-de-mulher/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/avocados-fron-mexico-5538/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-globo-1-621/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-globo-2-83971/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/e-o-pintinho-piu-26037/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bilu-o-et-brasileiro/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/som-motor-f1-51289/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/buzina-de-caminhao-byrm-17163/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/caminhao-de-gas/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/re-caminhao-67082/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/o-moco-o-caminhao-tombou-35530/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/toque-do-motorola-28486/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/encara-messi-23845/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cr7-vou-ao-u-ao-messi-36080/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/linkin-park-in-the-end-versao-forro-brazil-79061/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vx-without-me-forro-estourado-27992/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/minha-pomba-forro-21153/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/champions-league-forro-42023/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/tu-conhece-a-paola-63959/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-feijao-puro-34490/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/chora-viola/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/sinonimos-chitaozinho-xororo-brasil-27832/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eu-to-maluco-to-doente-to-doidao-14644/embed/" frameborder="0" scrolling="no"></iframe>'
+];
+ 
+    const randomIframe = iframes[Math.floor(Math.random() * iframes.length)];
+
+    // --- MODIFICAÇÃO ADICIONADA ---
+    // Remove qualquer popup antigo antes de criar um novo
+    const existingPopup = document.querySelector('.congrats-popup');
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+    // --- FIM DA MODIFICAÇÃO ---
+
+    const popup = document.createElement('div');
+    popup.className = 'congrats-popup';
+    popup.innerHTML = `
+    <div class="congrats-content">
+    {/* --- MODIFICAÇÃO NA MENSAGEM --- */}
+    <p class="congrats-message">Parabéns! Você acertou 70% ou mais neste bloco!</p>
+    <div class="random-iframe">${randomIframe}</div>
+    <button class="button close-popup" onclick="this.closest('.congrats-popup').remove()">Fechar</button>
+    </div>
+    `;
+
+    document.body.appendChild(popup);
+}
+ 
+     function showFinalResults() {
+    quizContainer.style.display = 'none';
+    resultsContainer.style.display = 'block';
+
+    let totalCorrect = 0;
+    let totalAttempted = 0;
+    resultsHistory.forEach(batch => {
+        totalCorrect += batch.score;
+        totalAttempted += batch.total;
+    });
+    const finalPercentage = totalAttempted > 0 ? Math.round((totalCorrect / totalAttempted) * 100) : 0;
+
+    // --- MODIFICAÇÃO AQUI ---
+    // Removemos a chamada ao popup daqui, pois agora ela acontece em showBatchResults
+    /*
+    if ((totalCorrect / totalAttempted) >= 0.7) {
+        setTimeout(showRandomCongratsPopup, 1000); // REMOVIDO/COMENTADO
+    }
+    */
+    // --- FIM DA MODIFICAÇÃO ---
+
+
+    resultsContainer.innerHTML = `
+        <div class="results-card">
+            <h2>Simulado Finalizado!</h2>
+            <p>Seu desempenho geral: ${totalCorrect} de ${totalAttempted} questões corretas (${finalPercentage}%).</p>
+            <div class="chart-container">
+                <canvas id="finalResultsChart"></canvas>
+            </div>
+            <div class="button-container">
+                <button class="button" onclick="startQuiz()">Reiniciar Simulado</button>
+            </div>
+        </div>
+    `;
+    renderFinalChart(resultsHistory);
+}
+ 
+     function renderFinalChart(history) {
+       const ctx = document.getElementById('finalResultsChart').getContext('2d');
+       if (currentChart) {
+         currentChart.destroy();
+       }
+ 
+       const labels = history.map(b => `Bloco ${b.batch}`);
+       const data = history.map(b => b.total > 0 ? (b.score / b.total) * 100 : 0);
+ 
+       currentChart = new Chart(ctx, {
+         type: 'bar',
+         data: {
+           labels: labels,
+           datasets: [{
+             label: '% Acerto por Bloco',
+             data: data,
+             backgroundColor: 'rgba(54, 162, 235, 0.7)',
+             borderColor: 'rgba(54, 162, 235, 1)',
+             borderWidth: 1
+           }]
+         },
+         options: {
+           scales: {
+             y: {
+               beginAtZero: true,
+               max: 100,
+               ticks: {
+                 callback: function(value) {
+                   return value + '%';
+                 }
+               }
+             }
+           },
+           responsive: true,
+           maintainAspectRatio: true,
+           plugins: {
+             legend: { display: false },
+             tooltip: {
+               callbacks: {
+                 label: function(context) {
+                   return `Bloco ${context.label}: ${context.parsed.y.toFixed(1)}%`;
+                 }
+               }
+             }
+           }
+         }
+       });
+     }
+ 
+     // Event listeners
+     closeModalBtn.onclick = closeImageModal;
+     imageModal.onclick = function(event) {
+       if (event.target == imageModal) {
+         closeImageModal();
+       }
+     }
+ 
+     // Torna funções globais
+     window.openImageModal = openImageModal;
+     window.closeImageModal = closeImageModal;
+     window.handleNext = handleNext;
+     window.continueQuiz = continueQuiz;
+     window.startQuiz = startQuiz;
+ 
+     // Inicia o quiz
+     document.addEventListener('DOMContentLoaded', startQuiz);
+   </script>
+ </body>
+ </html>
