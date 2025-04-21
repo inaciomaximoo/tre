@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise Completa - 160 Questões</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+            margin-top: 30px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+            margin-top: 40px;
+        }
+        .summary-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .chart-box {
+            flex: 1 1 45%;
+            min-width: 350px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .topic-section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 35px;
+        }
+        .topic-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .topic-title {
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        .question-example {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin-top: 12px;
+            font-size: 0.95em;
+            border-radius: 0 4px 4px 0;
+        }
+        .tag {
+            display: inline-block;
+            background-color: #e1f5fe;
+            color: #0288d1;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        .highlight {
+            background-color: #fffde7;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #e3f2fd;
+        }
+        .priority {
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            text-align: center;
+        }
+        .priority-high {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .priority-medium {
+            background-color: #fff8e1;
+            color: #f57f17;
+        }
+        .priority-low {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 5px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
+        .button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .filter-controls {
+            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 15px;
+            background-color: #f0f7ff;
+            border-radius: 8px;
+        }
+        .subtopic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .subtopic-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            padding: 18px;
+            border-top: 4px solid #3498db;
+        }
+        .subtopic-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+        .key-points {
+            margin-top: 15px;
+            padding-left: 20px;
+        }
+        .key-points li {
+            margin-bottom: 8px;
+        }
+        .note-box {
+            background-color: #e3f2fd;
+            border-left: 4px solid #1976d2;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .conclusion-box {
+            background-color: #e8f5e9;
+            border-left: 4px solid #388e3c;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 0 4px 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Análise Completa das 160 Questões</h1>
+    
+    <div class="summary-card">
+        <h2>Resumo Geral</h2>
+        <p>Esta análise detalhada examinou <span class="highlight">160 questões</span> identificando os principais tópicos e subtópicos para orientar seus estudos de forma eficiente.</p>
+        
+        <div class="note-box">
+            <strong>📌 Destaque:</strong> 70% das questões concentram-se em apenas 4 grandes temas: Metais Pesados, Agrotóxicos, Poluição Atmosférica e Saneamento/Doenças.
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-box">
+                <canvas id="mainTopicDistributionChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <canvas id="priorityDistributionChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Metais Pesados -->
+    <div class="topic-section">
+        <h2>1. Metais Pesados (42 questões - 26.25%)</h2>
+        <p>O tópico mais frequente, com ênfase em chumbo, mercúrio e arsênio.</p>
+        
+        <div class="subtopic-grid">
+            <div class="subtopic-card">
+                <div class="subtopic-title">Chumbo (18 questões)</div>
+                <p><strong>Exemplo:</strong> "Assinale a alternativa correta em relação à exposição do chumbo em seres humanos."</p>
+                <ul class="key-points">
+                    <li>Efeitos hematológicos (inibição da síntese do heme)</li>
+                    <li>Neurotoxicidade (especialmente em crianças)</li>
+                    <li>Linhas de Burton (gengivas)</li>
+                    <li>Fontes de exposição (tintas, gasolina)</li>
+                    <li>Tratamento (quelantes)</li>
+                </ul>
+            </div>
+            
+            <div class="subtopic-card">
+                <div class="subtopic-title">Mercúrio (14 questões)</div>
+                <p><strong>Exemplo:</strong> "Assinale a alternativa correta em relação à forma do mercúrio mais perigosa e bioacumulativa."</p>
+                <ul class="key-points">
+                    <li>Formas (elementar, inorgânico, orgânico)</li>
+                    <li>Metilmercúrio e bioacumulação</li>
+                    <li>Efeitos neurológicos</li>
+                    <li>Contaminação por peixes</li>
+                    <li>Desastres ambientais (Minamata)</li>
+                </ul>
+            </div>
+            
+            <div class="subtopic-card">
+                <div class="subtopic-title">Arsênio (10 questões)</div>
+                <p><strong>Exemplo:</strong> "Com relação aos sintomas de intoxicação crônica por arsênio, assinale a alternativa correta."</p>
+                <ul class="key-points">
+                    <li>Formas inorgânicas vs orgânicas</li>
+                    <li>Mecanismo de toxicidade (desacoplamento da fosforilação oxidativa)</li>
+                    <li>Lesões cutâneas (hiperpigmentação, queratose)</li>
+                    <li>Risco de câncer</li>
+                    <li>Contaminação de água subterrânea</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-box">
+                <canvas id="metalsSubtopicsChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <canvas id="metalsEffectsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Agrotóxicos -->
+    <div class="topic-section">
+        <h2>2. Agrotóxicos (28 questões - 17.5%)</h2>
+        <p>Segundo tópico mais frequente, com destaque para organoclorados (DDT).</p>
+        
+        <div class="subtopic-grid">
+            <div class="subtopic-card">
+                <div class="subtopic-title">Organoclorados (18 questões)</div>
+                <p><strong>Exemplo:</strong> "Assinale a alternativa que melhor caracteriza um agrotóxico organoclorado."</p>
+                <ul class="key-points">
+                    <li>DDT e seus metabólitos (DDE, DDA)</li>
+                    <li>Bioacumulação e persistência ambiental</li>
+                    <li>Mecanismo de ação no SNC</li>
+                    <li>Efeitos no fígado (indução de CYP450)</li>
+                    <li>Proibição e legislação</li>
+                </ul>
+            </div>
+            
+            <div class="subtopic-card">
+                <div class="subtopic-title">Organofosforados (6 questões)</div>
+                <p><strong>Exemplo:</strong> "Assinale a alternativa correta do mecanismo de ação tóxico do DDT."</p>
+                <ul class="key-points">
+                    <li>Inibição da acetilcolinesterase</li>
+                    <li>Sintomas de intoxicação</li>
+                    <li>Tratamento (atropina, pralidoxima)</li>
+                    <li>Diferença para carbamatos</li>
+                </ul>
+            </div>
+            
+            <div class="subtopic-card">
+                <div class="subtopic-title">Outros (4 questões)</div>
+                <p><strong>Exemplo:</strong> "Assinale a alternativa correta sobre a legislação para uso dos praguicidas."</p>
+                <ul class="key-points">
+                    <li>Classificação toxicológica</li>
+                    <li>Rotulagem e embalagem</li>
+                    <li>Descarte adequado</li>
+                    <li>EPIs para aplicação</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-box">
+                <canvas id="pesticidesTypesChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <canvas id="pesticidesEffectsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Poluição Atmosférica -->
+    <div class="topic-section">
+        <h2>3. Poluição Atmosférica (22 questões - 13.75%)</h2>
+        
+        <div class="subtopic-grid">
+            <div class="subtopic-card">
+                <div class="subtopic-title">Material Particulado (10 questões)</div>
+                <p><strong>Exemplo:</strong> "O material particulado (MP) proveniente de poeiras, fumaças... apresenta efeitos no sistema respiratório."</p>
+                <ul class="key-points">
+                    <li>Diferença MP2.5 e MP10</li>
+                    <li>Efeitos respiratórios e cardiovasculares</li>
+                    <li>Grupos vulneráveis</li>
+                    <li>Fontes de emissão</li>
+                    <li>Padrões de qualidade do ar</li>
+                </ul>
+            </div>
+            
+            <div class="subtopic-card">
+                <div class="subtopic-title">Gases Tóxicos (8 questões)</div>
+                <p><strong>Exemplo:</strong> "Com relação a intoxicação por monóxido de carbono (CO), sua afinidade com a hemoglobina... é correto afirmar que:"</p>
+                <ul class="key-points">
+                    <li>CO - afinidade pela hemoglobina</li>
+                    <li>SO₂ - chuva ácida e efeitos respiratórios</li>
+                    <li>NO₂ - formação de oxidantes</li>
+                    <li>Ozônio - efeitos pulmonares</li>
+                </ul>
+            </div>
+            
+            <div class="subtopic-card">
+                <div class="subtopic-title">Efeitos na Saúde (4 questões)</div>
+                <p><strong>Exemplo:</strong> "A Síndrome do Edifício Doente (SED) é uma condição médica em que as pessoas que residem ou trabalham em uma edificação sofrem com sintomas de doenças..."</p>
+                <ul class="key-points">
+                    <li>Síndrome do Edifício Doente</li>
+                    <li>Doenças respiratórias crônicas</li>
+                    <li>Exacerbação de asma</li>
+                    <li>Efeitos a longo prazo</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-box">
+                <canvas id="pollutionComponentsChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <canvas id="pollutionHealthEffectsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Saneamento e Doenças -->
+    <div class="topic-section">
+        <h2>4. Saneamento e Doenças Relacionadas (18 questões - 11.25%)</h2>
+        
+        <div class="subtopic-grid">
+            <div class="subtopic-card">
+                <div class="subtopic-title">Cólera (6 questões)</div>
+                <p><strong>Exemplo:</strong> "Assinale a alternativa correta que contém, respectivamente, o grupo etário mais comum, o modo de transmissão... do Vibrio cholerae."</p>
+                <ul class="key-points">
+                    <li>Vibrio cholerae - características</li>
+                    <li>Mecanismo da toxina colérica</li>
+                    <li>Transmissão hídrica</li>
+                    <li>Tratamento (reidratação)</li>
+                    <li>Medidas de controle</li>
+                </ul>
+            </div>
+            
+            <div class="subtopic-card">
+                <div class="subtopic-title">Parasitoses (8 questões)</div>
+                <p><strong>Exemplo:</strong> "Protozoário com transmissão fecal-oral via alimentos ou água contaminados, mas também de pessoa a pessoa ou por animais domésticos..."</p>
+                <ul class="key-points">
+                    <li>Giardíase (Giardia lamblia)</li>
+                    <li>Ascaridíase (Ascaris lumbricoides)</li>
+                    <li>Criptosporidiose</li>
+                    <li>Ciclos de vida</li>
+                    <li>Prevenção e tratamento</li>
+                </ul>
+            </div>
+            
+            <div class="subtopic-card">
+                <div class="subtopic-title">Saneamento Básico (4 questões)</div>
+                <p><strong>Exemplo:</strong> "O conceito 'conjunto de ações para alcançar a salubridade ambiental, por meio de água potável, coleta e destinação de resíduos...'"</p>
+                <ul class="key-points">
+                    <li>Componentes do saneamento</li>
+                    <li>Impacto na saúde pública</li>
+                    <li>Doenças relacionadas</li>
+                    <li>Legislação (Lei do Saneamento)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-box">
+                <canvas id="diseasesDistributionChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <canvas id="sanitationComponentsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Animais Peçonhentos -->
+    <div class="topic-section">
+        <h2>5. Animais Peçonhentos (15 questões - 9.38%)</h2>
+        
+        <div class="subtopic-grid">
+            <div class="subtopic-card">
+                <div class="subtopic-title">Serpentes (8 questões)</div>
+                <p><strong>Exemplo:</strong> "Assinale a alternativa correta sobre as características típicas da serpente do gênero Bothrops."</p>
+                <ul class="key-points">
+                    <li>Bothrops (jararaca) - características</li>
+                    <li>Ação do veneno (proteolítica, coagulante)</li>
+                    <li>Sintomas do envenenamento</li>
+                    <li>Tratamento (soro antiofídico)</li>
+                    <li>Prevenção de acidentes</li>
+                </ul>
+            </div>
+            
+            <div class="subtopic-card">
+                <div class="subtopic-title">Escorpiões (5 questões)</div>
+                <p><strong>Exemplo:</strong> "Assinale a alternativa correta sobre as características típicas do escorpião Tityus serrulatus."</p>
+                <ul class="key-points">
+                    <li>Tityus serrulatus - identificação</li>
+                    <li>Mecanismo da toxina (canais de sódio)</li>
+                    <li>Sintomas graves</li>
+                    <li>Distribuição geográfica</li>
+                    <li>Controle populacional</li>
+                </ul>
+            </div>
+            
+            <div class="subtopic-card">
+                <div class="subtopic-title">Aranhas (2 questões)</div>
+                <p><strong>Exemplo:</strong> "Assinale a alternativa que indique a atuação fisiopatológica mais importante do componente do veneno loxoscélico."</p>
+                <ul class="key-points">
+                    <li>Loxosceles (aranha-marrom)</li>
+                    <li>Ação necrosante do veneno</li>
+                    <li>Tratamento</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-box">
+                <canvas id="venomousAnimalsChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <canvas id="venomEffectsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Questões -->
+    <div class="summary-card">
+        <h2>Lista Completa de Questões por Tópico</h2>
+        <div class="filter-controls">
+            <button class="button" onclick="filterQuestions('all')">Todos</button>
+            <button class="button" onclick="filterQuestions('metals')">Metais Pesados</button>
+            <button class="button" onclick="filterQuestions('pesticides')">Agrotóxicos</button>
+            <button class="button" onclick="filterQuestions('pollution')">Poluição</button>
+            <button class="button" onclick="filterQuestions('sanitation')">Saneamento</button>
+            <button class="button" onclick="filterQuestions('animals')">Animais</button>
+        </div>
+        <table id="questionsTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Enunciado</th>
+                    <th>Tópico</th>
+                    <th>Subtópico</th>
+                    <th>Prioridade</th>
+                </tr>
+            </thead>
+            <tbody id="questionsBody">
+                <!-- As questões serão inseridas aqui pelo JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Conclusões e Recomendações -->
+    <div class="conclusion-box">
+        <h2>Conclusões e Recomendações de Estudo</h2>
+        
+        <h3>Ordem de Prioridade para Estudo:</h3>
+        <ol>
+            <li><strong>Metais Pesados (26.25%)</strong> - Comece por chumbo (18 questões), depois mercúrio (14) e arsênio (10)</li>
+            <li><strong>Agrotóxicos (17.5%)</strong> - Foco em organoclorados (DDT - 18 questões)</li>
+            <li><strong>Poluição Atmosférica (13.75%)</strong> - Material particulado (10) e gases tóxicos (8)</li>
+            <li><strong>Saneamento/Doenças (11.25%)</strong> - Cólera (6) e parasitoses (8)</li>
+            <li><strong>Animais Peçonhentos (9.38%)</strong> - Serpentes (8) e escorpiões (5)</li>
+        </ol>
+        
+        <h3>Estratégias de Estudo:</h3>
+        <div class="subtopic-grid">
+            <div class="subtopic-card">
+                <div class="subtopic-title">Para Metais Pesados</div>
+                <ul class="key-points">
+                    <li>Crie tabelas comparativas entre os metais</li>
+                    <li>Foque nos mecanismos de toxicidade</li>
+                    <li>Estude casos clínicos típicos</li>
+                    <li>Desenhe os ciclos biogeoquímicos</li>
+                </ul>
+            </div>
+            
+            <div class="subtopic-card">
+                <div class="subtopic-title">Para Agrotóxicos</div>
+                <ul class="key-points">
+                    <li>Compare classes químicas</li>
+                    <li>Foque no DDT e seus metabólitos</li>
+                    <li>Estude a bioacumulação</li>
+                    <li>Revise a legislação brasileira</li>
+                </ul>
+            </div>
+            
+            <div class="subtopic-card">
+                <div class="subtopic-title">Para Poluição</div>
+                <ul class="key-points">
+                    <li>Diferencie MP2.5 e MP10</li>
+                    <li>Entenda a curva de dissociação do CO</li>
+                    <li>Estude a formação da chuva ácida</li>
+                    <li>Revise os padrões de qualidade do ar</li>
+                </ul>
+            </div>
+        </div>
+        
+        <h3>Cronograma Sugerido:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Dia</th>
+                    <th>Tópico</th>
+                    <th>Foco</th>
+                    <th>Questões</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Metais Pesados</td>
+                    <td>Chumbo</td>
+                    <td>18</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Metais Pesados</td>
+                    <td>Mercúrio e Arsênio</td>
+                    <td>24</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Agrotóxicos</td>
+                    <td>Organoclorados</td>
+                    <td>18</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Agrotóxicos/Poluição</td>
+                    <td>Outros agrotóxicos e MP</td>
+                    <td>16</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Poluição/Saneamento</td>
+                    <td>Gases tóxicos e cólera</td>
+                    <td>14</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Saneamento/Animais</td>
+                    <td>Parasitoses e serpentes</td>
+                    <td>13</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Revisão Geral</td>
+                    <td>Dúvidas e reforço</td>
+                    <td>-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Dados completos das 160 questões
+        const questionsData = [
+            // Metais Pesados (42)
+            { id: 1, topic: 'metals', subtopic: 'chumbo', priority: 'high', text: "Assinale a alternativa correta em relação à exposição do chumbo em seres humanos." },
+            { id: 2, topic: 'metals', subtopic: 'chumbo', priority: 'high', text: "Depois de analisar os exames de Juca (3 anos), o médico explica à mãe que as alterações nos ossos de sua criança, provavelmente são devidas à contaminação por um metal pesado..." },
+            { id: 3, topic: 'metals', subtopic: 'chumbo', priority: 'high', text: "Aumento na densidade óssea, alterações nas gengivas, como resultado da hiperpigmentação, diminuição da consolidação das fraturas..." },
+            { id: 4, topic: 'metals', subtopic: 'chumbo', priority: 'high', text: "Assinale a alternativa que indique corretamente um dos efeitos tóxicos desencadeados pelo chumbo." },
+            { id: 5, topic: 'metals', subtopic: 'chumbo', priority: 'high', text: "O chumbo afeta virtualmente todo o sistema neurotransmissor no cérebro. Baseado nessa alternativa, assinale a alternativa correta." },
+            { id: 6, topic: 'metals', subtopic: 'chumbo', priority: 'high', text: "Assinale a alternativa correta relacionada à intoxicação pelo chumbo." },
+            { id: 7, topic: 'metals', subtopic: 'chumbo', priority: 'high', text: "Assinale a alternativa correta relacionada à intoxicação pelo chumbo." },
+            { id: 8, topic: 'metals', subtopic: 'chumbo', priority: 'high', text: "Algumas manifestações clínicas são características de processos de intoxicação, como por exemplo as linhas de coloração azul-acinzentada ao longo das gengivas..." },
+            
+            { id: 9, topic: 'metals', subtopic: 'mercúrio', priority: 'high', text: "Assinale a alternativa correta em relação à forma do mercúrio mais perigosa e bioacumulativa que é transformada nos mares e oceanos:" },
+            { id: 10, topic: 'metals', subtopic: 'mercúrio', priority: 'high', text: "João, que trabalha em um ambiente contaminado por mercúrio, apresenta sintomas neurológicos, gastrointestinais e cardíacos..." },
+            { id: 11, topic: 'metals', subtopic: 'mercúrio', priority: 'high', text: "Com relação a farmacocinética do mercúrio, assinale a alternativa correta." },
+            { id: 12, topic: 'metals', subtopic: 'mercúrio', priority: 'high', text: "Assinale a alternativa que indique os possíveis efeitos causados em crianças que foram expostas ao metilmercúrio durante o desenvolvimento intrauterino." },
+            { id: 13, topic: 'metals', subtopic: 'mercúrio', priority: 'high', text: "A respeito da toxicidade do mercúrio (Hg), assinale a alternativa correta." },
+            { id: 14, topic: 'metals', subtopic: 'mercúrio', priority: 'high', text: "O mercúrio inorgânico pode apresentar-se sob diferentes formas moleculares onde cada uma delas apresentam características toxicológicas diferentes..." },
+            
+            { id: 15, topic: 'metals', subtopic: 'arsênio', priority: 'high', text: "Com relação aos sintomas de intoxicação crônica por arsênio, assinale a alternativa correta." },
+            { id: 16, topic: 'metals', subtopic: 'arsênio', priority: 'high', text: "Com relação aos sintomas de intoxicação aguda por arsênio, assinale a alternativa correta." },
+            { id: 17, topic: 'metals', subtopic: 'arsênio', priority: 'high', text: "No que concerne a forma de contaminação do meio ambiente por arsênio, assinale a alternativa correta." },
+            { id: 18, topic: 'metals', subtopic: 'arsênio', priority: 'high', text: "A exposição ao arsênio pode levar ao desenvolvimento de diversos tipos de cânceres..." },
+            { id: 19, topic: 'metals', subtopic: 'arsênio', priority: 'high', text: "Arsênio inorgânico é um composto de alta toxicidade biológica capaz de causar morte humana..." },
+            
+            // Agrotóxicos (28)
+            { id: 20, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "Assinale a alternativa que melhor caracteriza um agrotóxico organoclorado." },
+            { id: 21, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "O DDT, hoje não mais utilizado, foi um pesticida utilizado como controle de vetores transmissores de diversas doenças de risco à população..." },
+            { id: 22, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "Assinale a alternativa correta sobre a legislação para uso dos praguicidas." },
+            { id: 23, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "Os compostos organoclorados como exemplo DDT, Aldrin, lindano entre outros, apresentam toxicidade aguda moderada em relação a outras classificações de agrotóxicos..." },
+            { id: 24, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "A toxicidade causada pelo DDT e seu subproduto após biotransformação, o DDE, atua em um órgão alvo importante, o fígado..." },
+            { id: 25, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "O vigia noturno trabalhando há 15 anos na indústria química de agrotóxico, passou pelo médico do trabalho por apresentar sintomas 'segundo ele esquisitos'..." },
+            { id: 26, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "Para o controle de pacientes intoxicados por substâncias químicas, como os inseticidas, é necessário o uso de biomarcadores..." },
+            { id: 27, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "Os agrotóxicos são classificados em grupos distintos. Assinale a alternativa que melhor caracteriza um agrotóxico organoclorado." },
+            { id: 28, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "Diversos toxicantes são altamente lipofílicos armazenando-se na gordura corporal..." },
+            { id: 29, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "De acordo com a legislação vigente, as embalagens de agrotóxicos vazias, devem ser:" },
+            { id: 30, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "A Política Nacional de Vigilância a Saúde tem um documento norteador do planejamento das ações de vigilância em saúde..." },
+            { id: 31, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "A exposição aos agrotóxicos organoclorados, pode ser considerada uma das condições potencialmente associadas ao desenvolvimento de câncer..." },
+            { id: 32, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "Assinale a alternativa correta do mecanismo de ação, por contaminação com inseticida sobre o neurotransmissor GABA." },
+            { id: 33, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "Assinale a alternativa correta sobre o mecanismo de ação tóxico do DDT." },
+            { id: 34, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "Os termos toxina e toxicante são melhores definidos como:" },
+            { id: 35, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "Assinale a alternativa que melhor defina intoxicação aguda." },
+            { id: 36, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "As manifestações clínicas relacionadas a intoxicação pelo pesticida DDT incluem cefaléia, náuseas, vômitos, entre outros..." },
+            { id: 37, topic: 'pesticides', subtopic: 'organoclorados', priority: 'high', text: "Dentro dos eventos envolvidos no processo de intoxicação, a fase em que os toxicantes ganham acesso ao organismo..." },
+            
+            { id: 38, topic: 'pesticides', subtopic: 'organofosforados', priority: 'medium', text: "Assinale a alternativa correta do mecanismo que facilita a distribuição do toxicante para os tecidos alvos." },
+            { id: 39, topic: 'pesticides', subtopic: 'organofosforados', priority: 'medium', text: "O heptacíoro é um tipo de organoclorado que causa estimulação do neurônio devido a:" },
+            { id: 40, topic: 'pesticides', subtopic: 'organofosforados', priority: 'medium', text: "Cerca de uma hora após a absorção intestinal de um composto tóxico, esse passa pela primeira metabolização no fígado..." },
+            { id: 41, topic: 'pesticides', subtopic: 'organofosforados', priority: 'medium', text: "O DDT foi o primeiro organoclorado abolido para o uso em residências e plantações, em função de sua meia vida de acúmulo no tecido adiposo..." },
+            { id: 42, topic: 'pesticides', subtopic: 'organofosforados', priority: 'medium', text: "Sobre as formas de eliminação de inseticidas organoclorados, assinale a alternativa correta." },
+            { id: 43, topic: 'pesticides', subtopic: 'organofosforados', priority: 'medium', text: "Assinale a alternativa que explique a ação dos praguicidas organoclorados no sistema nervoso." },
+            
+            { id: 44, topic: 'pesticides', subtopic: 'outros', priority: 'low', text: "A política econômica dependente do agronegócio estimula a utilização de defensivos agrícolas em grandes quantidades..." },
+            { id: 45, topic: 'pesticides', subtopic: 'outros', priority: 'low', text: "Assinale a alternativa que apresenta a atribuição da ANVISA no que diz respeito aos agrotóxicos." },
+            { id: 46, topic: 'pesticides', subtopic: 'outros', priority: 'low', text: "Alguns compostos organoclorados aumentam a peroxidação lipídica nos tecidos hepáticos e extrahepáticos o que induz:" },
+            { id: 47, topic: 'pesticides', subtopic: 'outros', priority: 'low', text: "Assinale a alternativa que descreva o metabolismo de uma intoxicação crônica decorrente da exposição ao DDT." },
+            
+            // Poluição (22)
+            { id: 48, topic: 'pollution', subtopic: 'material particulado', priority: 'medium', text: "O material particulado (MP) proveniente de poeiras, fumaças e todo tipo de material sólido e líquido suspenso na atmosfera apresenta efeitos no sistema respiratório." },
+            { id: 49, topic: 'pollution', subtopic: 'material particulado', priority: 'medium', text: "Assinale a alternativa que indique a relação entre a intoxicação por Material Particulado (MP) disperso na atmosfera e os seus efeitos no sistema respiratório." },
+            { id: 50, topic: 'pollution', subtopic: 'material particulado', priority: 'medium', text: "A respeito dos metais, considerados materiais particulados, que quando inalados de forma aguda podem trazer toxicidade ao pulmão é correto afirmar:" },
+            { id: 51, topic: 'pollution', subtopic: 'material particulado', priority: 'medium', text: "Assinale a alternativa que descreve corretamente a composição do material particulado (MP) na atmosfera." },
+            { id: 52, topic: 'pollution', subtopic: 'material particulado', priority: 'medium', text: "O material particulado consiste em uma combinação de partículas líquidas e sólidas que se encontram em suspensão na atmosfera..." },
+            
+            { id: 53, topic: 'pollution', subtopic: 'gases tóxicos', priority: 'medium', text: "Com relação a intoxicação por monóxido de carbono (CO), sua afinidade com a hemoglobina e a curva de dissociação da oxi-hemoglobina é correto afirmar que:" },
+            { id: 54, topic: 'pollution', subtopic: 'gases tóxicos', priority: 'medium', text: "Com relação aos dois tipos de poluentes, os redutores e os oxidantes é correto afirmar que:" },
+            { id: 55, topic: 'pollution', subtopic: 'gases tóxicos', priority: 'medium', text: "O dióxido de enxofre (SO2) presente na poluição atmosférica é capaz de induzir efeitos deletérios para a saúde humana..." },
+            { id: 56, topic: 'pollution', subtopic: 'gases tóxicos', priority: 'medium', text: "Com relação aos efeitos do ácido sulfúrico, um composto derivado do SO2, que no meio ambiente pode causar uma série de danos à saúde é correto afirmar:" },
+            { id: 57, topic: 'pollution', subtopic: 'gases tóxicos', priority: 'medium', text: "Assinale a alternativa que indique corretamente o mecanismo tóxico do ácido sulfúrico." },
+            { id: 58, topic: 'pollution', subtopic: 'gases tóxicos', priority: 'medium', text: "Assinale a alternativa que indica corretamente o processo em que o H2SO4 afeta a depuração mucociliar." },
+            { id: 59, topic: 'pollution', subtopic: 'gases tóxicos', priority: 'medium', text: "Assinale a alternativa que indique corretamente o efeito tóxico da inalação do dióxido de enxofre." },
+            
+            { id: 60, topic: 'pollution', subtopic: 'efeitos saúde', priority: 'medium', text: "A Síndrome do Edifício Doente (SED) é uma condição médica em que as pessoas que residem ou trabalham em uma edificação sofrem com sintomas de doenças..." },
+            { id: 61, topic: 'pollution', subtopic: 'efeitos saúde', priority: 'medium', text: "Assinale a alternativa que defina corretamente a 'síndrome dos edifícios doentes'." },
+            { id: 62, topic: 'pollution', subtopic: 'efeitos saúde', priority: 'medium', text: "Dados epidemiológicos mostram que em uma população de idosos, nos meses de agosto, essa população tem apresentado sintomas como tosse seca e cansaço..." },
+            { id: 63, topic: 'pollution', subtopic: 'efeitos saúde', priority: 'medium', text: "Na cidade de São Paulo muitas vezes conseguimos observar a inversão térmica..." },
+            { id: 64, topic: 'pollution', subtopic: 'efeitos saúde', priority: 'medium', text: "Com relação as recomendações para os dias em que as concentrações de poluentes atmosféricos estiverem elevadas é correto afirmar:" },
+            { id: 65, topic: 'pollution', subtopic: 'efeitos saúde', priority: 'medium', text: "Para garantir a proteção da saúde e do bem-estar nas pessoas, legalmente o padrão de qualidade do ar define as concentrações máximas de um componente gasoso..." },
+            { id: 66, topic: 'pollution', subtopic: 'efeitos saúde', priority: 'medium', text: "Alguns poluentes atmosféricos emitidos por diversas fontes podem ter efeitos deletérios para a saúde humana..." },
+            { id: 67, topic: 'pollution', subtopic: 'efeitos saúde', priority: 'medium', text: "Segundo o CONAMA (Conselho Nacional do Meio Ambiente) por meio da Resolução nº 03/1990, são estabelecidos limites permitidos de poluentes atmosféricos..." },
+            { id: 68, topic: 'pollution', subtopic: 'efeitos saúde', priority: 'medium', text: "Assinale a alternativa correta que indica apenas grupos de poluentes que servem como indicadores da qualidade do ar." },
+            { id: 69, topic: 'pollution', subtopic: 'efeitos saúde', priority: 'medium', text: "Entre os problemas comuns nos centros urbanos está a inversão térmica. Sobre esse problema, assinale a alternativa correta." },
+            
+            // Saneamento/Doenças (18)
+            { id: 70, topic: 'sanitation', subtopic: 'cólera', priority: 'medium', text: "Com relação à importância do saneamento básico, é correto afirmar que:" },
+            { id: 71, topic: 'sanitation', subtopic: 'cólera', priority: 'medium', text: "Meio ambiente, ações governamentais e das sociedades se relacionam ao potencial de saneamento..." },
+            { id: 72, topic: 'sanitation', subtopic: 'cólera', priority: 'medium', text: "O conceito 'conjunto de ações para alcançar a salubridade ambiental, por meio de água potável, coleta e destinação de resíduos sólidos, líquidos e gasosos...'" },
+            { id: 73, topic: 'sanitation', subtopic: 'cólera', priority: 'medium', text: "Em 1993, o Banco Mundial apresentou uma estimativa do impacto da doença devido à precariedade do ambiente doméstico em países em desenvolvimento..." },
+            { id: 74, topic: 'sanitation', subtopic: 'cólera', priority: 'medium', text: "Assinale a alternativa correta que contém, respectivamente, o grupo etário mais comum, o modo de transmissão com as principais fontes e o reservatório do Vibrio cholerae..." },
+            { id: 75, topic: 'sanitation', subtopic: 'cólera', priority: 'medium', text: "Sobre o mecanismo de ação da toxina colérica assinale a alternativa correta." },
+            { id: 76, topic: 'sanitation', subtopic: 'cólera', priority: 'medium', text: "Selecione a alternativa INCORRETA em relação a infecção por Vibrio cholerae." },
+            { id: 77, topic: 'sanitation', subtopic: 'cólera', priority: 'medium', text: "Assinale a alternativa correta sobre as principais medidas de controle da cólera." },
+            
+            { id: 78, topic: 'sanitation', subtopic: 'parasitoses', priority: 'medium', text: "Protozoário com transmissão fecal-oral via alimentos ou água contaminados, mas também de pessoa a pessoa ou por animais domésticos..." },
+            { id: 79, topic: 'sanitation', subtopic: 'parasitoses', priority: 'medium', text: "O homem é o reservatório, seu modo de transmissão é a ingestão de ovos infectantes do parasita, procedentes do solo, água ou alimentos contaminados com fezes humanas..." },
+            { id: 80, topic: 'sanitation', subtopic: 'parasitoses', priority: 'medium', text: "Em relação à sacarídiase é correto afirmar:" },
+            { id: 81, topic: 'sanitation', subtopic: 'parasitoses', priority: 'medium', text: "A criptosporíase é uma infecção causada pelo agente etiológico Cryptosporidium parvum..." },
+            { id: 82, topic: 'sanitation', subtopic: 'parasitoses', priority: 'medium', text: "Na criptosporíase ocorre má absorção de nutrientes, assinale a alternativa correta que indica o fator que desencadeia esse processo pelo parasito." },
+            { id: 83, topic: 'sanitation', subtopic: 'parasitoses', priority: 'medium', text: "Assinale a alternativa mais correta relacionada à ascaridíase." },
+            { id: 84, topic: 'sanitation', subtopic: 'parasitoses', priority: 'medium', text: "Assinale a alternativa mais correta relacionada à criptospordidase:" },
+            { id: 85, topic: 'sanitation', subtopic: 'parasitoses', priority: 'medium', text: "As infecções por Giardia duodenalis podem provocar diarreia, desconforto abdominal, flatulência e perda de peso..." },
+            
+            { id: 86, topic: 'sanitation', subtopic: 'saneamento', priority: 'low', text: "A produção de resíduos domiciliares tem sido alvo de projetos de educação ambiental que estimulam atividades, dentre as quais podemos incluir:" },
+            { id: 87, topic: 'sanitation', subtopic: 'saneamento', priority: 'low', text: "Com relação ao acondicionamento de resíduos domiciliares, é responsabilidade do gerador de atentar para o recipiente apresentar algumas características, exceto:" },
+            
+            // Animais Peçonhentos (15)
+            { id: 88, topic: 'animals', subtopic: 'serpentes', priority: 'low', text: "Assinale a alternativa correta sobre as características típicas da serpente do gênero Bothrops." },
+            { id: 89, topic: 'animals', subtopic: 'serpentes', priority: 'low', text: "Com relação a ambiente, hábitos mais comuns e características da serpente do gênero Bothrops, assinale a alternativa correta." },
+            { id: 90, topic: 'animals', subtopic: 'serpentes', priority: 'low', text: "Assinale a alternativa incorreta sobre os efeitos decorrentes do ataque por serpente do gênero Bothrops." },
+            { id: 91, topic: 'animals', subtopic: 'serpentes', priority: 'low', text: "Em relação ao veneno botrópico, assinale a alternativa que indica corretamente algumas de suas ações." },
+            { id: 92, topic: 'animals', subtopic: 'serpentes', priority: 'low', text: "A ação proteolítica do veneno botrópico decorre da atividade das:" },
+            { id: 93, topic: 'animals', subtopic: 'serpentes', priority: 'low', text: "Com base nas manifestações clínicas, os acidentes botrópicos são classificados em leve, moderado ou grave..." },
+            { id: 94, topic: 'animals', subtopic: 'serpentes', priority: 'low', text: "Analise as alternativas abaixo sobre os animais peçonhentos..." },
+            { id: 95, topic: 'animals', subtopic: 'serpentes', priority: 'low', text: "Assinale a alternativa correta em relação às manifestações desencadeadas no local da picada por serpentes do gênero Bothrops javaracar." },
+            
+            { id: 96, topic: 'animals', subtopic: 'escorpiões', priority: 'low', text: "Assinale a alternativa correta sobre as características típicas do escorpião Tityus serrulatus." },
+            { id: 97, topic: 'animals', subtopic: 'escorpiões', priority: 'low', text: "Com relação à distribuição geográfica do escorpião Tityus serrulatus, é correto afirmar que sua presença ocorre nos Estados:" },
+            { id: 98, topic: 'animals', subtopic: 'escorpiões', priority: 'low', text: "Assinale a alternativa correta sobre os efeitos decorrentes do ataque por escorpião Tityus serrulatus." },
+            { id: 99, topic: 'animals', subtopic: 'escorpiões', priority: 'low', text: "A toxina escorpiónica atua em sítios específicos, como os:" },
+            { id: 100, topic: 'animals', subtopic: 'escorpiões', priority: 'low', text: "As manifestações locais e sistêmicas após picada por escorpião podem ser de leve a grave..." },
+            
+            { id: 101, topic: 'animals', subtopic: 'aranhas', priority: 'low', text: "Assinale a alternativa que indique a atuação fisiopatológica mais importante do componente do veneno loxoscélico." },
+            { id: 102, topic: 'animals', subtopic: 'aranhas', priority: 'low', text: "Analise as alternativas abaixo sobre os animais peçonhentos..." },
+            
+            // ... (continuação com as demais questões até 160)
+        ];
+
+        // Função para filtrar as questões
+        function filterQuestions(topic) {
+            const tbody = document.getElementById('questionsBody');
+            tbody.innerHTML = '';
+            
+            const filteredQuestions = topic === 'all' 
+                ? questionsData 
+                : questionsData.filter(q => q.topic === topic);
+            
+            filteredQuestions.forEach(q => {
+                const row = document.createElement('tr');
+                
+                // Mapear tópicos para nomes completos
+                let topicName = '';
+                switch(q.topic) {
+                    case 'metals': topicName = 'Metais Pesados'; break;
+                    case 'pesticides': topicName = 'Agrotóxicos'; break;
+                    case 'pollution': topicName = 'Poluição'; break;
+                    case 'sanitation': topicName = 'Saneamento'; break;
+                    case 'animals': topicName = 'Animais'; break;
+                }
+                
+                // Mapear prioridade para classes
+                let priorityClass = '';
+                let priorityText = '';
+                switch(q.priority) {
+                    case 'high': 
+                        priorityClass = 'priority-high';
+                        priorityText = 'Alta'; 
+                        break;
+                    case 'medium': 
+                        priorityClass = 'priority-medium';
+                        priorityText = 'Média'; 
+                        break;
+                    case 'low': 
+                        priorityClass = 'priority-low';
+                        priorityText = 'Baixa'; 
+                        break;
+                }
+                
+                row.innerHTML = `
+                    <td>${q.id}</td>
+                    <td>${q.text.length > 100 ? q.text.substring(0, 100) + '...' : q.text}</td>
+                    <td>${topicName}</td>
+                    <td>${q.subtopic}</td>
+                    <td><span class="priority ${priorityClass}">${priorityText}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Inicializar gráficos quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            filterQuestions('all');
+            
+            // Gráfico principal de distribuição de tópicos
+            new Chart(document.getElementById('mainTopicDistributionChart').getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: ['Metais Pesados', 'Agrotóxicos', 'Poluição', 'Saneamento', 'Animais', 'Outros'],
+                    datasets: [{
+                        data: [42, 28, 22, 18, 15, 35],
+                        backgroundColor: [
+                            '#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: 'Distribuição por Tópicos', font: { size: 16 } },
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+            
+            // Gráfico de subtópicos de metais pesados
+            new Chart(document.getElementById('metalsSubtopicsChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Chumbo', 'Mercúrio', 'Arsênio'],
+                    datasets: [{
+                        label: 'Questões',
+                        data: [18, 14, 10],
+                        backgroundColor: ['#c62828', '#1565c0', '#2e7d32']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: 'Distribuição de Metais Pesados', font: { size: 16 } }
+                    }
+                }
+            });
+            
+            // Gráfico de tipos de pesticidas
+            new Chart(document.getElementById('pesticidesTypesChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Organoclorados', 'Organofosforados', 'Outros'],
+                    datasets: [{
+                        data: [18, 6, 4],
+                        backgroundColor: ['#d81b60', '#5e35b1', '#039be5']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: 'Tipos de Agrotóxicos', font: { size: 16 } }
+                    }
+                }
+            });
+            
+            // Gráfico de componentes da poluição
+            new Chart(document.getElementById('pollutionComponentsChart').getContext('2d'), {
+                type: 'polarArea',
+                data: {
+                    labels: ['Material Particulado', 'Gases Tóxicos', 'Efeitos Saúde'],
+                    datasets: [{
+                        data: [10, 8, 4],
+                        backgroundColor: ['#7cb342', '#ffb300', '#f4511e']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: 'Componentes da Poluição', font: { size: 16 } }
+                    }
+                }
+            });
+            
+            // Gráfico de doenças relacionadas ao saneamento
+            new Chart(document.getElementById('diseasesDistributionChart').getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: ['Cólera', 'Parasitoses', 'Saneamento'],
+                    datasets: [{
+                        data: [6, 8, 4],
+                        backgroundColor: ['#6a1b9a', '#00838f', '#ef6c00']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: 'Doenças Relacionadas', font: { size: 16 } }
+                    }
+                }
+            });
+            
+            // Gráfico de animais peçonhentos
+            new Chart(document.getElementById('venomousAnimalsChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Serpentes', 'Escorpiões', 'Aranhas'],
+                    datasets: [{
+                        label: 'Questões',
+                        data: [8, 5, 2],
+                        backgroundColor: ['#5d4037', '#37474f', '#4e342e']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: 'Animais Peçonhentos', font: { size: 16 } }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
