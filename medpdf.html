@@ -1,0 +1,3382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Med.PDF - Analisador de Provas Médicas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3498db;
+            --primary-hover: #2980b9;
+            --danger: #e74c3c;
+            --danger-hover: #c0392b;
+            --success: #2ecc71;
+            --success-hover: #27ae60;
+            --warning: #f39c12;
+            --warning-hover: #d35400;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --gray: #95a5a6;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: var(--dark);
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+        
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: var(--success-hover);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: var(--danger-hover);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: var(--warning-hover);
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        input[type="text"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        input[type="text"]:focus,
+        input[type="file"]:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .filter-item {
+            display: inline-flex;
+            align-items: center;
+            background: var(--danger);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .filter-item button {
+            background: none;
+            border: none;
+            color: white;
+            margin-left: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 0 5px;
+        }
+        
+        .filter-item button:hover {
+            color: var(--light);
+        }
+        
+        #filtersList {
+            margin: 15px 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .term-card {
+            background: white;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .term-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .term-name {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .term-count {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            border-radius: 5px;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .results-section {
+            display: none;
+        }
+        
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .tab:hover:not(.active) {
+            border-bottom: 3px solid var(--light);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+            }
+            
+            .tab-container {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Estilos para as tabs internas de tipos de termos */
+        .term-type-content {
+            display: none;
+        }
+
+        .term-type-content.active {
+            display: block;
+        }
+
+        .empty-state {
+            padding: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        .empty-state i {
+    font-size: 3rem;
+    color: #dee2e6;
+    margin-bottom: 15px;
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+        .error {
+            color: #e74c3c;
+            padding: 15px;
+        }
+
+        /* Estilo para o botão de filtro */
+        .btn-filter {
+            background-color: #e74c3c !important;
+            color: white !important;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 14px;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-filter:hover {
+            background-color: #c0392b !important;
+            transform: scale(1.1);
+        }
+
+        /* Estilos para os gráficos */
+        .chart-container {
+            position: relative;
+            margin: 30px 0;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .chart-container h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        /* Estilos para termos compostos */
+        .term-compound {
+            color: #2c3e50;
+            font-weight: 700;
+        }
+        
+        .compound-tag {
+            font-size: 0.7rem;
+            background: #7f8c8d;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+        
+        .term-simple {
+            color: #7f8c8d;
+        }
+
+        .term-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        /* Estilos para filtros recolhíveis */
+        .filters-container {
+            margin: 15px 0;
+        }
+        
+        .filters-toggle {
+            background-color: var(--gray);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        
+        .filters-toggle:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .filters-toggle i {
+            margin-left: 5px;
+            transition: transform 0.3s ease;
+        }
+        
+        .filters-toggle.collapsed i {
+            transform: rotate(-90deg);
+        }
+        
+        #filtersList {
+            display: none;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        #filtersList.visible {
+            display: flex;
+        }
+
+        /* Estilos para diferentes tipos de termos */
+        .term-single {
+            border-left: 4px solid #3498db;
+        }
+
+        .term-pair {
+            border-left: 4px solid #2ecc71;
+        }
+
+        .term-triple {
+            border-left: 4px solid #f39c12;
+        }
+
+        .term-quad {
+            border-left: 4px solid #9b59b6;
+        }
+
+        /* Estilos para o cabeçalho do termo */
+        .term-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .term-rank {
+            background-color: var(--primary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .term-content {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.term-content:hover {
+    background-color: rgba(52, 152, 219, 0.05);
+}
+
+.term-content.no-questions {
+    animation: shake 0.5s;
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-3px); }
+    40%, 80% { transform: translateX(3px); }
+}
+
+        .term-main {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .term-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .term-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-term-action {
+            background-color: var(--light);
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-term-action:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+.term-rank-1 {
+    border-left-color: #f1c40f;
+    background-color: rgba(241, 196, 15, 0.03);
+}
+
+.term-rank-2 {
+    border-left-color: #95a5a6;
+    background-color: rgba(149, 165, 166, 0.03);
+}
+
+.term-rank-3 {
+    border-left-color: #e67e22;
+    background-color: rgba(230, 126, 34, 0.03);
+}
+
+        /* Estilos para o modal/popup */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            transition: color 0.2s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+        }
+
+        .questions-list {
+            list-style-type: none;
+        }
+
+        .question-item {
+    display: flex;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+        .question-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+.question-text {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.question-context {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.question-context p {
+    margin: 5px 0 0;
+}
+
+.question-context strong {
+    color: #e74c3c;
+}
+
+/* Estilo para as questões */
+.question-container {
+    margin-bottom: 25px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    background: white;
+}
+
+.question-enunciation {
+    font-weight: 500;
+    margin-bottom: 15px;
+    line-height: 1.5;
+    color: #212529;
+}
+
+.question-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.question-option {
+    padding: 8px 12px;
+    border-left: 3px solid #e9ecef;
+    background-color: #f8f9fa;
+    border-radius: 0 4px 4px 0;
+}
+
+.question-option.correct {
+    border-left-color: #28a745;
+    background-color: #e6f7eb;
+}
+
+        .question-source {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .no-questions {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+        }
+
+        
+.no-questions i {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: #bdc3c7;
+}
+    
+.questions-container {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.questions-stats {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.questions-stats p {
+    margin: 0;
+    color: #2c3e50;
+}
+
+.questions-stats strong {
+    color: #e74c3c;
+    font-size: 1.2em;
+}
+
+.question-source-group {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.source-header {
+    background: #e9ecef;
+    padding: 10px 15px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.source-header i {
+    margin-right: 10px;
+    color: #d63384;
+}
+
+.source-header small {
+    margin-left: auto;
+    color: #95a5a6;
+    font-weight: normal;
+}
+
+.source-questions-list {
+    display: grid;
+    gap: 15px;
+}
+
+
+.question-index {
+    font-weight: bold;
+    margin-right: 10px;
+    color: #0d6efd;
+}
+
+.question-content {
+    flex: 1;
+}
+
+
+
+.context-label {
+    font-size: 0.8em;
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+.context-text {
+    color: #555;
+    line-height: 1.4;
+}
+
+
+
+.no-questions h4 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.no-questions p {
+    margin-bottom: 5px;
+}
+
+.no-questions small {
+    display: block;
+    margin-top: 10px;
+}
+
+
+.question-file-header {
+    background: #f8f9fa;
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin: 20px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+}
+
+.question-list {
+    margin-bottom: 30px;
+}
+
+.question-block {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.question-enunciado {
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.question-alternativas {
+    margin: 10px 0 15px 20px;
+}
+
+.alt {
+    padding: 5px 10px;
+    background: #f1f8fe;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.btn-context {
+    margin-top: 10px;
+    background: #ecf0f1 !important;
+    color: #7f8c8d !important;
+}
+
+.full-question-context pre {
+    white-space: pre-wrap;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+
+
+/* Melhoria para acessibilidade */
+.tab:focus-visible {
+    outline: 2px solid #0066cc;
+    outline-offset: 2px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Estilos para o modal de questões */
+#questionsModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+#questionsModal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-questions-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+#questionsModal.active .modal-questions-content {
+    transform: translateY(0);
+}
+
+/* Estilos para os diferentes estados */
+.loading-questions {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+
+.no-questions.error i {
+    color: #dc3545;
+}
+
+/* Estilos para o conteúdo das questões */
+
+
+
+
+
+
+/* Estilos para os termos melhorados */
+.term-card {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.term-header {
+    padding: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s ease;
+}
+
+.term-header:hover {
+    background: #f8f9fa;
+}
+
+.term-rank-badge {
+    width: 40px;
+    height: 40px;
+    background: #3498db;
+    color: white;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.rank-number {
+    font-weight: bold;
+    font-size: 1.1em;
+    line-height: 1;
+}
+
+.rank-label {
+    font-size: 0.6em;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+.term-main-content {
+    flex-grow: 1;
+}
+
+.term-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.term-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 0.85em;
+    color: #7f8c8d;
+}
+
+.term-meta i {
+    margin-right: 3px;
+}
+
+.progress-bar-container {
+    height: 6px;
+    background: #ecf0f1;
+    border-radius: 3px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.progress-bar {
+    height: 100%;
+    background: #3498db;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.term-actions {
+    display: flex;
+    border-top: 1px solid #eee;
+    padding: 10px 15px;
+    gap: 8px;
+}
+
+.btn-term-action {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    background: #f8f9fa;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.btn-term-action:hover {
+    background: #e9ecef;
+}
+
+.btn-term-action i {
+    font-size: 0.9em;
+}
+
+.has-questions .term-header {
+    background: #f8f9fa;
+}
+
+.no-questions-feedback {
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-3px); }
+    40%, 80% { transform: translateX(3px); }
+}
+
+/* Cores para rankings */
+.term-rank-1 .term-rank-badge { background: #e74c3c; }
+.term-rank-2 .term-rank-badge { background: #e67e22; }
+.term-rank-3 .term-rank-badge { background: #f39c12; }
+.term-rank-1 .progress-bar { background: #e74c3c; }
+.term-rank-2 .progress-bar { background: #e67e22; }
+.term-rank-3 .progress-bar { background: #f39c12; }
+
+
+/* Estilos para a aba de questões */
+#questionsResults {
+    padding: 20px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.empty-message {
+    text-align: center;
+    color: #666;
+    padding: 40px 20px;
+    font-size: 1.1em;
+}
+
+.questions-header {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.questions-header h3 {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+}
+
+.search-term {
+    background-color: #e3f2fd;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.questions-stats {
+    font-size: 0.9em;
+    color: #7f8c8d;
+}
+
+.question-source-group {
+    margin-bottom: 30px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.source-header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+}
+
+.source-header i {
+    margin-right: 10px;
+}
+
+.source-header small {
+    margin-left: auto;
+    opacity: 0.8;
+}
+
+.source-questions {
+    padding: 15px;
+}
+
+.question-item {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed #eee;
+}
+
+.question-item:last-child {
+    border-bottom: none;
+}
+
+.formatted-question {
+    background-color: white;
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.question-number {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.question-statement {
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.question-alternatives {
+    margin-left: 20px;
+}
+
+.question-alt {
+    margin-bottom: 8px;
+    display: flex;
+}
+
+.alt-marker {
+    font-weight: bold;
+    margin-right: 8px;
+    color: #3498db;
+}
+
+.question-source {
+    font-size: 0.8em;
+    color: #95a5a6;
+    margin-top: 10px;
+    text-align: right;
+}
+
+.highlight-term {
+    background-color: #fffde7;
+    padding: 0 2px;
+    border-radius: 2px;
+    font-weight: bold;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .source-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .source-header small {
+        margin-left: 0;
+        margin-top: 5px;
+    }
+}
+
+
+
+
+
+.highlight-term {
+    background-color: #fff3cd;
+    padding: 0 2px;
+    border-radius: 3px;
+}
+
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-warning {
+    background: #ffc107;
+    color: #212529
+}
+
+
+/* Estilo para os termos destacados */
+.search-highlight {
+    background-color: #fff3cd;
+    padding: 0 2px;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    font-weight: bold;
+}
+
+/* Estilo para o contexto nos resultados */
+.search-context {
+    color: #6c757d;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.search-context .highlight {
+    background-color: #ffeeba;
+}
+
+/* Estilo para a lista de resultados */
+.search-results {
+    list-style: none;
+    padding: 0;
+}
+
+.search-result-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+}
+
+.search-result-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Estilo para as estatísticas de busca */
+.search-stats {
+    color: #6c757d;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+}
+
+
+.sentence-text {
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.sentence-context {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+.sentence-context small {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #495057;
+}
+
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Med.PDF &copy; 2025</h1>
+        <p class="subtitle">Analisador de Provas</p>
+    </header>
+    
+    <div class="card">
+        <h2 class="card-title">Configuração da Análise</h2>
+        
+        <div class="input-group">
+            <label for="pdfInput">Carregar 1 ou + Provas (PDF)</label>
+            <input type="file" id="pdfInput" multiple accept=".pdf">
+        </div>
+        
+        <div class="input-group">
+            <label for="filterWords">Filtrar Palavras Irrelevantes</label>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="filterWords" placeholder="Digite uma palavra para ignorar">
+                <button id="addFilter" class="btn btn-success">Adicionar</button>
+            </div>
+            <div class="filters-container">
+                <div class="filters-toggle" onclick="toggleFilters()">
+                    Mostrar Filtros <i>▼</i>
+                </div>
+                <div id="filtersList"></div>
+            </div>
+        </div>
+        
+        <button id="analyzeButton" class="btn btn-primary" style="margin-top: 15px; width: 100%; padding: 12px;">
+            Analisar Provas
+        </button>
+    </div>
+    
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Processando seus arquivos...</p>
+        <div class="progress-container">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+        <p id="progressText">0% concluído</p>
+    </div>
+    
+    <div id="results" class="results-section">
+        <div class="tab-container">
+            <div class="tab active" onclick="switchTab('terms')">Termos Frequentes</div>
+            <div class="tab" onclick="switchTab('chart')">Gráficos</div>
+            <div class="tab" onclick="switchTab('questions')">Questões</div>
+        </div>
+        
+        <div id="terms" class="tab-content active">
+            <div class="card">
+                <h2 class="card-title">Termos Mais Frequentes</h2>
+                
+                <!-- Tabs de tipos de termos -->
+                <div class="tab-container">
+                    <div class="tab term-type-tab active" data-term-type="single" onclick="switchTermType('single')">1 Palavra</div>
+                    <div class="tab term-type-tab" data-term-type="pair" onclick="switchTermType('pair')">2 Palavras</div>
+                    <div class="tab term-type-tab" data-term-type="triple" onclick="switchTermType('triple')">3 Palavras</div>
+                    <div class="tab term-type-tab" data-term-type="quad" onclick="switchTermType('quad')">4 Palavras</div>
+                </div>
+                
+                <!-- Containers para cada tipo de termo -->
+                <div id="termResults">
+                    <div id="singleTerms" class="term-type-content active">
+                        <div class="term-list" id="singleTermList"></div>
+                    </div>
+                    <div id="pairTerms" class="term-type-content">
+                        <div class="term-list" id="pairTermList"></div>
+                    </div>
+                    <div id="tripleTerms" class="term-type-content">
+                        <div class="term-list" id="tripleTermList"></div>
+                    </div>
+                    <div id="quadTerms" class="term-type-content">
+                        <div class="term-list" id="quadTermList"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="export-buttons" style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="copyToClipboard()" class="btn btn-primary">
+                    Copiar Resultados
+                </button>
+                <button onclick="clearResults()" class="btn btn-danger">
+                    Limpar Análise
+                </button>
+            </div>
+        </div>
+        
+        <div id="chart" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">Distribuição de Tópicos</h2>
+                <div class="chart-container">
+                    <div class="chart-wrapper">
+                        <canvas id="chartCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="questions" class="tab-content" aria-hidden="true">
+            <div class="card">
+                <h2 class="card-title">Questões Relacionadas</h2>
+                <div id="questionsResults">
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <p>Selecione algum termo frequente para visualizar as questões relacionadas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    <footer>
+        <p>Med.PDF &copy; 2025 - Ferramenta para auxílio em estudos </p>
+        <p style="margin-top: 5px;">Desenvolvido por estudantes - UNICID</p>
+    </footer>
+</div>
+
+
+<script>
+    // Configuração do PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
+    
+    // Variáveis globais
+    let filterList = ['paciente', 'caso', 'tratamento', 'como', 'quando', 'para', 'mais', 'sobre', 'tem', 'pode'];
+    let analysisResults = [];
+    let allQuestions = [];
+    let allText = '';
+    let chartInstance = null;
+    let filesData = [];
+    let termQuestionsMap = {}; // Mapeamento de termos para questões
+    
+
+    // Lista de termos médicos compostos comuns
+    const medicalCompounds = [
+        'hipertensão arterial', 'diabetes mellitus', 'insuficiência cardíaca',
+        'síndrome metabólica', 'doença pulmonar obstrutiva crônica',
+        'infarto agudo do miocárdio', 'acidente vascular cerebral',
+        'fratura exposta', 'insuficiência renal crônica',
+        'trombose venosa profunda', 'úlcera péptica', 'cirrose hepática',
+        'artrite reumatoide', 'lúpus eritematoso sistêmico',
+        'esclerose múltipla', 'doença de alzheimer', 'doença de parkinson',
+        'hipertensão portal', 'edema agudo de pulmão', 'choque cardiogênico',
+        'embolia pulmonar', 'sepse grave', 'insuficiência respiratória aguda',
+        'traumatismo cranioencefálico', 'queimadura de terceiro grau',
+        'parada cardiorrespiratória', 'síndrome do desconforto respiratório agudo',
+        'aneurisma da aorta abdominal', 'estenose aórtica',
+        'fibrilação atrial', 'bloqueio atrioventricular',
+        'bronquite crônica', 'carcinoma hepatocelular',
+        'doença de crohn', 'diverticulite aguda',
+        'encefalite viral', 'endocardite infecciosa',
+        'gastrite erosiva', 'glomerulonefrite aguda',
+        'hemorragia digestiva alta', 'hepatite viral aguda',
+        'infecção do trato urinário', 'leucemia mieloide aguda',
+        'mieloma múltiplo', 'neumonia adquirida na comunidade',
+        'pancreatite aguda', 'púrpura trombocitopênica idiopática',
+        'síndrome nefrótica', 'tireoidite de hashimoto',
+        'tuberculose pulmonar', 'úlcera varicosa'
+    ];
+
+    // Palavras comuns para filtrar
+    const commonWords = [
+        'que', 'com', 'dos', 'das', 'uma', 'para', 'por', 'nos', 'nas', 
+        'são', 'ser', 'está', 'sua', 'seu', 'este', 'esta', 'isso', 'como',
+        'mais', 'mas', 'sem', 'ao', 'pelo', 'pela', 'entre', 'após', 'até',
+        'tem', 'pode', 'pela', 'pelo', 'sobre', 'como', 'quando', 'onde',
+        'qual', 'quais', 'quem', 'cujo', 'cuja', 'cujos', 'cujas', 'ou',
+        'e', 'nem', 'também', 'já', 'ainda', 'só', 'apenas', 'até',
+        'mesmo', 'até', 'mesmo', 'talvez', 'assim', 'então', 'logo',
+        'porque', 'pois', 'portanto', 'todavia', 'contudo', 'embora',
+        'conforme', 'segundo', 'consoante', 'quanto', 'quanta', 'quantos',
+        'quantas', 'qualquer', 'quaisquer', 'algum', 'alguma', 'alguns',
+        'algumas', 'nenhum', 'nenhuma', 'nenhuns', 'nenhumas', 'todo',
+        'toda', 'todos', 'todas', 'outro', 'outra', 'outros', 'outras',
+        'muito', 'muita', 'muitos', 'muitas', 'pouco', 'pouca', 'poucos',
+        'poucas', 'certo', 'certa', 'certos', 'certas', 'vário', 'vária',
+        'vários', 'várias', 'qualquer', 'quaisquer', 'tal', 'tais', 'o',
+        'a', 'os', 'as', 'um', 'uns', 'uma', 'umas', 'de', 'do', 'da',
+        'dos', 'das', 'em', 'no', 'na', 'nos', 'nas', 'por', 'pelo', 'pela',
+        'pelos', 'pelas', 'com', 'sem', 'sob', 'sobre', 'trás', 'ante',
+        'após', 'até', 'perante', 'entre', 'para', 'pra', 'pras', 'pro',
+        'pros', 'contra', 'desde', 'durante', 'exceto', 'mediante',
+        'salvo', 'segundo', 'visto', 'afora', 'como', 'conforme', 'que',
+        'se', 'quando', 'enquanto', 'embora', 'conquanto', 'logo', 'pois',
+        'portanto', 'porque', 'porquanto', 'assim', 'então', 'desse',
+        'dessa', 'desses', 'dessas', 'deste', 'desta', 'destes', 'destas',
+        'daquele', 'daquela', 'daqueles', 'daquelas', 'disto', 'disso',
+        'daquilo', 'aqui', 'aí', 'ali', 'lá', 'cá', 'acolá', 'onde',
+        'aonde', 'quando', 'quanto', 'quão', 'como', 'porque', 'porquanto',
+        'qual', 'quais', 'quem', 'cujo', 'cuja', 'cujos', 'cujas', 'que',
+        'se', 'qualquer', 'quaisquer', 'algum', 'alguma', 'alguns',
+        'algumas', 'nenhum', 'nenhuma', 'nenhuns', 'nenhumas', 'todo',
+        'toda', 'todos', 'todas', 'outro', 'outra', 'outros', 'outras',
+        'muito', 'muita', 'muitos', 'muitas', 'pouco', 'pouca', 'poucos',
+        'poucas', 'certo', 'certa', 'certos', 'certas', 'vário', 'vária',
+        'vários', 'várias', 'tal', 'tais', 'quanto', 'quanta', 'quantos',
+        'quantas', 'tanto', 'tanta', 'tantos', 'tantas', 'quão', 'tão',
+        'quase', 'quase', 'já', 'ainda', 'só', 'apenas', 'até', 'mesmo',
+        'até', 'mesmo', 'talvez', 'assim', 'então', 'logo', 'porque',
+        'pois', 'portanto', 'todavia', 'contudo', 'embora', 'conforme',
+        'segundo', 'consoante', 'quanto', 'quanta', 'quantos', 'quantas',
+        'qualquer', 'quaisquer', 'algum', 'alguma', 'alguns', 'algumas',
+        'nenhum', 'nenhuma', 'nenhuns', 'nenhumas', 'todo', 'toda', 'todos',
+        'todas', 'outro', 'outra', 'outros', 'outras', 'muito', 'muita',
+        'muitos', 'muitas', 'pouco', 'pouca', 'poucos', 'poucas', 'certo',
+        'certa', 'certos', 'certas', 'vário', 'vária', 'vários', 'várias',
+        'qualquer', 'quaisquer', 'tal', 'tais', 'o', 'a', 'os', 'as', 'um',
+        'uns', 'uma', 'umas', 'de', 'do', 'da', 'dos', 'das', 'em', 'no',
+        'na', 'nos', 'nas', 'por', 'pelo', 'pela', 'pelos', 'pelas', 'com',
+        'sem', 'sob', 'sobre', 'trás', 'ante', 'após', 'até', 'perante',
+        'entre', 'para', 'pra', 'pras', 'pro', 'pros', 'contra', 'desde',
+        'durante', 'exceto', 'mediante', 'salvo', 'segundo', 'visto', 'afora',
+        'como', 'conforme', 'que', 'se', 'quando', 'enquanto', 'embora',
+        'conquanto', 'logo', 'pois', 'portanto', 'porque', 'porquanto',
+        'assim', 'então', 'desse', 'dessa', 'desses', 'dessas', 'deste',
+        'desta', 'destes', 'destas', 'daquele', 'daquela', 'daqueles',
+        'daquelas', 'disto', 'disso', 'daquilo', 'aqui', 'aí', 'ali', 'lá',
+        'cá', 'acolá', 'onde', 'aonde', 'quando', 'quanto', 'quão', 'como',
+        'porque', 'porquanto', 'qual', 'quais', 'quem', 'cujo', 'cuja',
+        'cujos', 'cujas', 'que', 'se', 'qualquer', 'quaisquer', 'algum',
+        'alguma', 'alguns', 'algumas', 'nenhum', 'nenhuma', 'nenhuns',
+        'nenhumas', 'todo', 'toda', 'todos', 'todas', 'outro', 'outra',
+        'outros', 'outras', 'muito', 'muita', 'muitos', 'muitas', 'pouco',
+        'pouca', 'poucos', 'poucas', 'certo', 'certa', 'certos', 'certas',
+        'vário', 'vária', 'vários', 'várias', 'tal', 'tais', 'quanto',
+        'quanta', 'quantos', 'quantas', 'tanto', 'tanta', 'tantos', 'tantas',
+        'quão', 'tão', 'quase', 'quase', 'já', 'ainda', 'só', 'apenas', 'até',
+        'mesmo', 'até', 'mesmo', 'talvez', 'assim', 'então', 'logo', 'porque',
+        'pois', 'portanto', 'todavia', 'contudo', 'embora', 'conforme',
+        'segundo', 'consoante', 'quanto', 'quanta', 'quantos', 'quantas',
+        'qualquer', 'quaisquer', 'algum', 'alguma', 'alguns', 'algumas',
+        'nenhum', 'nenhuma', 'nenhuns', 'nenhumas', 'todo', 'toda', 'todos',
+        'todas', 'outro', 'outra', 'outros', 'outras', 'muito', 'muita',
+        'muitos', 'muitas', 'pouco', 'pouca', 'poucos', 'poucas', 'certo',
+        'certa', 'certos', 'certas', 'vário', 'vária', 'vários', 'várias',
+        'qualquer', 'quaisquer', 'tal', 'tais'
+    ];
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configura eventos
+        document.getElementById('addFilter').addEventListener('click', addFilter);
+        document.getElementById('analyzeButton').addEventListener('click', analyzePDFs);
+        document.getElementById('filterWords').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addFilter();
+        });
+        
+        // Carrega filtros salvos
+        loadSavedFilters();
+    });
+
+    // Adiciona filtro manual
+    function addFilter() {
+        const input = document.getElementById('filterWords');
+        const word = input.value.trim().toLowerCase();
+        
+        if (word && !filterList.includes(word)) {
+            filterList.push(word);
+            updateFiltersList();
+            input.value = '';
+            saveFilters();
+        }
+    }
+    
+    // Remove filtro
+    function removeFilter(word) {
+        filterList = filterList.filter(w => w !== word);
+        updateFiltersList();
+        saveFilters();
+    }
+    
+    // Atualiza lista de filtros na UI
+    function updateFiltersList() {
+        const filtersDiv = document.getElementById('filtersList');
+        filtersDiv.innerHTML = '';
+        
+        if (filterList.length === 0) {
+            filtersDiv.innerHTML = '<p style="color: var(--gray);">Nenhum filtro adicionado</p>';
+            return;
+        }
+        
+        filterList.forEach(word => {
+            const filterItem = document.createElement('div');
+            filterItem.className = 'filter-item';
+            filterItem.innerHTML = `${word} <button onclick="removeFilter('${word}')">×</button>`;
+            filtersDiv.appendChild(filterItem);
+        });
+    }
+    
+    // Alterna visibilidade dos filtros
+    function toggleFilters() {
+        const filtersList = document.getElementById('filtersList');
+        const toggleBtn = document.querySelector('.filters-toggle');
+        
+        filtersList.classList.toggle('visible');
+        toggleBtn.classList.toggle('collapsed');
+    }
+    
+    // Salva filtros no localStorage
+    function saveFilters() {
+        localStorage.setItem('medpattern_filters', JSON.stringify(filterList));
+    }
+    
+    // Carrega filtros do localStorage
+    function loadSavedFilters() {
+        const savedFilters = localStorage.getItem('medpattern_filters');
+        if (savedFilters) {
+            filterList = JSON.parse(savedFilters);
+            updateFiltersList();
+        }
+    }
+    
+    // Extrai texto de PDF
+    async function extractTextFromPDF(pdfFile, progressCallback) {
+        try {
+            const arrayBuffer = await pdfFile.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+            let fullText = '';
+            
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                fullText += textContent.items.map(item => item.str).join(' ') + ' ';
+                
+                if (progressCallback) {
+                    const progress = Math.round((i / pdf.numPages) * 100);
+                    progressCallback(progress);
+                }
+            }
+            
+            return fullText.toLowerCase();
+        } catch (error) {
+            console.error('Erro ao extrair texto do PDF:', error);
+            throw new Error('Falha ao processar o arquivo PDF. Verifique se o arquivo não está corrompido.');
+        }
+    }
+    
+    // Função para identificar termos médicos compostos
+    function findCompoundTerms(text) {
+        // Primeiro verifica os termos compostos conhecidos
+        const foundCompounds = [];
+        
+        medicalCompounds.forEach(term => {
+            const regex = new RegExp(term, 'gi');
+            const matches = text.match(regex);
+            if (matches && matches.length > 0) {
+                foundCompounds.push(term.toLowerCase());
+            }
+        });
+
+        // Depois procura por padrões de 2-4 palavras médicas juntas
+        const medicalPrefixes = ['hiper', 'hipo', 'endo', 'exo', 'intra', 'inter', 'poli', 'mono'];
+        const medicalSuffixes = ['ite', 'ose', 'emia', 'algia', 'ectomia', 'scopia', 'patia', 'penia'];
+        
+        const compoundRegex = new RegExp(
+            `\\b(?:[a-z]+[ -]){1,3}(?:${medicalSuffixes.join('|')})\\b|` +
+            `\\b(?:${medicalPrefixes.join('|')})[a-z]+(?:[ -][a-z]+){0,2}\\b|` +
+            `\\b[a-z]+(?:[ -][a-z]+){1,3}(?: doença| síndrome| tratamento| teste| terapia)\\b`,
+            'gi'
+        );
+        
+        const matches = text.match(compoundRegex) || [];
+        const allCompounds = [...foundCompounds, ...matches.map(m => m.toLowerCase())];
+        
+        // Filtra resultados
+        return [...new Set(allCompounds)]
+            .filter(term => term.split(/[ -]/).length > 1)
+            .filter(term => !filterList.some(filter => term.includes(filter)))
+            .filter(term => !commonWords.some(word => term.includes(word)))
+            .filter(term => term.length > 5);
+    }
+
+    // Função para extrair grupos de palavras frequentes
+    function findFrequentWordGroups(text) {
+        // Remove pontuação e normaliza espaços
+        const cleanedText = text
+            .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()\[\]"'?<>]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        // Divide em palavras e aplica filtros
+        const words = cleanedText.split(/\s+/)
+            .filter(word => {
+                const lowerWord = word.toLowerCase();
+                return word.length > 3 && 
+                       !/\d/.test(word) && 
+                       !filterList.includes(lowerWord) &&
+                       !commonWords.includes(lowerWord);
+            });
+
+        // Inicializa grupos
+        const groups = {
+            singles: {},
+            pairs: {},
+            triplets: {},
+            quads: {}
+        };
+
+        // Conta palavras simples
+        words.forEach(word => {
+            groups.singles[word] = (groups.singles[word] || 0) + 1;
+        });
+
+        // Conta pares de palavras
+        for (let i = 0; i < words.length - 1; i++) {
+            const pair = `${words[i]} ${words[i+1]}`;
+            if (!filterList.some(f => pair.includes(f))) {
+                groups.pairs[pair] = (groups.pairs[pair] || 0) + 1;
+            }
+        }
+
+        // Conta trios de palavras
+        for (let i = 0; i < words.length - 2; i++) {
+            const triplet = `${words[i]} ${words[i+1]} ${words[i+2]}`;
+            if (!filterList.some(f => triplet.includes(f))) {
+                groups.triplets[triplet] = (groups.triplets[triplet] || 0) + 1;
+            }
+        }
+
+        // Conta quartetos de palavras
+        for (let i = 0; i < words.length - 3; i++) {
+            const quad = `${words[i]} ${words[i+1]} ${words[i+2]} ${words[i+3]}`;
+            if (!filterList.some(f => quad.includes(f))) {
+                groups.quads[quad] = (groups.quads[quad] || 0) + 1;
+            }
+        }
+
+        // Filtra resultados (mínimo 2 ocorrências) e combina
+        const frequentSingles = Object.entries(groups.singles)
+            .filter(([_, count]) => count >= 2)
+            .map(([term, count]) => [term, count]);
+
+        const frequentPairs = Object.entries(groups.pairs)
+            .filter(([_, count]) => count >= 2)
+            .map(([term, count]) => [term, count]);
+
+        const frequentTriplets = Object.entries(groups.triplets)
+            .filter(([_, count]) => count >= 2)
+            .map(([term, count]) => [term, count]);
+
+        const frequentQuads = Object.entries(groups.quads)
+            .filter(([_, count]) => count >= 2)
+            .map(([term, count]) => [term, count]);
+
+        // Combina todos os grupos e ordena por frequência
+        return [
+            ...frequentSingles,
+            ...frequentPairs,
+            ...frequentTriplets,
+            ...frequentQuads
+        ].sort((a, b) => b[1] - a[1]);
+    }
+
+    // Analisa texto e extrai termos médicos
+    function analyzeText(text) {
+        // Extrai questões
+        const questions = text.split('\n')
+            .filter(line => line.trim().endsWith('?'))
+            .map(q => q.trim());
+        
+        // Encontra termos compostos específicos
+        const compoundTerms = findCompoundTerms(text);
+        
+        // Encontra grupos de palavras frequentes
+        const wordGroups = findFrequentWordGroups(text);
+        
+        // Combina todos os termos encontrados
+        const allTerms = {};
+        
+        // Adiciona termos compostos
+        compoundTerms.forEach(term => {
+            const matches = text.match(new RegExp(term, 'gi')) || [];
+            allTerms[term] = (allTerms[term] || 0) + matches.length;
+        });
+        
+        // Adiciona grupos de palavras frequentes
+        wordGroups.forEach(([term, count]) => {
+            allTerms[term] = (allTerms[term] || 0) + count;
+        });
+        
+        // Converte para array, ordena e filtra
+        const sortedTerms = Object.entries(allTerms)
+            .sort((a, b) => b[1] - a[1])
+            .filter(([term, _]) => {
+                // Remove termos simples que são partes de termos compostos
+                if (term.split(/[ -]/).length === 1) {
+                    return !Object.keys(allTerms).some(t => 
+                        t !== term && t.split(/[ -]/).length > 1 && t.includes(term)
+                    );
+                }
+                return true;
+            });
+        
+        return {
+            terms: sortedTerms,
+            questions: questions
+        };
+    }
+
+    // Analisa os PDFs
+    async function analyzePDFs() {
+    const loadingElement = document.getElementById('loading');
+    const resultsElement = document.getElementById('results');
+
+    try {
+        const pdfInput = document.getElementById('pdfInput');
+        const files = Array.from(pdfInput.files);
+
+        if (files.length === 0) {
+            alert('Por favor, selecione pelo menos um arquivo PDF.');
+            return;
+        }
+
+        loadingElement.style.display = 'block';
+        resultsElement.style.display = 'none';
+
+        // Limpa resultados anteriores
+        document.getElementById('questionsResults').innerHTML = `
+            <p class="empty-message">Selecione algum termo frequente para visualizar as questões relacionadas.</p>
+        `;
+
+        // Reseta variáveis globais
+        allText = '';
+        allQuestions = [];
+        filesData = [];
+        termQuestionsMap = {};
+        analysisResults = [];
+
+        // Processa cada arquivo
+        for (const [index, file] of files.entries()) {
+            updateProgressText(`Processando arquivo ${index + 1} de ${files.length}: ${file.name}`);
+            
+            try {
+                const text = await extractTextFromPDF(file, progress => {
+                    updateProgressBar(progress);
+                });
+
+                allText += text + ' ';
+
+                // Extrai questões completas com contexto
+                const questions = extractCompleteQuestionsWithContext(text);
+                
+                allQuestions.push({
+                    fileName: file.name,
+                    questions: questions
+                });
+
+                filesData.push({
+                    name: file.name,
+                    text: text
+                });
+
+            } catch (error) {
+                console.error(`Erro ao processar arquivo ${file.name}:`, error);
+                alert(`Erro no arquivo ${file.name}: ${error.message}`);
+            }
+        }
+
+        // Analisa o texto completo para termos frequentes
+        const results = analyzeText(allText);
+        analysisResults = results.terms;
+
+        // Mapeia termos para questões (versão melhorada)
+        mapTermsToQuestionsEnhanced();
+
+        // Exibe resultados
+        displayResults(results.terms);
+        renderChart(results.terms.slice(0, 15));
+        switchTab('terms');
+
+    } catch (error) {
+        console.error('Erro na análise:', error);
+        alert(`Erro ao analisar PDFs: ${error.message}`);
+    } finally {
+        loadingElement.style.display = 'none';
+        resultsElement.style.display = 'block';
+    }
+}
+
+// Função auxiliar para extrair questões completas com alternativas
+function extractCompleteQuestions(text) {
+    const questionBlocks = [];
+    const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    
+    for (let i = 0; i < lines.length; i++) {
+        // Detecta questões (linhas terminadas com ? ou começando com número)
+        if (lines[i].endsWith('?') || lines[i].match(/^\d+[\.\)]\s/)) {
+            const question = {
+                text: lines[i],
+                alternatives: [],
+                sourceText: lines[i] // Inicia com o enunciado
+            };
+
+            // Captura alternativas (padrão A), B., C), D.)
+            let j = i + 1;
+            while (j < lines.length) {
+                if (lines[j].match(/^[A-D][\.\)]\s/)) {
+                    question.alternatives.push(lines[j]);
+                    question.sourceText += '\n' + lines[j];
+                    j++;
+                } else if (lines[j].match(/^\d+[\.\)]\s/) || lines[j].endsWith('?')) {
+                    break; // Nova questão encontrada
+                } else {
+                    // Adiciona contexto ao enunciado se não for alternativa
+                    question.sourceText += '\n' + lines[j];
+                    j++;
+                }
+            }
+
+            questionBlocks.push(question);
+            i = j - 1; // Avança o índice principal
+        }
+    }
+    return questionBlocks;
+}
+
+    
+/**
+ * Versão melhorada do mapeamento de termos para questões
+ * Considera contexto, sinônimos e variações dos termos
+ */
+ function mapTermsToQuestionsEnhanced() {
+    termQuestionsMap = {};
+    
+    // Verifica se temos dados necessários
+    if (!analysisResults || !filesData || !Array.isArray(allQuestions)) {
+        console.error('mapTermsToQuestionsEnhanced: Dados insuficientes para mapeamento');
+        return;
+    }
+
+    // Para cada termo frequente encontrado
+    analysisResults.forEach(([term, _]) => {
+        // Cria entrada no mapa se não existir
+        if (!termQuestionsMap[term]) {
+            termQuestionsMap[term] = [];
+        }
+
+        // Busca o termo em todas as questões de todos os arquivos
+        allQuestions.forEach(fileQuestions => {
+            fileQuestions.questions.forEach(question => {
+                // Cria regex flexível para o termo
+                const termRegex = createFlexibleTermRegex(term);
+                
+                // Verifica se o termo aparece no enunciado ou alternativas
+                const inStatement = termRegex.test(question.text);
+                const inAlternatives = question.alternatives.some(alt => termRegex.test(alt));
+                
+                if (inStatement || inAlternatives) {
+                    // Verifica se a questão já foi adicionada para este termo
+                    const alreadyAdded = termQuestionsMap[term].some(
+                        q => q.text === question.text && q.source === fileQuestions.fileName
+                    );
+                    
+                    if (!alreadyAdded) {
+                        termQuestionsMap[term].push({
+                            text: question.text,
+                            alternatives: question.alternatives,
+                            source: fileQuestions.fileName,
+                            context: {
+                                before: question.contextBefore,
+                                after: question.contextAfter
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+    // Função auxiliar para criar regex flexível para um termo
+    function createFlexibleTermRegex(term) {
+        // Trata termos compostos
+        if (term.includes(' ')) {
+            const words = term.split(' ');
+            const regexParts = words.map(word => `(?=.*\\b${escapeRegExp(word)}\\b)`);
+            return new RegExp(regexParts.join(''), 'i');
+        }
+        
+        // Para termos simples, permite pluralizações e pequenas variações
+        return new RegExp(`\\b${escapeRegExp(term)}s?\\b`, 'i');
+    }
+}
+
+
+    // Atualiza barra de progresso
+    function updateProgressBar(percent) {
+        const progressBar = document.getElementById('progressBar');
+        progressBar.style.width = percent + '%';
+        document.getElementById('progressText').textContent = percent + '% concluído';
+    }
+    
+    // Atualiza texto de progresso
+    function updateProgressText(text) {
+        document.getElementById('progressText').textContent = text;
+    }
+    
+    // Alterna entre tipos de termos
+    function switchTermType(type) {
+        // Ativa tab selecionada
+        document.querySelectorAll('.term-type-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.termType === type);
+        });
+        
+        // Mostra conteúdo correspondente
+        document.querySelectorAll('.term-type-content').forEach(content => {
+            content.classList.toggle('active', content.id === `${type}Terms`);
+        });
+    }
+
+    function displayResults(results) {
+    const containers = {
+        single: document.getElementById('singleTermList'),
+        pair: document.getElementById('pairTermList'),
+        triple: document.getElementById('tripleTermList'),
+        quad: document.getElementById('quadTermList')
+    };
+
+    // Classifica os resultados por tipo
+    const categorized = {
+        single: results.filter(([term]) => term.split(/[ -]/).length === 1),
+        pair: results.filter(([term]) => term.split(/[ -]/).length === 2),
+        triple: results.filter(([term]) => term.split(/[ -]/).length === 3),
+        quad: results.filter(([term]) => term.split(/[ -]/).length >= 4)
+    };
+
+    // Exibe cada categoria
+    Object.entries(categorized).forEach(([type, terms]) => {
+        if (terms.length > 0) {
+            const maxCount = Math.max(...results.map(([_, count]) => count));
+            displayTermCategoryEnhanced(terms, maxCount, containers[type], type);
+        } else {
+            containers[type].innerHTML = `
+                <div class="empty-state">
+                    <p>Nenhum termo com ${getTermTypeName(type)} encontrado</p>
+                </div>
+            `;
+        }
+    });
+}
+
+/**
+ * Exibe termos categorizados na interface com interações melhoradas
+ * @param {Array} terms - Array de termos [termo, contagem]
+ * @param {number} maxCount - Contagem máxima para normalização
+ * @param {HTMLElement} container - Elemento DOM container
+ * @param {string} type - Tipo de termo ('single', 'pair', 'triple', 'quad')
+ */
+ function displayTermCategoryEnhanced(terms, maxCount, container, type) {
+    // Limpeza inicial do container
+    container.innerHTML = '';
+
+    // Tratamento para lista vazia
+    if (!terms || terms.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-search-minus"></i>
+                <p>Nenhum termo ${getTermTypeName(type)} encontrado</p>
+                <small>Tente ajustar seus filtros ou adicionar mais documentos</small>
+                <button class="btn btn-primary" onclick="analyzePDFs()">
+                    <i class="fas fa-sync-alt"></i> Tentar novamente
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    // Ordenação melhorada (frequência + comprimento + alfabética)
+    terms.sort((a, b) => {
+        const freqDiff = b[1] - a[1];
+        if (freqDiff !== 0) return freqDiff;
+        
+        const lengthDiff = b[0].length - a[0].length;
+        if (lengthDiff !== 0) return lengthDiff;
+        
+        return a[0].localeCompare(b[0]);
+    });
+
+    const fragment = document.createDocumentFragment();
+    const termTypeName = getTermTypeName(type);
+
+    terms.forEach(([term, count], index) => {
+        const ranking = index + 1;
+        const percentage = Math.round((count / maxCount * 100));
+        const wordCount = term.split(/[-\s]/).length;
+        const isCompound = wordCount > 1;
+        const hasQuestions = termQuestionsMap[term]?.length > 0;
+        const termId = `term-${type}-${ranking}`;
+
+        // Criação do elemento do termo
+        const termEl = document.createElement('div');
+        termEl.className = `term-card term-${type} ${isCompound ? 'term-compound' : ''} 
+                           ${hasQuestions ? 'has-questions' : ''} 
+                           term-rank-${Math.min(ranking, 5)}`;
+        termEl.id = termId;
+        termEl.dataset.term = term;
+        termEl.dataset.count = count;
+        termEl.dataset.rank = ranking;
+
+        // Template do termo
+        termEl.innerHTML = `
+            <div class="term-header" role="button" aria-expanded="false" aria-controls="term-details-${termId}">
+                <div class="term-rank-badge">
+                    <span class="rank-number">${ranking}</span>
+                    <span class="rank-label">${ranking === 1 ? 'TOP' : ''}</span>
+                </div>
+                <div class="term-main-content">
+                    <h3 class="term-name">${escapeHtml(term)}</h3>
+                    <div class="term-meta">
+                        <span class="term-count">
+                            <i class="fas fa-file-alt"></i>
+                            ${count} ${count === 1 ? 'ocorrência' : 'ocorrências'}
+                        </span>
+                        ${isCompound ? `
+                        <span class="term-complexity">
+                            <i class="fas fa-layer-group"></i>
+                            ${wordCount} ${wordCount === 1 ? 'palavra' : 'palavras'}
+                        </span>
+                        ` : ''}
+                        <span class="term-percentage">
+                            <i class="fas fa-chart-bar"></i>
+                            ${percentage}% de frequência
+                        </span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${percentage}%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="term-actions">
+                <button class="btn-term-action btn-filter" data-action="filter" data-term="${escapeHtml(term)}">
+                    <i class="fas fa-ban"></i> Filtrar
+                </button>
+                <button class="btn-term-action btn-highlight" data-action="highlight" data-term="${escapeHtml(term)}">
+                    <i class="fas fa-highlighter"></i> Destacar
+                </button>
+                <button class="btn-term-action btn-questions" data-action="show-sentences" data-term="${escapeHtml(term)}">
+                    <i class="fas fa-search"></i> Buscar Frases
+                </button>
+                ${hasQuestions ? `
+                <button class="btn-term-action btn-questions" data-action="show-questions" data-term="${escapeHtml(term)}">
+                    <i class="fas fa-question-circle"></i> Questões
+                </button>
+                ` : ''}
+            </div>
+        `;
+
+        // Event Listeners
+        const header = termEl.querySelector('.term-header');
+        const showSentencesBtn = termEl.querySelector('[data-action="show-sentences"]');
+        const showQuestionsBtn = termEl.querySelector('[data-action="show-questions"]');
+        
+        // Clique no cabeçalho (mostra frases com o termo)
+        header.addEventListener('click', () => {
+            showSentencesWithTerm(term);
+        });
+
+        // Botão de buscar frases
+        showSentencesBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showSentencesWithTerm(term);
+        });
+
+        // Botão de questões (se existir)
+        if (showQuestionsBtn) {
+            showQuestionsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showQuestionsForTermInTab(term);
+            });
+        }
+
+        // Botão de filtro
+        termEl.querySelector('[data-action="filter"]').addEventListener('click', (e) => {
+            e.stopPropagation();
+            addCommonFilter(term);
+            termEl.classList.add('filtered');
+            setTimeout(() => termEl.remove(), 300);
+        });
+
+        // Botão de destacar
+        termEl.querySelector('[data-action="highlight"]').addEventListener('click', (e) => {
+            e.stopPropagation();
+            highlightTermInDocuments(term);
+        });
+
+        // Efeitos de hover
+        termEl.addEventListener('mouseenter', () => {
+            termEl.style.transform = 'translateY(-2px)';
+            termEl.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.1)';
+        });
+
+        termEl.addEventListener('mouseleave', () => {
+            termEl.style.transform = '';
+            termEl.style.boxShadow = '';
+        });
+
+        fragment.appendChild(termEl);
+    });
+
+    container.appendChild(fragment);
+
+    // Animação de entrada
+    const termCards = container.querySelectorAll('.term-card');
+    termCards.forEach((card, i) => {
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, i * 50);
+    });
+}
+
+// Função auxiliar para escape HTML (caso não exista)
+function escapeHtml(unsafe) {
+    return unsafe?.toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;") || '';
+}
+
+/**
+ * Exibe questões relacionadas a um termo em um modal interativo
+ * @param {string} term - O termo para buscar questões relacionadas
+ * @returns {void}
+ */
+ function showQuestionsForTerm(term) {
+    try {
+        // Validação do parâmetro de entrada
+        if (typeof term !== 'string' || !term.trim()) {
+            console.error('showQuestionsForTerm: Termo inválido fornecido');
+            return;
+        }
+
+        // Elementos do DOM
+        const modal = document.getElementById('questionsModal');
+        const modalTermName = document.getElementById('modalTermName');
+        const modalContent = document.getElementById('modalQuestionsContent');
+        
+        // Verifica se os elementos necessários existem
+        if (!modal || !modalTermName || !modalContent) {
+            console.error('showQuestionsForTerm: Elementos do modal não encontrados no DOM');
+            return;
+        }
+
+        // Fecha e reabre o modal suavemente se já estiver aberto
+        const resetModal = () => {
+            if (modal.classList.contains('active')) {
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    modal.classList.add('active');
+                }, 100);
+            } else {
+                modal.classList.add('active');
+            }
+        };
+
+        // Atualiza o título do modal com o termo (com escape para segurança)
+        modalTermName.textContent = term;
+        modalContent.innerHTML = '<div class="loading-questions"><i class="fas fa-spinner fa-spin"></i> Carregando questões...</div>';
+
+        // Verifica se o mapeamento de termos existe
+        if (typeof termQuestionsMap === 'undefined' || termQuestionsMap === null) {
+            modalContent.innerHTML = `
+                <div class="no-questions error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h4>Erro no sistema de busca</h4>
+                    <p>O índice de questões não foi carregado corretamente.</p>
+                    <button onclick="location.reload()" class="btn btn-warning">
+                        <i class="fas fa-sync-alt"></i> Recarregar página
+                    </button>
+                </div>
+            `;
+            resetModal();
+            return;
+        }
+
+        // Verifica se o termo existe no mapeamento
+        if (!termQuestionsMap.hasOwnProperty(term)) {
+            modalContent.innerHTML = `
+                <div class="no-questions">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h4>Termo não encontrado no índice</h4>
+                    <p>O termo "${escapeHtml(term)}" não foi mapeado para nenhuma questão.</p>
+                    <small>Isso pode ocorrer se o termo aparecer apenas no contexto das provas.</small>
+                    <button onclick="searchTermInFullText('${escapeSingleQuotes(term)}')" class="btn btn-secondary">
+                        <i class="fas fa-search"></i> Buscar termo no texto completo
+                    </button>
+                </div>
+            `;
+            resetModal();
+            return;
+        }
+
+        const questions = termQuestionsMap[term];
+        
+        // Valida a estrutura das questões
+        if (!Array.isArray(questions)) {
+            console.error('showQuestionsForTerm: Estrutura de questões inválida para o termo', term);
+            modalContent.innerHTML = `
+                <div class="no-questions error">
+                    <i class="fas fa-database"></i>
+                    <h4>Dados corrompidos</h4>
+                    <p>As questões para este termo estão em um formato inválido.</p>
+                </div>
+            `;
+            resetModal();
+            return;
+        }
+
+        // Caso não haja questões para o termo
+        if (questions.length === 0) {
+            modalContent.innerHTML = `
+                <div class="no-questions">
+                    <i class="fas fa-search-minus"></i>
+                    <h4>Nenhuma questão encontrada</h4>
+                    <p>O termo "${escapeHtml(term)}" não aparece em nenhuma questão direta.</p>
+                    <small>Ele pode estar presente no contexto ou enunciados das provas.</small>
+                    <button onclick="searchTermInFullText('${escapeSingleQuotes(term)}')" class="btn btn-primary">
+                        <i class="fas fa-file-alt"></i> Buscar em todo o texto
+                    </button>
+                </div>
+            `;
+            resetModal();
+            return;
+        }
+
+        // Processamento assíncrono para não bloquear a UI
+        setTimeout(() => {
+            try {
+                // Cria um contêiner para as questões
+                const questionsContainer = document.createElement('div');
+                questionsContainer.className = 'questions-container';
+                
+                // Adiciona estatísticas
+                const statsDiv = document.createElement('div');
+                statsDiv.className = 'questions-stats';
+                statsDiv.innerHTML = `
+                    <p><strong>${questions.length}</strong> ${questions.length === 1 ? 'questão encontrada' : 'questões encontradas'}</p>
+                    <p>Aparece em <strong>${new Set(questions.map(q => q.source)).size}</strong> ${new Set(questions.map(q => q.source)).size === 1 ? 'prova' : 'provas'}</p>
+                `;
+                questionsContainer.appendChild(statsDiv);
+                
+                // Agrupa questões por fonte (nome do arquivo)
+                const questionsBySource = groupQuestionsBySource(questions);
+                
+                // Adiciona questões agrupadas
+                Object.entries(questionsBySource).forEach(([source, sourceQuestions]) => {
+                    const sourceDiv = document.createElement('div');
+                    sourceDiv.className = 'question-source-group';
+                    
+                    const sourceHeader = document.createElement('div');
+                    sourceHeader.className = 'source-header';
+                    sourceHeader.innerHTML = `
+                        <i class="fas fa-file-pdf"></i>
+                        <span>${escapeHtml(source)}</span>
+                        <small>${sourceQuestions.length} ${sourceQuestions.length === 1 ? 'questão' : 'questões'}</small>
+                    `;
+                    sourceDiv.appendChild(sourceHeader);
+                    
+                    const questionsList = document.createElement('div');
+                    questionsList.className = 'source-questions-list';
+                    
+                    sourceQuestions.forEach((q, i) => {
+                        const questionDiv = document.createElement('div');
+                        questionDiv.className = 'question-item';
+                        
+                        // Valida a estrutura da questão
+                        if (!q.text) {
+                            console.warn('Questão sem texto encontrada', q);
+                            return;
+                        }
+                        
+                        questionDiv.innerHTML = `
+                            <div class="question-index">${i + 1}.</div>
+                            <div class="question-content">
+                                <div class="question-text">${highlightTermInText(escapeHtml(q.text), term)}</div>
+                                ${q.context ? `
+                                <div class="question-context">
+                                    <div class="context-label">Contexto:</div>
+                                    <div class="context-text">${highlightTermInText(escapeHtml(q.context), term)}</div>
+                                </div>
+                                ` : ''}
+                            </div>
+                        `;
+                        questionsList.appendChild(questionDiv);
+                    });
+                    
+                    sourceDiv.appendChild(questionsList);
+                    questionsContainer.appendChild(sourceDiv);
+                });
+                
+                modalContent.innerHTML = '';
+                modalContent.appendChild(questionsContainer);
+                
+                // Dispara evento de conclusão
+                const event = new CustomEvent('questionsLoaded', {
+                    detail: { term, count: questions.length }
+                });
+                modal.dispatchEvent(event);
+                
+            } catch (renderError) {
+                console.error('showQuestionsForTerm: Erro ao renderizar questões', renderError);
+                modalContent.innerHTML = `
+                    <div class="no-questions error">
+                        <i class="fas fa-bug"></i>
+                        <h4>Erro ao exibir questões</h4>
+                        <p>Ocorreu um erro inesperado ao processar as questões.</p>
+                        <button onclick="showQuestionsForTerm('${escapeSingleQuotes(term)}')" class="btn btn-warning">
+                            <i class="fas fa-redo"></i> Tentar novamente
+                        </button>
+                    </div>
+                `;
+            }
+            
+            resetModal();
+            
+        }, 50); // Pequeno delay para permitir que a UI responda
+
+        // Configura eventos do modal
+        setupModalEvents(modal, term);
+
+    } catch (error) {
+        console.error('showQuestionsForTerm: Erro inesperado', error);
+        // Fallback básico
+        const modal = document.getElementById('questionsModal');
+        if (modal) {
+            const modalContent = document.getElementById('modalQuestionsContent');
+            if (modalContent) {
+                modalContent.innerHTML = `
+                    <div class="no-questions error">
+                        <i class="fas fa-skull-crossbones"></i>
+                        <h4>Erro crítico</h4>
+                        <p>O sistema encontrou um erro inesperado.</p>
+                        <button onclick="location.reload()" class="btn btn-danger">
+                            <i class="fas fa-radiation"></i> Recarregar aplicação
+                        </button>
+                    </div>
+                `;
+                modal.classList.add('active');
+            }
+        }
+    }
+}
+
+// Funções auxiliares
+function groupQuestionsBySource(questions) {
+    return questions.reduce((acc, question) => {
+        const source = question.source || 'Prova desconhecida';
+        if (!acc[source]) {
+            acc[source] = [];
+        }
+        acc[source].push(question);
+        return acc;
+    }, {});
+}
+
+function highlightTermInText(text, term) {
+    if (!term) return text;
+    const regex = new RegExp(escapeRegExp(term), 'gi');
+    return text.replace(regex, match => `<span class="highlight-term">${match}</span>`);
+}
+
+function escapeHtml(unsafe) {
+    return unsafe?.toString()
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;") || '';
+}
+
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function setupModalEvents(modal, term) {
+    // Remove event listeners antigos para evitar duplicação
+    document.removeEventListener('keydown', handleModalKeyDown);
+    
+    // Fechar com ESC
+    const handleModalKeyDown = (e) => {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+    };
+    
+    document.addEventListener('keydown', handleModalKeyDown);
+    
+    // Fechar ao clicar fora do conteúdo
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+    
+    // Botão de fechar
+    const closeBtn = modal.querySelector('.modal-close');
+    if (closeBtn) {
+        closeBtn.onclick = closeModal;
+    }
+}
+
+function formatQuestion(questionText, highlightTerm) {
+    // Extrai o número da questão
+    const questionMatch = questionText.match(/^(\d+)\.\s+(.*)/);
+    if (!questionMatch) return questionText;
+
+    const questionNumber = questionMatch[1];
+    let questionBody = questionMatch[2];
+    
+    // Destaca o termo buscado
+    if (highlightTerm) {
+        const regex = new RegExp(highlightTerm, 'gi');
+        questionBody = questionBody.replace(regex, match => 
+            `<span class="highlight-term">${match}</span>`
+        );
+    }
+
+    // Formata alternativas (assumindo padrão a., b., c., d.)
+    questionBody = questionBody.replace(/([a-d])\./g, '<br>$1.');
+
+    return `
+        <div class="question-header">
+            <span class="question-number">Questão ${questionNumber}</span>
+        </div>
+        <div class="question-body">${questionBody}</div>
+    `;
+}
+
+    // Fecha o modal
+    function closeModal() {
+        const modal = document.getElementById('questionsModal');
+        modal.classList.remove('active');
+    }
+
+    // Fecha o modal ao clicar fora do conteúdo
+    document.getElementById('questionsModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    // Função auxiliar para escapar aspas simples
+    function escapeSingleQuotes(str) {
+        return str.replace(/'/g, "\\'");
+    }
+
+    // Função auxiliar para obter nome do tipo de termo
+    function getTermTypeName(type) {
+        const typeNames = {
+            'single': '1 palavra',
+            'pair': '2 palavras', 
+            'triple': '3 palavras',
+            'quad': '4 palavras'
+        };
+        return typeNames[type] || '';
+    }
+
+// Função para exibir questões na aba
+function displayQuestions() {
+    const container = document.getElementById('questionsResults');
+    container.innerHTML = '';
+
+    if (allQuestions.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-search-minus"></i>
+                <p>Nenhuma questão encontrada nos PDFs</p>
+                <small>As questões devem terminar com "?" ou começar com número (ex: 1., 2))</small>
+            </div>
+        `;
+        return;
+    }
+
+    // Agrupa questões por arquivo
+    allQuestions.forEach(file => {
+        if (file.questions.length > 0) {
+            const fileHeader = document.createElement('div');
+            fileHeader.className = 'question-file-header';
+            fileHeader.innerHTML = `
+                <i class="fas fa-file-pdf"></i>
+                <span>${file.fileName}</span>
+                <small>${file.questions.length} ${file.questions.length === 1 ? 'questão' : 'questões'}</small>
+            `;
+            container.appendChild(fileHeader);
+
+            const questionsList = document.createElement('div');
+            questionsList.className = 'question-list';
+
+            file.questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-block';
+                questionDiv.innerHTML = `
+                    <div class="question-enunciado">
+                        <span class="question-number">${index + 1}.</span>
+                        ${q.text}
+                    </div>
+                    ${q.alternatives.length > 0 ? `
+                    <div class="question-alternativas">
+                        ${q.alternatives.map(alt => `
+                            <div class="alt">${alt}</div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                    <button onclick="showQuestionContext('${escapeSingleQuotes(q.sourceText)}')" 
+                            class="btn btn-sm btn-context">
+                        <i class="fas fa-expand"></i> Ver contexto completo
+                    </button>
+                `;
+                questionsList.appendChild(questionDiv);
+            });
+
+            container.appendChild(questionsList);
+        }
+    });
+}
+
+// Função para mostrar o contexto completo da questão
+function showQuestionContext(fullText) {
+    const modal = document.getElementById('questionsModal');
+    const modalContent = document.getElementById('modalQuestionsContent');
+    
+    modalContent.innerHTML = `
+        <div class="full-question-context">
+            <pre>${fullText}</pre>
+        </div>
+        <button onclick="closeModal()" class="btn btn-primary">
+            <i class="fas fa-times"></i> Fechar
+        </button>
+    `;
+    
+    document.getElementById('modalTermName').textContent = 'Contexto da Questão';
+    modal.classList.add('active');
+}
+    
+    // Renderiza gráfico principal
+    function renderChart(data) {
+        const ctx = document.getElementById('chartCanvas');
+        if (!ctx) return;
+        
+        // Destrói gráfico anterior se existir
+        if (chartInstance) {
+            chartInstance.destroy();
+            chartInstance = null;
+        }
+        
+        chartInstance = new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: data.map(item => item[0]),
+                datasets: [{
+                    label: 'Frequência nas Provas',
+                    data: data.map(item => item[1]),
+                    backgroundColor: '#3498db',
+                    borderColor: '#2980b9',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Número de Ocorrências'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Termos Médicos'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.parsed.y} ${context.parsed.y === 1 ? 'ocorrência' : 'ocorrências'}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+/**
+ * Alterna entre as abas do sistema de forma segura e eficiente
+ * @param {string} tabId - ID da aba a ser ativada
+ * @returns {void}
+ */
+function switchTab(tabId) {
+    try {
+        // Validação do parâmetro de entrada
+        if (typeof tabId !== 'string' || !tabId.trim()) {
+            console.error('switchTab: ID da aba inválido');
+            return;
+        }
+
+        // Seleciona todos os elementos de aba e conteúdo
+        const allTabs = Array.from(document.querySelectorAll('.tab'));
+        const allTabContents = Array.from(document.querySelectorAll('.tab-content'));
+        
+        // Verifica se existem abas no DOM
+        if (allTabs.length === 0 || allTabContents.length === 0) {
+            console.warn('switchTab: Nenhuma aba ou conteúdo de aba encontrado no DOM');
+            return;
+        }
+
+        // Encontra a aba e conteúdo alvo
+        const targetTab = allTabs.find(tab => {
+            const onclickAttr = tab.getAttribute('onclick');
+            return onclickAttr && onclickAttr.includes(`'${tabId}'`);
+        });
+        
+        const targetContent = document.getElementById(tabId);
+
+        // Verifica se os elementos alvo existem
+        if (!targetTab || !targetContent) {
+            console.warn(`switchTab: Aba com ID '${tabId}' não encontrada`);
+            return;
+        }
+
+        // Remove a classe 'active' de todas as abas e conteúdos
+        allTabs.forEach(tab => {
+            tab.classList.remove('active');
+            tab.setAttribute('aria-selected', 'false');
+        });
+        
+        allTabContents.forEach(content => {
+            content.classList.remove('active');
+            content.setAttribute('aria-hidden', 'true');
+        });
+
+        // Adiciona a classe 'active' aos elementos alvo
+        targetTab.classList.add('active');
+        targetTab.setAttribute('aria-selected', 'true');
+        
+        targetContent.classList.add('active');
+        targetContent.setAttribute('aria-hidden', 'false');
+
+        // Dispara evento customizado para notificar mudança de aba
+        const tabChangedEvent = new CustomEvent('tabChanged', {
+            detail: {
+                tabId: tabId,
+                tabElement: targetTab,
+                contentElement: targetContent
+            }
+        });
+        document.dispatchEvent(tabChangedEvent);
+
+        // Tratamento especial para aba de gráficos
+        if (tabId === 'chart' && typeof chartInstance !== 'undefined' && chartInstance) {
+            try {
+                chartInstance.resize();
+            } catch (chartError) {
+                console.error('switchTab: Erro ao redimensionar gráfico', chartError);
+            }
+        }
+
+        // Tratamento especial para aba de questões
+        if (tabId === 'questions-tab' && !document.querySelector('.no-term-selected')) {
+            const questionsContainer = document.getElementById('questions-container');
+            if (questionsContainer && questionsContainer.children.length === 0) {
+                questionsContainer.innerHTML = `
+                    <div class="no-term-selected">
+                        <p>Selecione algum termo frequente para visualizar as questões relacionadas</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Foco na aba para acessibilidade
+        setTimeout(() => {
+            targetTab.focus();
+        }, 50);
+
+    } catch (error) {
+        console.error('switchTab: Erro inesperado', error);
+    }
+}
+    
+    // Copia resultados para clipboard
+    function copyToClipboard() {
+        if (analysisResults.length === 0) {
+            alert('Nenhum dado para copiar. Execute uma análise primeiro.');
+            return;
+        }
+        
+        let textToCopy = "Termos Mais Frequentes nas Provas:\n\n";
+        analysisResults.forEach(([term, count], index) => {
+            textToCopy += `${index + 1}. ${term}: ${count} ocorrências\n`;
+        });
+        
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert('Resultados copiados para a área de transferência!');
+        }).catch(err => {
+            alert('Erro ao copiar: ' + err);
+        });
+    }
+    
+    // Limpa resultados
+    function clearResults() {
+        analysisResults = [];
+        allQuestions = [];
+        allText = '';
+        filesData = [];
+        termQuestionsMap = {};
+        document.getElementById('singleTermList').innerHTML = '';
+        document.getElementById('pairTermList').innerHTML = '';
+        document.getElementById('tripleTermList').innerHTML = '';
+        document.getElementById('quadTermList').innerHTML = '';
+        document.getElementById('questionsResults').innerHTML = '';
+        document.getElementById('results').style.display = 'none';
+        
+        if (chartInstance) {
+            chartInstance.destroy();
+            chartInstance = null;
+        }
+    }
+    
+    // Adiciona um filtro comum
+    function addCommonFilter(word) {
+        if (!filterList.includes(word)) {
+            filterList.push(word);
+            updateFiltersList();
+            saveFilters();
+        }
+    }
+    
+    // Destaca termo nos documentos (simulação)
+    function highlightTermInDocuments(term) {
+        alert(`Funcionalidade de destaque para "${term}" será implementada em versões futuras.`);
+    }
+    
+/**
+ * Busca um termo em todas as questões extraídas dos PDFs
+ * @param {string} term - Termo a ser buscado nas questões
+ * @param {object} [options] - Opções de busca avançadas
+ * @param {boolean} [options.caseSensitive=false] - Busca sensível a maiúsculas/minúsculas
+ * @param {boolean} [options.exactMatch=false] - Busca por correspondência exata
+ * @param {boolean} [options.wholeWord=false] - Busca por palavra inteira
+ * @param {number} [options.maxResults=0] - Número máximo de resultados (0 = ilimitado)
+ * @param {boolean} [options.includeContext=false] - Inclui contexto ao redor do termo
+ * @param {number} [options.contextChars=100] - Número de caracteres de contexto para incluir
+ * @returns {Array} Array de objetos com questões encontradas e metadados
+ */
+ function searchTermInQuestions(term, options = {}) {
+    // Validação inicial dos parâmetros
+    if (typeof term !== 'string' || term.trim().length === 0) {
+        console.error('searchTermInQuestions: Termo de busca inválido');
+        return [];
+    }
+
+    // Configuração das opções padrão
+    const {
+        caseSensitive = false,
+        exactMatch = false,
+        wholeWord = false,
+        maxResults = 0,
+        includeContext = false,
+        contextChars = 100
+    } = options;
+
+    // Verifica se temos texto combinado para buscar
+    if (typeof combinedText !== 'string' || combinedText.length === 0) {
+        console.warn('searchTermInQuestions: Nenhum texto disponível para busca');
+        return [];
+    }
+
+    try {
+        // Extrai todas as questões (com cache para performance)
+        const allQuestions = extractCompleteQuestions(combinedText);
+        
+        // Se não houver questões, retorna vazio
+        if (!Array.isArray(allQuestions)) {
+            console.error('searchTermInQuestions: Formato inválido de questões extraídas');
+            return [];
+        }
+
+        // Prepara o termo de busca com base nas opções
+        const searchTerm = prepareSearchTerm(term, { caseSensitive, exactMatch, wholeWord });
+        const searchRegex = createSearchRegex(searchTerm, { wholeWord, caseSensitive });
+
+        // Array para armazenar os resultados
+        const matchingQuestions = [];
+        let resultCount = 0;
+
+        // Percorre todas as questões
+        for (const question of allQuestions) {
+            if (typeof question !== 'string') continue;
+
+            // Verifica se a questão contém o termo
+            const matchResult = findMatchesInQuestion(question, searchRegex, {
+                includeContext,
+                contextChars
+            });
+
+            if (matchResult) {
+                matchingQuestions.push({
+                    question: question,
+                    matches: matchResult.matches,
+                    highlighted: matchResult.highlighted,
+                    context: matchResult.context,
+                    score: matchResult.score
+                });
+
+                resultCount++;
+                
+                // Limita os resultados se necessário
+                if (maxResults > 0 && resultCount >= maxResults) {
+                    break;
+                }
+            }
+        }
+
+        // Ordena por relevância (questões com mais ocorrências primeiro)
+        matchingQuestions.sort((a, b) => b.score - a.score);
+
+        return matchingQuestions;
+
+    } catch (error) {
+        console.error('searchTermInQuestions: Erro durante a busca', error);
+        return [];
+    }
+}
+
+// Funções auxiliares ==============================================
+
+/**
+ * Prepara o termo de busca com base nas opções
+ */
+function prepareSearchTerm(term, options) {
+    let processedTerm = term;
+    
+    if (!options.caseSensitive) {
+        processedTerm = processedTerm.toLowerCase();
+    }
+    
+    if (options.exactMatch) {
+        processedTerm = processedTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+    
+    return processedTerm;
+}
+
+/**
+ * Cria a expressão regular para busca
+ */
+function createSearchRegex(searchTerm, options) {
+    let pattern;
+    
+    if (options.wholeWord) {
+        pattern = `\\b${searchTerm}\\b`;
+    } else {
+        pattern = searchTerm;
+    }
+    
+    return new RegExp(pattern, options.caseSensitive ? 'g' : 'gi');
+}
+
+/**
+ * Encontra correspondências em uma questão individual
+ */
+function findMatchesInQuestion(question, searchRegex, options) {
+    const matches = [];
+    let match;
+    let score = 0;
+    
+    // Encontra todas as ocorrências
+    while ((match = searchRegex.exec(question)) !== null) {
+        matches.push({
+            index: match.index,
+            length: match[0].length,
+            text: match[0]
+        });
+        score += 1 + (match[0].length / 10); // Pontuação baseada no comprimento do match
+        
+        // Para regex global, evita loop infinito
+        if (match.index === searchRegex.lastIndex) {
+            searchRegex.lastIndex++;
+        }
+    }
+    
+    // Se não encontrou nada, retorna null
+    if (matches.length === 0) return null;
+    
+    // Prepara o resultado
+    const result = {
+        matches: matches,
+        score: score
+    };
+    
+    // Adiciona destaque se houver matches
+    result.highlighted = highlightMatchesInText(question, matches);
+    
+    // Adiciona contexto se solicitado
+    if (options.includeContext) {
+        result.context = extractMatchContext(question, matches, options.contextChars);
+    }
+    
+    return result;
+}
+
+/**
+ * Destaca os matches no texto da questão
+ */
+function highlightMatchesInText(text, matches) {
+    let highlightedText = '';
+    let lastIndex = 0;
+    
+    // Ordena matches por posição para garantir a ordem correta
+    matches.sort((a, b) => a.index - b.index);
+    
+    for (const match of matches) {
+        // Adiciona texto antes do match
+        highlightedText += text.slice(lastIndex, match.index);
+        
+        // Adiciona o match destacado
+        highlightedText += `<span class="search-highlight">${text.slice(match.index, match.index + match.length)}</span>`;
+        
+        lastIndex = match.index + match.length;
+    }
+    
+    // Adiciona o restante do texto
+    highlightedText += text.slice(lastIndex);
+    
+    return highlightedText;
+}
+
+/**
+ * Extrai contexto ao redor dos matches
+ */
+function extractMatchContext(text, matches, contextChars) {
+    const contextAreas = [];
+    
+    for (const match of matches) {
+        const start = Math.max(0, match.index - contextChars);
+        const end = Math.min(text.length, match.index + match.length + contextChars);
+        
+        let context = '';
+        if (start > 0) context += '...';
+        context += text.slice(start, end);
+        if (end < text.length) context += '...';
+        
+        contextAreas.push({
+            before: text.slice(start, match.index),
+            match: text.slice(match.index, match.index + match.length),
+            after: text.slice(match.index + match.length, end)
+        });
+    }
+    
+    return contextAreas;
+}
+
+/**
+ * Formata uma questão encontrada, destacando o termo buscado e organizando alternativas
+ * @param {Object} questionObj - Objeto contendo a questão e metadados
+ * @param {string} searchTerm - Termo buscado para destacar
+ * @returns {string} HTML formatado da questão
+ */
+ function formatQuestionWithTerm(questionObj, searchTerm) {
+    // Validação dos parâmetros
+    if (!questionObj || !questionObj.text || typeof questionObj.text !== 'string') {
+        console.error('formatQuestionWithTerm: Objeto de questão inválido');
+        return '<div class="question-error">Questão inválida</div>';
+    }
+
+    const { text, alternatives = [], source } = questionObj;
+    const hasAlternatives = alternatives && alternatives.length > 0;
+
+    // Extrai número da questão se existir
+    const questionNumberMatch = text.match(/^(\d+)[.)]\s+/);
+    const questionNumber = questionNumberMatch ? questionNumberMatch[1] : null;
+    const questionBody = questionNumber ? text.replace(/^\d+[.)]\s+/, '') : text;
+
+    // Destaca o termo buscado no enunciado
+    const highlightedBody = highlightTermInText(questionBody, searchTerm);
+
+    // Formata alternativas
+    let alternativesHTML = '';
+    if (hasAlternatives) {
+        alternativesHTML = alternatives.map(alt => {
+            // Extrai marcador de alternativa (A, B, C, D)
+            const altMarkerMatch = alt.match(/^([A-D])[.)]\s+/i);
+            const altMarker = altMarkerMatch ? altMarkerMatch[1].toUpperCase() : '';
+            const altText = altMarker ? alt.replace(/^[A-D][.)]\s+/i, '') : alt;
+            
+            // Destaca termo nas alternativas
+            const highlightedAlt = highlightTermInText(altText, searchTerm);
+            
+            return `
+                <div class="question-alt" data-alt="${altMarker}">
+                    <span class="alt-marker">${altMarker}.</span>
+                    <span class="alt-text">${highlightedAlt}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // HTML final da questão
+    return `
+        <div class="formatted-question" data-source="${source || 'unknown'}">
+            ${questionNumber ? `<div class="question-number">Questão ${questionNumber}</div>` : ''}
+            <div class="question-statement">
+                ${highlightedBody}
+            </div>
+            ${hasAlternatives ? `
+            <div class="question-alternatives">
+                ${alternativesHTML}
+            </div>
+            ` : ''}
+            ${source ? `<div class="question-source">Fonte: ${source}</div>` : ''}
+        </div>
+    `;
+}
+
+/**
+ * Exibe todas as frases completas que contêm o termo selecionado
+ * @param {string} term - Termo para buscar nas frases
+ */
+ function showSentencesWithTerm(term) {
+    const questionsContainer = document.getElementById('questionsResults');
+    
+    // Mostra estado de carregamento
+    questionsContainer.innerHTML = `
+        <div class="loading-questions">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Buscando frases com o termo: "${escapeHtml(term)}"</p>
+        </div>
+    `;
+    
+    // Rola para a aba de questões
+    switchTab('questions');
+    
+    // Processamento assíncrono para não bloquear a UI
+    setTimeout(() => {
+        try {
+            // Extrai todas as frases completas dos PDFs que contêm o termo
+            const sentences = extractSentencesWithTerm(term);
+            
+            if (sentences.length === 0) {
+                questionsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search-minus"></i>
+                        <p>Nenhuma frase completa encontrada contendo o termo</p>
+                        <strong>"${escapeHtml(term)}"</strong>
+                        <small>Tente usar um termo mais específico ou verifique os filtros</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Agrupa frases por arquivo de origem
+            const sentencesBySource = groupSentencesBySource(sentences);
+            
+            // HTML para os resultados
+            let html = `
+                <div class="questions-header">
+                    <h3>Frases contendo: <span class="search-term">${escapeHtml(term)}</span></h3>
+                    <div class="questions-stats">
+                        ${sentences.length} ${sentences.length === 1 ? 'frase encontrada' : 'frases encontradas'} em 
+                        ${Object.keys(sentencesBySource).length} ${Object.keys(sentencesBySource).length === 1 ? 'arquivo' : 'arquivos'}
+                    </div>
+                </div>
+            `;
+            
+            // Adiciona frases agrupadas por arquivo
+            Object.entries(sentencesBySource).forEach(([source, sourceSentences]) => {
+                html += `
+                    <div class="question-source-group">
+                        <div class="source-header">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>${escapeHtml(source)}</span>
+                            <small>${sourceSentences.length} ${sourceSentences.length === 1 ? 'frase' : 'frases'}</small>
+                        </div>
+                        <div class="source-questions">
+                            ${sourceSentences.map((sentence, idx) => `
+                                <div class="question-item">
+                                    <div class="formatted-question">
+                                        <div class="sentence-text">
+                                            ${highlightTermInText(escapeHtml(sentence.text), term)}
+                                        </div>
+                                        ${sentence.context ? `
+                                        <div class="sentence-context">
+                                            <small>Contexto:</small>
+                                            <p>${highlightTermInText(escapeHtml(sentence.context), term)}</p>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            questionsContainer.innerHTML = html;
+            
+        } catch (error) {
+            console.error('Erro ao buscar frases:', error);
+            questionsContainer.innerHTML = `
+                <div class="empty-state error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Ocorreu um erro ao buscar frases com o termo</p>
+                    <strong>"${escapeHtml(term)}"</strong>
+                    <button onclick="showSentencesWithTerm('${escapeSingleQuotes(term)}')" class="btn btn-warning">
+                        <i class="fas fa-redo"></i> Tentar novamente
+                    </button>
+                </div>
+            `;
+        }
+    }, 100);
+}
+
+
+/**
+ * Extrai frases completas que contêm um termo específico
+ * @param {string} term - Termo para buscar
+ * @returns {Array} Array de frases com metadados
+ */
+ function extractSentencesWithTerm(term) {
+    if (!filesData || filesData.length === 0) return [];
+    
+    const sentences = [];
+    const termRegex = new RegExp(escapeRegExp(term), 'gi');
+    
+    filesData.forEach(file => {
+        // Divide o texto em frases (considerando pontuação)
+        const fileSentences = file.text.split(/(?<=[.!?])\s+/);
+        
+        fileSentences.forEach(sentence => {
+            if (termRegex.test(sentence)) {
+                sentences.push({
+                    text: sentence.trim(),
+                    source: file.name,
+                    // Pega um pouco de contexto (frases antes e depois)
+                    context: getSentenceContext(fileSentences, sentence)
+                });
+                
+                // Reseta o estado do regex para buscas subsequentes
+                termRegex.lastIndex = 0;
+            }
+        });
+    });
+    
+    return sentences;
+}
+
+function getSentenceContext(sentences, targetSentence, contextSize = 1) {
+    const index = sentences.indexOf(targetSentence);
+    if (index === -1) return '';
+    
+    const start = Math.max(0, index - contextSize);
+    const end = Math.min(sentences.length - 1, index + contextSize);
+    
+    let context = '';
+    if (start !== index) {
+        context += sentences.slice(start, index).join(' ') + ' ';
+    }
+    if (end !== index) {
+        context += sentences.slice(index + 1, end + 1).join(' ');
+    }
+    
+    return context.trim();
+}
+
+/**
+ * Agrupa frases por arquivo de origem
+ */
+function groupSentencesBySource(sentences) {
+    return sentences.reduce((acc, sentence) => {
+        const source = sentence.source || 'Arquivo desconhecido';
+        if (!acc[source]) {
+            acc[source] = [];
+        }
+        acc[source].push(sentence);
+        return acc;
+    }, {});
+}
+
+/**
+ * Extrai questões completas com enunciado e alternativas do texto
+ * @param {string} text - Texto completo do PDF
+ * @returns {Array} Array de objetos com questões formatadas
+ */
+ function extractCompleteQuestionsWithContext(text) {
+    if (!text || typeof text !== 'string') {
+        console.error('extractCompleteQuestionsWithContext: Texto inválido');
+        return [];
+    }
+
+    const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    const questions = [];
+    let currentQuestion = null;
+
+    // Padrões para identificar questões e alternativas
+    const questionPattern = /^(\d+[.)]|Q\d*[:.]?)\s*(.+[?])$/i;
+    const altPattern = /^([A-Da-d][.)]|\([A-Da-d]\))\s+(.+)/;
+    const endPattern = /^([Ee][.)]|\([Ee]\))\s+/; // Alternativa E marca o fim
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        
+        // Verifica se é início de nova questão
+        const isQuestion = questionPattern.test(line);
+        const isAlternative = altPattern.test(line);
+        const isEndAlternative = endPattern.test(line);
+
+        if (isQuestion) {
+            // Se já havia uma questão em andamento, finaliza ela
+            if (currentQuestion) {
+                questions.push(currentQuestion);
+            }
+            
+            // Cria nova questão
+            currentQuestion = {
+                text: line,
+                alternatives: [],
+                contextBefore: i > 0 ? lines.slice(Math.max(0, i-2), i).join('\n') : '',
+                contextAfter: ''
+            };
+        } 
+        else if (currentQuestion) {
+            if (isAlternative || isEndAlternative) {
+                // Adiciona alternativa
+                currentQuestion.alternatives.push(line);
+                
+                // Se for alternativa E, finaliza a questão
+                if (isEndAlternative) {
+                    currentQuestion.contextAfter = lines.slice(i+1, Math.min(lines.length, i+3)).join('\n');
+                    questions.push(currentQuestion);
+                    currentQuestion = null;
+                }
+            } 
+            else if (!currentQuestion.alternatives.length) {
+                // Adiciona ao enunciado se ainda não tiver alternativas
+                currentQuestion.text += '\n' + line;
+            }
+        }
+    }
+
+    // Adiciona a última questão se existir
+    if (currentQuestion) {
+        questions.push(currentQuestion);
+    }
+
+    return questions.map(q => ({
+        ...q,
+        // Remove espaços extras e linhas vazias
+        text: q.text.replace(/\s+/g, ' ').trim(),
+        alternatives: q.alternatives.map(a => a.replace(/\s+/g, ' ').trim())
+    }));
+}
+
+
+</script>
+</body>
+</html>
