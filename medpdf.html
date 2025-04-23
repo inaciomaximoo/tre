@@ -2651,61 +2651,198 @@ function showQuestionContext(fullText) {
 }
     
     // Renderiza gráfico principal
-    function renderChart(data) {
-        const ctx = document.getElementById('chartCanvas');
-        if (!ctx) return;
-        
-        // Destrói gráfico anterior se existir
-        if (chartInstance) {
-            chartInstance.destroy();
-            chartInstance = null;
-        }
-        
-        chartInstance = new Chart(ctx.getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: data.map(item => item[0]),
-                datasets: [{
-                    label: 'Frequência nas Provas',
-                    data: data.map(item => item[1]),
-                    backgroundColor: '#3498db',
-                    borderColor: '#2980b9',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Número de Ocorrências'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Termos Médicos'
-                        }
-                    }
+    /**
+ * Renderiza o gráfico de distribuição de termos com cores vibrantes
+ * @param {Array} data - Array de termos [termo, contagem]
+ */
+function renderChart(data) {
+    const ctx = document.getElementById('chartCanvas');
+    if (!ctx) return;
+    
+    // Destrói gráfico anterior se existir
+    if (chartInstance) {
+        chartInstance.destroy();
+        chartInstance = null;
+    }
+    
+    // Paleta de cores vibrantes
+    const backgroundColors = [
+        'rgba(255, 99, 132, 0.7)',
+        'rgba(54, 162, 235, 0.7)',
+        'rgba(255, 206, 86, 0.7)',
+        'rgba(75, 192, 192, 0.7)',
+        'rgba(153, 102, 255, 0.7)',
+        'rgba(255, 159, 64, 0.7)',
+        'rgba(199, 199, 199, 0.7)',
+        'rgba(83, 102, 255, 0.7)',
+        'rgba(40, 159, 64, 0.7)',
+        'rgba(210, 99, 132, 0.7)',
+        'rgba(100, 162, 235, 0.7)',
+        'rgba(155, 206, 86, 0.7)'
+    ];
+
+    const borderColors = [
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)',
+        'rgba(199, 199, 199, 1)',
+        'rgba(83, 102, 255, 1)',
+        'rgba(40, 159, 64, 1)',
+        'rgba(210, 99, 132, 1)',
+        'rgba(100, 162, 235, 1)',
+        'rgba(155, 206, 86, 1)'
+    ];
+
+    // Configuração do gradiente para o background
+    const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(58, 123, 213, 0.8)');
+    gradient.addColorStop(1, 'rgba(0, 210, 255, 0.3)');
+
+    chartInstance = new Chart(ctx.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: data.map(item => item[0]),
+            datasets: [{
+                label: 'Frequência nas Provas',
+                data: data.map(item => item[1]),
+                backgroundColor: data.map((_, index) => 
+                    backgroundColors[index % backgroundColors.length]
+                ),
+                borderColor: data.map((_, index) => 
+                    borderColors[index % borderColors.length]
+                ),
+                borderWidth: 2,
+                borderRadius: 6,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
                 },
-                plugins: {
-                    legend: {
-                        display: false
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.parsed.y} ${context.parsed.y === 1 ? 'ocorrência' : 'ocorrências'}`;
+                        },
+                        title: function(context) {
+                            return `Termo: ${context[0].label}`;
+                        }
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.parsed.y} ${context.parsed.y === 1 ? 'ocorrência' : 'ocorrências'}`;
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 12
+                    },
+                    padding: 12,
+                    cornerRadius: 6,
+                    displayColors: true,
+                    boxPadding: 4
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#666',
+                        font: {
+                            weight: 'bold'
+                        },
+                        callback: function(value) {
+                            if (value % 1 === 0) {
+                                return value;
                             }
                         }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Número de Ocorrências',
+                        color: '#555',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        padding: {top: 20, bottom: 10}
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#666',
+                        font: {
+                            weight: 'bold'
+                        },
+                        maxRotation: 45,
+                        minRotation: 45,
+                        padding: 10
+                    },
+                    title: {
+                        display: true,
+                        text: 'Termos Médicos',
+                        color: '#555',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        padding: {top: 10, bottom: 20}
                     }
                 }
+            },
+            animation: {
+                duration: 1500,
+                easing: 'easeOutQuart',
+                onComplete: function() {
+                    const chart = this;
+                    const ctx = chart.ctx;
+                    ctx.font = Chart.helpers.fontString(
+                        Chart.defaults.font.size,
+                        'bold',
+                        Chart.defaults.font.family
+                    );
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+
+                    this.data.datasets.forEach(function(dataset, i) {
+                        const meta = chart.getDatasetMeta(i);
+                        meta.data.forEach(function(bar, index) {
+                            const data = dataset.data[index];
+                            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                            ctx.fillText(
+                                data, 
+                                bar.x, 
+                                bar.y - 5
+                            );
+                        });
+                    });
+                }
+            },
+            layout: {
+                padding: {
+                    top: 20,
+                    right: 10,
+                    bottom: 10,
+                    left: 10
+                }
             }
-        });
-    }
+        }
+    });
+}
     
 /**
  * Alterna entre as abas do sistema de forma segura e eficiente
