@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Morfologia - Aulas 1 a 5</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3f37c9;
+            --primary-light: #4895ef;
+            --secondary: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --success: #43aa8b;
+            --dark: #1b263b;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        header {
+            position: relative;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+            color: white;
+            padding: 5rem 2rem 8rem;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 0%, transparent 45%);
+            z-index: 1;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 3;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        
+        .header-text {
+            max-width: 600px;
+        }
+        
+        .header-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #fff, #e0f2fe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .title-word {
+            display: inline-block;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .title-word-1 { animation-delay: 0.2s; }
+        .title-word-2 { animation-delay: 0.4s; }
+        .title-word-3 { animation-delay: 0.6s; }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            font-weight: 300;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 0.8s forwards;
+            max-width: 90%;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .highlight {
+            font-weight: 600;
+            color: #fff;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            z-index: -1;
+            border-radius: 3px;
+        }
+        
+        .header-cta {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 1s forwards;
+        }
+        
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: white;
+            color: var(--primary);
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            color: var(--primary-dark);
+        }
+        
+        .cta-button i {
+            transition: transform 0.3s ease;
+        }
+        
+        .cta-button:hover i {
+            transform: translateY(3px);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+            border-radius: 50%;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+        }
+        
+        .header-image {
+            position: relative;
+            opacity: 0;
+            animation: fadeInRight 1s ease-out 0.5s forwards;
+        }
+        
+        .header-img {
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            transform: perspective(1000px) rotateY(-15deg);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+        
+        .header-image:hover .header-img {
+            transform: perspective(1000px) rotateY(-5deg);
+        }
+        
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(67, 97, 238, 0.3), rgba(76, 201, 240, 0.2));
+            border-radius: 20px;
+            mix-blend-mode: overlay;
+        }
+        
+        .header-scroll {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 1.5s forwards;
+        }
+        
+        .scroll-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+        }
+        
+        .scroll-line {
+            width: 2px;
+            height: 50px;
+            background: rgba(255,255,255,0.5);
+            margin-top: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scroll-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: white;
+            animation: scrollIndicator 2s infinite ease-in-out;
+        }
+        
+        /* Main Content Styles */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+        
+        .aulas-section {
+            margin-top: -5rem;
+            position: relative;
+            z-index: 5;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+        
+        .section-title p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+        
+        .buttons-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .aula-btn {
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .aula-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary);
+        }
+        
+        .aula-btn:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .aula-btn:nth-child(1)::before { background: var(--primary); }
+        .aula-btn:nth-child(2)::before { background: var(--danger); }
+        .aula-btn:nth-child(3)::before { background: var(--warning); }
+        .aula-btn:nth-child(4)::before { background: var(--success); }
+        .aula-btn:nth-child(5)::before { background: var(--info); }
+        
+        .icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .aula-btn:nth-child(1) .icon { color: var(--primary); }
+        .aula-btn:nth-child(2) .icon { color: var(--danger); }
+        .aula-btn:nth-child(3) .icon { color: var(--warning); }
+        .aula-btn:nth-child(4) .icon { color: var(--success); }
+        .aula-btn:nth-child(5) .icon { color: var(--info); }
+        
+        .aula-btn:hover .icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .btn-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark);
+            position: relative;
+        }
+        
+        .btn-desc {
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-number {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0,0,0,0.1);
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Footer Styles */
+        footer {
+            text-align: center;
+            margin-top: 6rem;
+            padding: 3rem 2rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+            position: relative;
+            background-color: var(--dark);
+            color: rgba(255,255,255,0.7);
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: left;
+        }
+        
+        .footer-column h3 {
+            color: white;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-column ul li a {
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-column ul li a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Floating Shapes */
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            border-radius: 50%;
+            filter: blur(40px);
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+        
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--danger);
+            bottom: -150px;
+            left: -100px;
+            animation-delay: 3s;
+        }
+        
+        .shape-3 {
+            width: 250px;
+            height: 250px;
+            background: var(--success);
+            top: 50%;
+            left: 10%;
+            animation-delay: 6s;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from { 
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes scrollIndicator {
+            0% { transform: translateY(-20px); opacity: 0; }
+            30% { opacity: 1; }
+            100% { transform: translateY(50px); opacity: 0; }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+        
+        /* Responsividade */
+        @media (max-width: 1200px) {
+            h1 {
+                font-size: 3.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .header-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .header-text {
+                max-width: 100%;
+                margin-bottom: 3rem;
+            }
+            
+            .header-cta {
+                justify-content: center;
+            }
+            
+            .header-image {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 3rem 1.5rem 6rem;
+                clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 2rem;
+            }
+            
+            .header-cta {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            .buttons-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .aula-btn {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="header-overlay"></div>
+        <div class="header-particles" id="particles-js"></div>
+        
+        <div class="header-content">
+            <div class="header-text">
+                <div class="header-badge">MORFOLOGIA</div>
+                <h1>
+                    <span class="title-word title-word-1">Portal</span>
+                    <span class="title-word title-word-2">de</span>
+                    <span class="title-word title-word-3">Morfologia</span>
+                </h1>
+                <p class="subtitle">Explore o conteúdo completo das aulas <span class="highlight">1 a 5</span> com materiais ricos em detalhes, visualizações interativas e recursos de aprendizagem</p>
+                
+                <div class="header-cta">
+                    <a href="#aulas" class="cta-button">
+                        <span>Explorar Aulas</span>
+                        <i class="fas fa-arrow-down"></i>
+                    </a>
+                    <div class="social-links">
+                        <a href="#" aria-label="Compartilhar no Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Compartilhar no Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Compartilhar no LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-image">
+                <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Ilustração científica" class="header-img">
+                <div class="image-overlay"></div>
+            </div>
+        </div>
+        
+        <div class="header-scroll">
+            <div class="scroll-indicator">
+                <span>Scroll</span>
+                <div class="scroll-line"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section id="aulas" class="aulas-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Conteúdo das Aulas</h2>
+                    <p>Selecione uma das aulas abaixo para acessar o material completo com tabelas comparativas, fluxogramas e esquemas visuais</p>
+                </div>
+                
+                <div class="buttons-container">
+                    <a href="aula1.html" class="aula-btn">
+                        <div class="btn-number">1</div>
+                        <div class="icon"><i class="fas fa-brain"></i></div>
+                        <h3 class="btn-title">Aula 1</h3>
+                        <p class="btn-desc">
+                            Acetilcolinesterase e Bócio Difuso Atóxico. Explore mecanismos de intoxicação, 
+                            morfologia glandular e anatomia detalhada da tireóide com visualizações 3D.
+                        </p>
+                    </a>
+                    
+                    <a href="aula2.html" class="aula-btn">
+                        <div class="btn-number">2</div>
+                        <div class="icon"><i class="fas fa-lungs"></i></div>
+                        <h3 class="btn-title">Aula 2</h3>
+                        <p class="btn-desc">
+                            Carboxiemoglobina e Doenças Pulmonares. Entenda a intoxicação por CO, 
+                            diferenças entre Bronquite Crônica e Enfisema, e a arquitetura das vias aéreas.
+                        </p>
+                    </a>
+                    
+                    <a href="aula3.html" class="aula-btn">
+                        <div class="btn-number">3</div>
+                        <div class="icon"><i class="fas fa-pills"></i></div>
+                        <h3 class="btn-title">Aula 3</h3>
+                        <p class="btn-desc">
+                            Drogas de Abuso e Pneumoconioses. Análise completa de mecanismos de ação, 
+                            efeitos toxicológicos e as principais doenças pulmonares ocupacionais.
+                        </p>
+                    </a>
+                    
+                    <a href="aula4.html" class="aula-btn">
+                        <div class="btn-number">4</div>
+                        <div class="icon"><i class="fas fa-toilet"></i></div>
+                        <h3 class="btn-title">Aula 4</h3>
+                        <p class="btn-desc">
+                            Saneamento e Diarreias Infecciosas. Tudo sobre E. coli patogênica, 
+                            cólera, giardíase e anatomia da parede abdominal com enfoque clínico.
+                        </p>
+                    </a>
+                    
+                    <a href="aula5.html" class="aula-btn">
+                        <div class="btn-number">5</div>
+                        <div class="icon"><i class="fas fa-microscope"></i></div>
+                        <h3 class="btn-title">Aula 5</h3>
+                        <p class="btn-desc">
+                            Metais Pesados e Neoplasias. Estudo aprofundado de intoxicações, 
+                            lesões pré-cancerosas e anatomia do nervo trigêmeo com correlações clínicas.
+                        </p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Sobre o Portal</h3>
+                    <p>Portal educativo desenvolvido para auxiliar no estudo de Morfologia, contendo todo o conteúdo das aulas 1 a 5 de forma organizada e interativa.</p>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Links Rápidos</h3>
+                    <ul>
+                        <li><a href="aula1.html">Aula 1 - Acetilcolinesterase</a></li>
+                        <li><a href="aula2.html">Aula 2 - Carboxiemoglobina</a></li>
+                        <li><a href="aula3.html">Aula 3 - Drogas de Abuso</a></li>
+                        <li><a href="aula4.html">Aula 4 - Saneamento</a></li>
+                        <li><a href="aula5.html">Aula 5 - Metais Pesados</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contato</h3>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> contato@portalmorfologia.com</li>
+                        <li><i class="fas fa-phone"></i> (11) 99999-9999</li>
+                        <li><i class="fas fa-map-marker-alt"></i> São Paulo, SP</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 Portal de Morfologia. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Inicializa partículas no background
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.getElementById('particles-js')) {
+                particlesJS('particles-js', {
+                    "particles": {
+                        "number": {
+                            "value": 80,
+                            "density": {
+                                "enable": true,
+                                "value_area": 800
+                            }
+                        },
+                        "color": {
+                            "value": "#ffffff"
+                        },
+                        "shape": {
+                            "type": "circle",
+                            "stroke": {
+                                "width": 0,
+                                "color": "#000000"
+                            },
+                            "polygon": {
+                                "nb_sides": 5
+                            }
+                        },
+                        "opacity": {
+                            "value": 0.3,
+                            "random": true,
+                            "anim": {
+                                "enable": true,
+                                "speed": 1,
+                                "opacity_min": 0.1,
+                                "sync": false
+                            }
+                        },
+                        "size": {
+                            "value": 3,
+                            "random": true,
+                            "anim": {
+                                "enable": true,
+                                "speed": 2,
+                                "size_min": 0.1,
+                                "sync": false
+                            }
+                        },
+                        "line_linked": {
+                            "enable": true,
+                            "distance": 150,
+                            "color": "#ffffff",
+                            "opacity": 0.2,
+                            "width": 1
+                        },
+                        "move": {
+                            "enable": true,
+                            "speed": 1,
+                            "direction": "none",
+                            "random": true,
+                            "straight": false,
+                            "out_mode": "out",
+                            "bounce": false,
+                            "attract": {
+                                "enable": true,
+                                "rotateX": 600,
+                                "rotateY": 1200
+                            }
+                        }
+                    },
+                    "interactivity": {
+                        "detect_on": "canvas",
+                        "events": {
+                            "onhover": {
+                                "enable": true,
+                                "mode": "grab"
+                            },
+                            "onclick": {
+                                "enable": true,
+                                "mode": "push"
+                            },
+                            "resize": true
+                        },
+                        "modes": {
+                            "grab": {
+                                "distance": 140,
+                                "line_linked": {
+                                    "opacity": 0.5
+                                }
+                            },
+                            "bubble": {
+                                "distance": 400,
+                                "size": 40,
+                                "duration": 2,
+                                "opacity": 8,
+                                "speed": 3
+                            },
+                            "repulse": {
+                                "distance": 200,
+                                "duration": 0.4
+                            },
+                            "push": {
+                                "particles_nb": 4
+                            },
+                            "remove": {
+                                "particles_nb": 2
+                            }
+                        }
+                    },
+                    "retina_detect": true
+                });
+            }
+            
+            // Efeito de paralaxe para os cards
+            document.querySelectorAll('.aula-btn').forEach((btn, index) => {
+                btn.style.animationDelay = `${index * 0.1 + 0.3}s`;
+                
+                btn.addEventListener('mousemove', (e) => {
+                    const x = e.pageX - btn.offsetLeft;
+                    const y = e.pageY - btn.offsetTop;
+                    
+                    btn.style.transform = `
+                        translateY(-10px) 
+                        rotateX(${(y - btn.offsetHeight/2) / 20}deg) 
+                        rotateY(${(x - btn.offsetWidth/2) / 20}deg) 
+                        scale(1.02)
+                    `;
+                    
+                    // Efeito de brilho dinâmico
+                    btn.style.boxShadow = `
+                        0 15px 40px rgba(0,0,0,0.15),
+                        ${(x - btn.offsetWidth/2) / 10}px ${(y - btn.offsetHeight/2) / 10}px 30px rgba(255,255,255,0.3)
+                    `;
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'translateY(-10px) scale(1.02)';
+                    btn.style.boxShadow = '0 15px 40px rgba(0,0,0,0.15)';
+                });
+            });
+            
+            // Verifica se há parâmetro de aula na URL e rola até o card correspondente
+            const urlParams = new URLSearchParams(window.location.search);
+            const aulaParam = urlParams.get('aula');
+            
+            if (aulaParam && aulaParam >= 1 && aulaParam <= 5) {
+                const card = document.querySelector(`.aula-btn:nth-child(${aulaParam})`);
+                if (card) {
+                    setTimeout(() => {
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        
+                        // Destaque temporário
+                        card.style.transform = 'translateY(-10px) scale(1.05)';
+                        card.style.boxShadow = '0 20px 50px rgba(0,0,0,0.2)';
+                        setTimeout(() => {
+                            card.style.transform = 'translateY(-10px) scale(1.02)';
+                            card.style.boxShadow = '0 15px 40px rgba(0,0,0,0.15)';
+                        }, 1500);
+                    }, 300);
+                }
+            }
+            
+            // Efeito de digitação opcional para o título
+            const titleWords = document.querySelectorAll('.title-word');
+            titleWords.forEach(word => {
+                const letters = word.textContent.split('');
+                word.textContent = '';
+                letters.forEach((letter, i) => {
+                    setTimeout(() => {
+                        word.textContent += letter;
+                    }, i * 50);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

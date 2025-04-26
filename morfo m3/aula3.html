@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Morfologia - Aula 3</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3f37c9;
+            --primary-light: #4895ef;
+            --secondary: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --success: #43aa8b;
+            --dark: #1b263b;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --text-color: #333;
+            --text-light: #555;
+            --line-height: 1.8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light);
+            color: var(--text-color);
+            line-height: var(--line-height);
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        header {
+            position: relative;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+            color: white;
+            padding: 5rem 2rem 8rem;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 0%, transparent 45%);
+            z-index: 1;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 3;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        
+        .header-text {
+            max-width: 600px;
+        }
+        
+        .header-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #fff, #e0f2fe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .title-word {
+            display: inline-block;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .title-word-1 { animation-delay: 0.2s; }
+        .title-word-2 { animation-delay: 0.4s; }
+        .title-word-3 { animation-delay: 0.6s; }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            font-weight: 300;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 0.8s forwards;
+            max-width: 90%;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .highlight {
+            font-weight: 600;
+            color: #fff;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            z-index: -1;
+            border-radius: 3px;
+        }
+        
+        .header-cta {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 1s forwards;
+        }
+        
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: white;
+            color: var(--primary);
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            color: var(--primary-dark);
+        }
+        
+        .cta-button i {
+            transition: transform 0.3s ease;
+        }
+        
+        .cta-button:hover i {
+            transform: translateY(3px);
+        }
+        
+        /* Main Content Styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+        
+        .aulas-section {
+            margin-top: -5rem;
+            position: relative;
+            z-index: 5;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+        
+        .section-title p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+        
+        /* Content Section Styles */
+        .content-section {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .content-title {
+            font-size: 2rem;
+            color: var(--primary-dark);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(67, 97, 238, 0.1);
+            line-height: 1.3;
+        }
+        
+        .content-subtitle {
+            font-size: 1.4rem;
+            color: var(--dark);
+            margin: 2.5rem 0 1.5rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        
+        .content-text {
+            margin-bottom: 1.8rem;
+            line-height: var(--line-height);
+            color: var(--text-color);
+            font-size: 1.05rem;
+        }
+        
+        .content-text p {
+            margin-bottom: 1.5rem;
+        }
+        
+        .content-list {
+            margin: 2rem 0;
+            padding-left: 2rem;
+        }
+        
+        .content-list li {
+            margin-bottom: 1rem;
+            line-height: var(--line-height);
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .content-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.7rem;
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+        
+        .content-highlight {
+            background: rgba(67, 97, 238, 0.05);
+            padding: 1.8rem;
+            border-radius: 12px;
+            margin: 2.5rem 0;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+        }
+        
+        .content-highlight-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .content-highlight-title i {
+            color: var(--primary);
+        }
+        
+        .content-highlight p {
+            margin-bottom: 0.8rem;
+            color: var(--text-light);
+        }
+        
+        .content-highlight a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .content-highlight a:hover {
+            text-decoration: underline;
+        }
+        
+        .content-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+        }
+        
+        .content-table th, 
+        .content-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .content-table th {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+        
+        .content-table tr:nth-child(even) {
+            background-color: rgba(0,0,0,0.02);
+        }
+        
+        .content-table tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .content-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: block;
+        }
+        
+        .content-image-caption {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: -1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .content-key-point {
+            background: rgba(67, 97, 238, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            position: relative;
+            padding-left: 3.5rem;
+        }
+        
+        .content-key-point::before {
+            content: '\f05a';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 1.5rem;
+            top: 1.5rem;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .content-key-point-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+        }
+        
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .nav-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+        }
+        
+        .nav-button i {
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-button:hover i {
+            transform: translateX(-3px);
+        }
+        
+        .nav-button.next:hover i {
+            transform: translateX(3px);
+        }
+        
+        /* Footer Styles */
+        footer {
+            text-align: center;
+            margin-top: 6rem;
+            padding: 3rem 2rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+            position: relative;
+            background-color: var(--dark);
+            color: rgba(255,255,255,0.7);
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: left;
+        }
+        
+        .footer-column h3 {
+            color: white;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-column ul li a {
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-column ul li a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Floating Shapes */
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            border-radius: 50%;
+            filter: blur(40px);
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+        
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--danger);
+            bottom: -150px;
+            left: -100px;
+            animation-delay: 3s;
+        }
+        
+        .shape-3 {
+            width: 250px;
+            height: 250px;
+            background: var(--success);
+            top: 50%;
+            left: 10%;
+            animation-delay: 6s;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from { 
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes scrollIndicator {
+            0% { transform: translateY(-20px); opacity: 0; }
+            30% { opacity: 1; }
+            100% { transform: translateY(50px); opacity: 0; }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+        
+        /* Responsividade */
+        @media (max-width: 1200px) {
+            h1 {
+                font-size: 3.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .header-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .header-text {
+                max-width: 100%;
+                margin-bottom: 3rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 3rem 1.5rem 6rem;
+                clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 2rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            .content-section {
+                padding: 2rem;
+            }
+            
+            .content-title {
+                font-size: 1.8rem;
+            }
+            
+            .content-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .nav-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-overlay"></div>
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+        <div class="header-content">
+            <div class="header-text">
+                <span class="header-badge">Morfologia - Aula 3</span>
+                <h1>
+                    <span class="title-word title-word-1">Drogas de Abuso</span>
+                    <span class="title-word title-word-2">e</span>
+                    <span class="title-word title-word-3">Pneumoconioses</span>
+                </h1>
+                <p class="subtitle">
+                    Conteúdo completo sobre <span class="highlight">Metabolismo de Drogas</span>, <span class="highlight">Pneumoconioses Ocupacionais</span> e <span class="highlight">Anatomia da Parede Torácica</span>.
+                </p>
+                <div class="header-cta">
+                    <a href="#content" class="cta-button">
+                        Começar Estudo
+                        <i class="fas fa-arrow-down"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" id="content">
+        <section class="aulas-section">
+            <div class="section-title">
+                <h2>Conteúdo Detalhado</h2>
+                <p>Explore os tópicos de Drogas de Abuso, Pneumoconioses e Anatomia Torácica de forma organizada e completa.</p>
+            </div>
+
+            <!-- Section 1 - Perguntas Norteadoras -->
+            <div class="content-section active" id="section1">
+                <h2 class="content-title">Perguntas Norteadoras</h2>
+                
+                <div class="content-key-point">
+                    <div class="content-key-point-title">ATIVIDADE PRÁTICAS FUNCIONAIS 3</div>
+                    <div class="content-text">
+                        <ol class="content-list">
+                            <li>Descrever o metabolismo e efeitos das principais drogas de abuso (opioides, estimulantes, cannabis).</li>
+                            <li>Identificar os métodos de diagnóstico laboratorial para intoxicação por drogas de abuso.</li>
+                            <li>Analisar o padrão epidemiológico do uso de drogas em diferentes populações.</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="content-key-point">
+                    <div class="content-key-point-title">ATIVIDADE PATOLOGIA 3</div>
+                    <div class="content-text">
+                        <ol class="content-list">
+                            <li>Descrever as características morfológicas das principais pneumoconioses (antracose, silicose, asbestose).</li>
+                            <li>Explicar a patogênese da fibrose pulmonar nas pneumoconioses.</li>
+                            <li>Correlacionar as alterações morfológicas com as manifestações clínicas e complicações das pneumoconioses.</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="content-key-point">
+                    <div class="content-key-point-title">ATIVIDADE ANATOMIA 3</div>
+                    <div class="content-text">
+                        <ol class="content-list">
+                            <li>Identificar e descrever as estruturas da parede torácica e cavidade pleural.</li>
+                            <li>Explicar a vascularização e inervação da parede torácica e pleura.</li>
+                            <li>Descrever os espaços pleurais e sua importância clínica.</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-button" onclick="navigate('home')">
+                        <i class="fas fa-home"></i> Voltar para Home
+                    </button>
+                    <button class="nav-button next" onclick="navigate('section2')">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 2 - Práticas Funcionais -->
+            <div class="content-section" id="section2">
+                <h2 class="content-title">Práticas Funcionais: Drogas de Abuso</h2>
+                <h3 class="content-subtitle">Metabolismo, Efeitos e Epidemiologia</h3>
+                
+                <div class="content-text">
+                    <p>O termo "drogas de abuso" engloba substâncias psicoativas consumidas não medicinalmente, incluindo depressoras do SNC, estimulantes, perturbadoras/halucinógenas e outras.</p>
+                    
+                    <div class="content-key-point">
+                        <div class="content-key-point-title">Classificação das Drogas de Abuso</div>
+                        <ul class="content-list">
+                            <li><strong>Depressoras do SNC:</strong> Álcool, opioides, benzodiazepínicos</li>
+                            <li><strong>Estimulantes:</strong> Cocaína, anfetaminas, metanfetaminas</li>
+                            <li><strong>Perturbadoras/Halucinógenas:</strong> Cannabis, LSD, cetamina</li>
+                            <li><strong>Outras:</strong> Solventes inalantes, drogas sintéticas (MDMA)</li>
+                        </ul>
+                    </div>
+                    
+                    <h3 class="content-subtitle">Opioides (ex.: heroína, morfina)</h3>
+                    
+                    <div class="content-text">
+                        <div class="content-highlight">
+                            <div class="content-highlight-title">
+                                <i class="fas fa-pills"></i> Metabolismo
+                            </div>
+                            <ul class="content-list">
+                                <li>Heroína (diacetilmorfina) é rapidamente metabolizada em morfina no corpo</li>
+                                <li>Metabolização hepática e excreção renal</li>
+                                <li>Meia-vida variável conforme a substância (ex.: morfina 2-3h, metadona 15-60h)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Efeitos Agudos</div>
+                            <ul class="content-list">
+                                <li>Analgesia e euforia</li>
+                                <li>Sonolência e depressão respiratória</li>
+                                <li>Miose acentuada (pupilas pontuais)</li>
+                                <li>Bradicardia e hipotensão</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-highlight">
+                            <div class="content-highlight-title">
+                                <i class="fas fa-flask"></i> Diagnóstico Laboratorial
+                            </div>
+                            <ul class="content-list">
+                                <li>Detecção de metabólitos urinários (morfina e derivados)</li>
+                                <li>Antídoto: Naloxona (antagonista opioide)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Epidemiologia</div>
+                            <ul class="content-list">
+                                <li>Crise dos opioides com alta mortalidade por overdose (especialmente fentanil)</li>
+                                <li>Heroína e analgésicos opiáceos prescritos são amplamente abusados</li>
+                                <li>Atinge diferentes faixas socioeconômicas</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h3 class="content-subtitle">Estimulantes (cocaína, crack, anfetaminas)</h3>
+                    
+                    <div class="content-text">
+                        <div class="content-highlight">
+                            <div class="content-highlight-title">
+                                <i class="fas fa-bolt"></i> Cocaína - Mecanismo de Ação
+                            </div>
+                            <ul class="content-list">
+                                <li>Bloqueia a recaptação de dopamina, noradrenalina e serotonina no SNC</li>
+                                <li>Metabolizada por colinesterases hepáticas e plasmáticas em benzoilecgonina</li>
+                                <li>Crack é cocaína em forma livre, fumada, com absorção pulmonar muito rápida</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-table-container">
+                            <table class="content-table">
+                                <thead>
+                                    <tr>
+                                        <th>Característica</th>
+                                        <th>Cocaína</th>
+                                        <th>Anfetaminas</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Efeitos</td>
+                                        <td>Euforia intensa, aumento de energia, alerta, supressão do apetite</td>
+                                        <td>Euforia, insônia, aumento da atividade, comportamento violento</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sintomas</td>
+                                        <td>Midríase, taquicardia, hipertensão, arritmias, hipertermia</td>
+                                        <td>Agitação, psicose, AVC hemorrágico por picos hipertensivos</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Duração</td>
+                                        <td>30-60 minutos (crack: efeito mais fugaz)</td>
+                                        <td>4-12 horas</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Diagnóstico</td>
+                                        <td colspan="2">Teste toxicológico urinário (benzoilecgonina para cocaína)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Epidemiologia</div>
+                            <ul class="content-list">
+                                <li>Cocaína mantém-se presente em todas as classes sociais</li>
+                                <li>Metanfetaminas têm alta prevalência em Ásia e algumas áreas dos EUA</li>
+                                <li>Estimulantes são amplamente consumidos no mundo</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h3 class="content-subtitle">Cannabis (maconha)</h3>
+                    
+                    <div class="content-text">
+                        <div class="content-highlight">
+                            <div class="content-highlight-title">
+                                <i class="fas fa-cannabis"></i> Características
+                            </div>
+                            <ul class="content-list">
+                                <li>Princípio ativo: THC (tetra-hidrocanabinol)</li>
+                                <li>Geralmente fumada; THC é lipossolúvel com meia-vida longa</li>
+                                <li>Metabolizado no fígado em THC-COOH (detectável na urina por dias/semanas)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Efeitos</div>
+                            <ul class="content-list">
+                                <li>Euforia e relaxamento</li>
+                                <li>Alterações sensoriais (cores/sons mais vívidos)</li>
+                                <li>Prejuízo de memória de curto prazo e coordenação</li>
+                                <li>Aumento do apetite, hiperemia conjuntival</li>
+                                <li>Taquicardia leve, ansiedade e paranoia em doses altas</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Epidemiologia</div>
+                            <ul class="content-list">
+                                <li>Droga ilícita mais amplamente usada no mundo (>200 milhões de usuários)</li>
+                                <li>Muitos países revisando políticas sobre seu uso</li>
+                                <li>Baixo potencial de intoxicação fatal</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h3 class="content-subtitle">Outras Drogas</h3>
+                    
+                    <div class="content-text">
+                        <div class="content-table-container">
+                            <table class="content-table">
+                                <thead>
+                                    <tr>
+                                        <th>Droga</th>
+                                        <th>Efeitos</th>
+                                        <th>Metabolismo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Alucinógenos (LSD, psilocibina)</td>
+                                        <td>Alterações profundas da percepção, alucinações visuais, sinestesias</td>
+                                        <td>Metabolismo hepático, excreção renal</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Solventes inalantes (cola, tíner)</td>
+                                        <td>Depressão do SNC, danos cerebrais, morte súbita por arritmia</td>
+                                        <td>Metabolismo variável conforme substância</td>
+                                    </tr>
+                                    <tr>
+                                        <td>MDMA (ecstasy)</td>
+                                        <td>Efeitos estimulantes e perturbadores, hipertermia, falência de órgãos</td>
+                                        <td>Metabolismo hepático complexo</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-button" onclick="navigate('section1')">
+                        <i class="fas fa-arrow-left"></i> Anterior
+                    </button>
+                    <button class="nav-button next" onclick="navigate('section3')">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 3 - Patologia -->
+            <div class="content-section" id="section3">
+                <h2 class="content-title">Patologia: Pneumoconioses</h2>
+                <h3 class="content-subtitle">Antracose, Silicose e Asbestose</h3>
+                
+                <div class="content-text">
+                    <p>As pneumoconioses são doenças pulmonares fibrosantes causadas pela inalação crônica de partículas inorgânicas, geralmente em ambiente ocupacional.</p>
+                    
+                    <div class="content-key-point">
+                        <div class="content-key-point-title">Classificação das Pneumoconioses</div>
+                        <ul class="content-list">
+                            <li><strong>Antracose:</strong> Depósito de pó de carvão (partículas de carbono)</li>
+                            <li><strong>Silicose:</strong> Inalação de partículas de sílica cristalina</li>
+                            <li><strong>Asbestose:</strong> Inalação de fibras de asbesto (amianto)</li>
+                        </ul>
+                    </div>
+                    
+                    <h3 class="content-subtitle">Antracose</h3>
+                    
+                    <div class="content-text">
+                        <div class="content-highlight">
+                            <div class="content-highlight-title">
+                                <i class="fas fa-industry"></i> Características
+                            </div>
+                            <ul class="content-list">
+                                <li>Forma mais branda de pneumoconiose do carvão</li>
+                                <li>Geralmente assintomática</li>
+                                <li>Encontrada em moradores de centros urbanos e fumantes</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Patogênese</div>
+                            <ul class="content-list">
+                                <li>Macrófagos alveolares fagocitam partículas de carbono</li>
+                                <li>Migram para o interstício e linfonodos</li>
+                                <li>O carvão em si não é muito fibrogênico</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Morfologia</div>
+                            <ul class="content-list">
+                                <li>Máculas ou manchas antracóticas preto-acinzentadas subpleurais</li>
+                                <li>Linfonodos hilares enegrecidos pela fuligem</li>
+                                <li>Na forma avançada: fibrose maciça progressiva com grandes áreas de fibrose negra</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Quadro Clínico</div>
+                            <ul class="content-list">
+                                <li>Antracose simples raramente provoca sintomas</li>
+                                <li>Forma avançada pode levar a enfisema e hipertensão pulmonar</li>
+                                <li>Mineradores de carvão frequentemente também inalam sílica, agravando o quadro</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h3 class="content-subtitle">Silicose</h3>
+                    
+                    <div class="content-text">
+                        <div class="content-highlight">
+                            <div class="content-highlight-title">
+                                <i class="fas fa-hard-hat"></i> Características
+                            </div>
+                            <ul class="content-list">
+                                <li>Pneumoconiose mais comum globalmente</li>
+                                <li>Ocorre em mineração, jateamento de areia, pedreiras e cerâmica</li>
+                                <li>Partículas de sílica cristalina (geralmente quartzo)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Patogênese</div>
+                            <ul class="content-list">
+                                <li>Sílica atinge alvéolos e é fagocitada por macrófagos</li>
+                                <li>Lesão de membranas dos fagolisossomos → morte do macrófago</li>
+                                <li>Liberação de mediadores fibrogênicos (citocinas, radicais livres)</li>
+                                <li>Processo repetido desencadeia inflamação crônica e deposição de colágeno</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Morfologia</div>
+                            <ul class="content-list">
+                                <li>Nódulo silicótico: centro hialino de colágeno denso circundado por macrófagos</li>
+                                <li>Nódulos (2-5 mm) nos lobos superiores e regiões subpleurais</li>
+                                <li>Fibrose maciça progressiva quando coalescem</li>
+                                <li>Linfonodos hilares com calcificações em "casca de ovo"</li>
+                                <li>Partículas de sílica birrefringentes visíveis sob luz polarizada</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Quadro Clínico</div>
+                            <ul class="content-list">
+                                <li>Silicose simples muitas vezes assintomática</li>
+                                <li>Dispneia aos esforços, tosse crônica</li>
+                                <li>Função pulmonar restritiva</li>
+                                <li>Predisposição a tuberculose (sílica prejudica capacidade macrofágica)</li>
+                                <li>Maior incidência de câncer de pulmão</li>
+                                <li>Pode progredir mesmo após cessar a exposição</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h3 class="content-subtitle">Asbestose</h3>
+                    
+                    <div class="content-text">
+                        <div class="content-highlight">
+                            <div class="content-highlight-title">
+                                <i class="fas fa-lungs"></i> Características
+                            </div>
+                            <ul class="content-list">
+                                <li>Causada por fibras de asbesto (amianto)</li>
+                                <li>Usado no passado em construção (isolamento, telhas, freios)</li>
+                                <li>Intervalo longo entre exposição e aparecimento de sintomas (décadas)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Patogênese</div>
+                            <ul class="content-list">
+                                <li>Fibras depositam-se nos bronquíolos e alvéolos</li>
+                                <li>Macrófagos tentam fagocitá-las, mas fibras longas escapam</li>
+                                <li>Danos celulares e inflamação</li>
+                                <li>Geração de radicais livres</li>
+                                <li>Fibrose pulmonar difusa (similar à fibrose intersticial idiopática)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Morfologia</div>
+                            <ul class="content-list">
+                                <li>Fibrose inicia nos lobos inferiores e regiões subpleurais</li>
+                                <li>Espessamento de septos alveolares</li>
+                                <li>Pulmão em favo de mel em estágios avançados</li>
+                                <li>"Corpos de asbesto": fibras revestidas por material proteináceo rico em ferro</li>
+                                <li>Placas pleurais fibrosas (frequentemente calcificadas)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Quadro Clínico</div>
+                            <ul class="content-list">
+                                <li>Dispneia de esforço progressiva</li>
+                                <li>Tosse seca, hipoxemia, baqueteamento digital</li>
+                                <li>Progressão pode levar a cor pulmonale</li>
+                                <li>Associação com tumores:
+                                    <ul class="content-list">
+                                        <li>Câncer de pulmão (especialmente em fumantes)</li>
+                                        <li>Mesotelioma maligno da pleura (tumor raro quase exclusivo de expostos)</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-button" onclick="navigate('section2')">
+                        <i class="fas fa-arrow-left"></i> Anterior
+                    </button>
+                    <button class="nav-button next" onclick="navigate('section4')">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 4 - Anatomia -->
+            <div class="content-section" id="section4">
+                <h2 class="content-title">Anatomia: Parede Torácica e Cavidade Pleural</h2>
+                <h3 class="content-subtitle">Estruturas, Vascularização e Inervação</h3>
+                
+                <div class="content-text">
+                    <div class="content-key-point">
+                        <div class="content-key-point-title">Parede Torácica</div>
+                        <p>Delimita externamente a cavidade torácica e protege os pulmões e o coração.</p>
+                        
+                        <div class="content-highlight">
+                            <div class="content-highlight-title">
+                                <i class="fas fa-bone"></i> Estrutura Osteomuscular
+                            </div>
+                            <ul class="content-list">
+                                <li><strong>Posterior:</strong> Coluna torácica (12 vértebras torácicas)</li>
+                                <li><strong>Lateral:</strong> Costelas (12 pares)</li>
+                                <li><strong>Anterior:</strong> Esterno</li>
+                                <li><strong>Músculos intercostais:</strong> Externos, internos e íntimos</li>
+                                <li><strong>Diafragma:</strong> Principal músculo inspiratório</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Classificação das Costelas</div>
+                            <ul class="content-list">
+                                <li><strong>Costelas verdadeiras (1-7):</strong> Conectam-se ao esterno via cartilagens costais</li>
+                                <li><strong>Costelas falsas (8-10):</strong> Unem-se à cartilagem suprajacente</li>
+                                <li><strong>Costelas flutuantes (11-12):</strong> Livres anteriormente</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Vascularização e Inervação</div>
+                            <ul class="content-list">
+                                <li><strong>Artérias intercostais:</strong>
+                                    <ul class="content-list">
+                                        <li>Posteriores: originam-se da aorta torácica</li>
+                                        <li>Anteriores: ramos da artéria torácica interna</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Veias intercostais:</strong> Drenam para sistema ázigo e veias torácicas internas</li>
+                                <li><strong>Nervos intercostais:</strong> Ramos anteriores dos nervos espinhais torácicos (T1-T11)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h3 class="content-subtitle">Cavidade Pleural</h3>
+                    
+                    <div class="content-text">
+                        <div class="content-highlight">
+                            <div class="content-highlight-title">
+                                <i class="fas fa-lungs"></i> Estrutura da Pleura
+                            </div>
+                            <ul class="content-list">
+                                <li><strong>Pleura visceral:</strong> Cobre a superfície do pulmão</li>
+                                <li><strong>Pleura parietal:</strong> Reveste a face interna da parede torácica, diafragma e pericárdio</li>
+                                <li><strong>Espaço pleural:</strong> Virtual, contém fina camada de líquido pleural</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Divisões da Pleura Parietal</div>
+                            <ul class="content-list">
+                                <li><strong>Costal:</strong> Reveste a face interna da parede torácica</li>
+                                <li><strong>Mediastinal:</strong> Reveste o mediastino</li>
+                                <li><strong>Diafragmática:</strong> Reveste o diafragma</li>
+                                <li><strong>Cúpula cervical:</strong> Extensão superior sobre o ápice pulmonar</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Inervação Pleural</div>
+                            <ul class="content-list">
+                                <li><strong>Pleura parietal:</strong> Inervação somática rica em nociceptores</li>
+                                <li><strong>Pleura costal:</strong> Nervos intercostais adjacentes</li>
+                                <li><strong>Pleuras mediastinal e diafragmática:</strong> Nervo frênico (C3-C5)</li>
+                                <li><strong>Pleura visceral:</strong> Fibras autonômicas viscerais (pouca sensibilidade dolorosa)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="content-key-point">
+                            <div class="content-key-point-title">Espaços Pleurais Importantes</div>
+                            <ul class="content-list">
+                                <li><strong>Recesso costodiafragmático:</strong> Área de reflexão pleural onde o pulmão não preenche completamente a cavidade pleural na expiração</li>
+                                <li><strong>Local comum de acúmulo de líquido (derrame pleural)</li>
+                                <li><strong>Ponto para punção pleural (toracocentese)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="content-highlight">
+                        <div class="content-highlight-title">
+                            <i class="fas fa-check-circle"></i> Resumo
+                        </div>
+                        <p>A parede torácica oferece a estrutura e músculos para a respiração, e a cavidade pleural permite o deslizamento dos pulmões durante a ventilação. A rica inervação somática da pleura parietal explica a dor aguda em inflamações pleurais, enquanto a pleura visceral é insensível, refletindo sua diferente origem embriológica e inervação.</p>
+                    </div>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-button" onclick="navigate('section3')">
+                        <i class="fas fa-arrow-left"></i> Anterior
+                    </button>
+                    <button class="nav-button next" onclick="navigate('home')">
+                        <i class="fas fa-home"></i> Voltar para Home
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>Sobre</h3>
+                <ul>
+                    <li><a href="#">Portal de Estudos</a></li>
+                    <li><a href="#">Morfologia</a></li>
+                    <li><a href="#">Práticas Funcionais</a></li>
+                    <li><a href="#">Anatomia</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Recursos</h3>
+                <ul>
+                    <li><a href="#">Bibliografia</a></li>
+                    <li><a href="#">Lâminas</a></li>
+                    <li><a href="#">Referências</a></li>
+                    <li><a href="#">Atividades</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Contato</h3>
+                <ul>
+                    <li><a href="#">Email</a></li>
+                    <li><a href="#">Suporte</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Feedback</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 Portal de Morfologia. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navigation function
+        function navigate(section) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(s => {
+                s.classList.remove('active');
+            });
+            
+            if (section === 'home') {
+                // Scroll to top
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+                // Show first section
+                document.getElementById('section1').classList.add('active');
+            } else {
+                // Show selected section
+                document.getElementById(section).classList.add('active');
+                // Scroll to content
+                document.getElementById('content').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        }
+        
+        // Animate title words on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleWords = document.querySelectorAll('.title-word');
+            titleWords.forEach(word => {
+                word.style.opacity = '1';
+            });
+            
+            const subtitle = document.querySelector('.subtitle');
+            subtitle.style.opacity = '1';
+            
+            const headerCta = document.querySelector('.header-cta');
+            headerCta.style.opacity = '1';
+            
+            const headerScroll = document.querySelector('.header-scroll');
+            if (headerScroll) headerScroll.style.opacity = '1';
+        });
+    </script>
+</body>
+</html>

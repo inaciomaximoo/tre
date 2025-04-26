@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Morfologia - Aula 5</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3f37c9;
+            --primary-light: #4895ef;
+            --secondary: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --success: #43aa8b;
+            --dark: #1b263b;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --text-color: #333;
+            --text-light: #555;
+            --line-height: 1.8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light);
+            color: var(--text-color);
+            line-height: var(--line-height);
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        header {
+            position: relative;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+            color: white;
+            padding: 5rem 2rem 8rem;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 0%, transparent 45%);
+            z-index: 1;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 3;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        
+        .header-text {
+            max-width: 600px;
+        }
+        
+        .header-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #fff, #e0f2fe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .title-word {
+            display: inline-block;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .title-word-1 { animation-delay: 0.2s; }
+        .title-word-2 { animation-delay: 0.4s; }
+        .title-word-3 { animation-delay: 0.6s; }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            font-weight: 300;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 0.8s forwards;
+            max-width: 90%;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .highlight {
+            font-weight: 600;
+            color: #fff;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            z-index: -1;
+            border-radius: 3px;
+        }
+        
+        .header-cta {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 1s forwards;
+        }
+        
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: white;
+            color: var(--primary);
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            color: var(--primary-dark);
+        }
+        
+        .cta-button i {
+            transition: transform 0.3s ease;
+        }
+        
+        .cta-button:hover i {
+            transform: translateY(3px);
+        }
+        
+        /* Main Content Styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+        
+        .aulas-section {
+            margin-top: -5rem;
+            position: relative;
+            z-index: 5;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+        
+        .section-title p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+        
+        /* Content Section Styles */
+        .content-section {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .content-title {
+            font-size: 2rem;
+            color: var(--primary-dark);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(67, 97, 238, 0.1);
+            line-height: 1.3;
+        }
+        
+        .content-subtitle {
+            font-size: 1.4rem;
+            color: var(--dark);
+            margin: 2.5rem 0 1.5rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        
+        .content-text {
+            margin-bottom: 1.8rem;
+            line-height: var(--line-height);
+            color: var(--text-color);
+            font-size: 1.05rem;
+        }
+        
+        .content-text p {
+            margin-bottom: 1.5rem;
+        }
+        
+        .content-list {
+            margin: 2rem 0;
+            padding-left: 2rem;
+        }
+        
+        .content-list li {
+            margin-bottom: 1rem;
+            line-height: var(--line-height);
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .content-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.7rem;
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+        
+        .content-highlight {
+            background: rgba(67, 97, 238, 0.05);
+            padding: 1.8rem;
+            border-radius: 12px;
+            margin: 2.5rem 0;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+        }
+        
+        .content-highlight-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .content-highlight-title i {
+            color: var(--primary);
+        }
+        
+        .content-highlight p {
+            margin-bottom: 0.8rem;
+            color: var(--text-light);
+        }
+        
+        .content-highlight a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .content-highlight a:hover {
+            text-decoration: underline;
+        }
+        
+        .content-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+        }
+        
+        .content-table th, 
+        .content-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .content-table th {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+        
+        .content-table tr:nth-child(even) {
+            background-color: rgba(0,0,0,0.02);
+        }
+        
+        .content-table tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .content-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: block;
+        }
+        
+        .content-image-caption {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: -1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .content-key-point {
+            background: rgba(67, 97, 238, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            position: relative;
+            padding-left: 3.5rem;
+        }
+        
+        .content-key-point::before {
+            content: '\f05a';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 1.5rem;
+            top: 1.5rem;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .content-key-point-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+        }
+        
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .nav-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+        }
+        
+        .nav-button i {
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-button:hover i {
+            transform: translateX(-3px);
+        }
+        
+        .nav-button.next:hover i {
+            transform: translateX(3px);
+        }
+        
+        /* Footer Styles */
+        footer {
+            text-align: center;
+            margin-top: 6rem;
+            padding: 3rem 2rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+            position: relative;
+            background-color: var(--dark);
+            color: rgba(255,255,255,0.7);
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: left;
+        }
+        
+        .footer-column h3 {
+            color: white;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-column ul li a {
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-column ul li a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Floating Shapes */
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            border-radius: 50%;
+            filter: blur(40px);
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+        
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--danger);
+            bottom: -150px;
+            left: -100px;
+            animation-delay: 3s;
+        }
+        
+        .shape-3 {
+            width: 250px;
+            height: 250px;
+            background: var(--success);
+            top: 50%;
+            left: 10%;
+            animation-delay: 6s;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from { 
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes scrollIndicator {
+            0% { transform: translateY(-20px); opacity: 0; }
+            30% { opacity: 1; }
+            100% { transform: translateY(50px); opacity: 0; }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+        
+        /* Responsividade */
+        @media (max-width: 1200px) {
+            h1 {
+                font-size: 3.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .header-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .header-text {
+                max-width: 100%;
+                margin-bottom: 3rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 3rem 1.5rem 6rem;
+                clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 2rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            .content-section {
+                padding: 2rem;
+            }
+            
+            .content-title {
+                font-size: 1.8rem;
+            }
+            
+            .content-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .nav-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-overlay"></div>
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+        <div class="header-content">
+            <div class="header-text">
+                <span class="header-badge">Morfologia - Aula 5</span>
+                <h1>
+                    <span class="title-word title-word-1">Portal de</span>
+                    <span class="title-word title-word-2">Estudos</span>
+                    <span class="title-word title-word-3">Médicos</span>
+                </h1>
+                <p class="subtitle">
+                    Conteúdo completo sobre <span class="highlight">Metais Pesados</span>, <span class="highlight">Lesões Pré-Neoplásicas</span> e <span class="highlight">Nervo Trigêmeo</span>.
+                </p>
+                <div class="header-cta">
+                    <a href="#content" class="cta-button">
+                        Começar Estudo
+                        <i class="fas fa-arrow-down"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" id="content">
+        <section class="aulas-section">
+            <div class="section-title">
+                <h2>Conteúdo Detalhado</h2>
+                <p>Explore os tópicos de Práticas Funcionais, Patologia e Anatomia de forma organizada e completa.</p>
+            </div>
+
+            <!-- Section 1 - Perguntas Norteadoras -->
+            <div class="content-section active" id="section1">
+                <h2 class="content-title">Perguntas Norteadoras</h2>
+                
+                <div class="content-key-point">
+                    <div class="content-key-point-title">ATIVIDADE PRÁTICAS FUNCIONAIS 5</div>
+                    <div class="content-text">
+                        <ol class="content-list">
+                            <li>Identificar os mecanismos de toxicidade do chumbo e mercúrio no organismo.</li>
+                            <li>Descrever os métodos de diagnóstico laboratorial para intoxicações por metais pesados.</li>
+                            <li>Explicar os achados clínicos característicos da intoxicação por chumbo (linha de Burton, linhas metafisárias).</li>
+                            <li>Compreender as medidas de prevenção e tratamento para intoxicações por metais pesados.</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="content-highlight">
+                    <div class="content-highlight-title">
+                        <i class="fas fa-book-open"></i> Referências
+                    </div>
+                    <p><strong>Referências recomendadas de Práticas Funcionais:</strong></p>
+                    <p>- Robbins & Cotran - Bases Patológicas</p>
+                    <p>- CDC e OMS para dados epidemiológicos</p>
+                    <p>- Protocolos de toxicologia laboratorial</p>
+                </div>
+                
+                <div class="content-key-point">
+                    <div class="content-key-point-title">ATIVIDADE PATOLOGIA 5</div>
+                    <div class="content-text">
+                        <p><strong>Objetivos:</strong></p>
+                        <ul class="content-list">
+                            <li>Definir metaplasia escamosa e diferenciá-la de displasia e neoplasia.</li>
+                            <li>Descrever as características do carcinoma in situ e sua importância clínica.</li>
+                            <li>Diferenciar adenocarcinoma de carcinoma escamoso quanto à histogênese e características morfológicas.</li>
+                            <li>Reconhecer exemplos de metaplasia escamosa em diferentes órgãos.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="content-highlight">
+                    <div class="content-highlight-title">
+                        <i class="fas fa-book"></i> Referências recomendadas de Patologia:
+                    </div>
+                    <p>Robbins & Cotran - Bases Patológicas</p>
+                    <p>AnatPat Unicamp</p>
+                    <p>Guias de oncologia básica</p>
+                </div>
+                
+                <div class="content-key-point">
+                    <div class="content-key-point-title">ATIVIDADE ANATOMIA 5</div>
+                    <div class="content-text">
+                        <p><strong>Objetivos:</strong></p>
+                        <ul class="content-list">
+                            <li>Descrever a anatomia do nervo trigêmeo e seus três ramos principais.</li>
+                            <li>Identificar os territórios de inervação sensitiva e motora do nervo trigêmeo.</li>
+                            <li>Explicar a estrutura dos dentes e sua inervação.</li>
+                            <li>Reconhecer os locais anatômicos de depósito do chumbo no organismo.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-button" onclick="navigate('home')">
+                        <i class="fas fa-home"></i> Voltar para Home
+                    </button>
+                    <button class="nav-button next" onclick="navigate('section2')">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 2 - Práticas Funcionais -->
+            <div class="content-section" id="section2">
+                <h2 class="content-title">Práticas Funcionais: Metais Pesados</h2>
+                <h3 class="content-subtitle">Intoxicações por Chumbo, Mercúrio e Outros - Mecanismos e Diagnóstico</h3>
+                
+                <div class="content-text">
+                    <p>Os metais pesados incluem elementos como chumbo, mercúrio, arsênio e cádmio que, em quantidades excessivas no organismo, causam toxicidade significativa.</p>
+                    
+                    <div class="content-key-point">
+                        <div class="content-key-point-title">Chumbo (Pb) - Saturnismo</div>
+                        <ul class="content-list">
+                            <li><strong>Fontes de exposição:</strong> Baterias, fundições, tintas antigas, água contaminada por encanamentos</li>
+                            <li><strong>Mecanismo de toxicidade:</strong> Liga-se a grupos sulfidrilas de enzimas, inibindo a síntese do heme</li>
+                            <li><strong>Efeitos hematológicos:</strong> Anemia por diminuição da incorporação de ferro no heme</li>
+                            <li><strong>Efeitos neurológicos:</strong> Em crianças - déficit cognitivo; em adultos - neuropatia periférica motora</li>
+                            <li><strong>Depósitos:</strong> Substitui cálcio em ossos e dentes em crescimento</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-highlight">
+                        <div class="content-highlight-title">
+                            <i class="fas fa-info-circle"></i> Achados Característicos do Chumbo
+                        </div>
+                        <ul class="content-list">
+                            <li><strong>Linhas de chumbo:</strong> Linhas densas nas metáfises ósseas em radiografias</li>
+                            <li><strong>Linha de Burton:</strong> Linha azul-escura na gengiva por depósito de sulfeto de chumbo</li>
+                            <li><strong>Pontilhado basofílico:</strong> Agregados de ribossomos em eritroblastos no hemograma</li>
+                        </ul>
+                    </div>
+                    
+                    <h3 class="content-subtitle">Diagnóstico e Tratamento do Saturnismo</h3>
+                    
+                    <div class="content-text">
+                        <div class="content-table-container">
+                            <table class="content-table">
+                                <thead>
+                                    <tr>
+                                        <th>Método Diagnóstico</th>
+                                        <th>Achado</th>
+                                        <th>Níveis de Referência</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Chumbo sanguíneo</td>
+                                        <td>Principal padrão diagnóstico</td>
+                                        <td>>5-10 μg/dL preocupante em crianças<br>>45 μg/dL indica tratamento</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Protoporfirina eritrocitária</td>
+                                        <td>Elevada na intoxicação</td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Chumbo urinário</td>
+                                        <td>Avalia excreção após quelante</td>
+                                        <td>-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <p><strong>Tratamento:</strong> Afastar a fonte e quelaterapia (EDTA cálcico, dimercaprol ou succimer)</p>
+                    </div>
+                    
+                    <div class="content-key-point">
+                        <div class="content-key-point-title">Mercúrio (Hg) - Formas e Toxicidade</div>
+                        <ul class="content-list">
+                            <li><strong>Mercúrio elementar:</strong> Vapores de Hg metálico (garimpos, laboratórios)</li>
+                            <li><strong>Mercúrio inorgânico:</strong> Sais de Hg (antigos amálgamas dentários)</li>
+                            <li><strong>Mercúrio orgânico:</strong> Metilmercúrio (bioacumula em peixes predadores)</li>
+                            <li><strong>Mecanismo:</strong> Liga-se a grupos sulfidrilas de proteínas e enzimas</li>
+                            <li><strong>Efeitos neurológicos:</strong> Tremores, alterações comportamentais ("erethism")</li>
+                            <li><strong>Síndrome de Minamata:</strong> Danos neurológicos graves por exposição fetal</li>
+                        </ul>
+                    </div>
+                    
+                    <h3 class="content-subtitle">Diagnóstico e Prevenção do Mercúrio</h3>
+                    
+                    <div class="content-text">
+                        <ul class="content-list">
+                            <li><strong>Diagnóstico:</strong> Dosagem de Hg no sangue, urina ou cabelos</li>
+                            <li><strong>Tratamento:</strong> Quelantes como dimercaprol e succimer</li>
+                            <li><strong>Prevenção:</strong> Evitar peixes grandes em áreas contaminadas (especialmente gestantes)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-key-point">
+                        <div class="content-key-point-title">Outros Metais Pesados</div>
+                        <ul class="content-list">
+                            <li><strong>Arsênio (As):</strong> Água subterrânea, pesticidas - causa lesões cutâneas, neuropatia, câncer</li>
+                            <li><strong>Cádmio (Cd):</strong> Baterias, cigarro - causa nefropatia crônica e enfisema</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-button" onclick="navigate('section1')">
+                        <i class="fas fa-arrow-left"></i> Anterior
+                    </button>
+                    <button class="nav-button next" onclick="navigate('section3')">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 3 - Patologia -->
+            <div class="content-section" id="section3">
+                <h2 class="content-title">Patologia: Lesões Pré-Neoplásicas e Neoplasias Epiteliais</h2>
+                <h3 class="content-subtitle">Metaplasia Escamosa, Carcinoma in situ, Adenocarcinoma vs Carcinoma Epidermoide</h3>
+                
+                <div class="content-text">
+                    <div class="content-key-point">
+                        <div class="content-key-point-title">Metaplasia Escamosa</div>
+                        <ul class="content-list">
+                            <li><strong>Definição:</strong> Substituição reversível de um epitélio adulto por outro mais resistente</li>
+                            <li><strong>Exemplos:</strong> 
+                                <ul>
+                                    <li>Trato respiratório de fumantes (epitélio colunar ciliado → escamoso)</li>
+                                    <li>Colo uterino (zona de transformação)</li>
+                                </ul>
+                            </li>
+                            <li><strong>Importância:</strong> Não é maligna, mas pode progredir para displasia com agressão persistente</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-key-point">
+                        <div class="content-key-point-title">Carcinoma in situ</div>
+                        <ul class="content-list">
+                            <li><strong>Definição:</strong> Neoplasia intraepitelial com todas características citológicas de malignidade, sem invasão da membrana basal</li>
+                            <li><strong>Exemplos:</strong> 
+                                <ul>
+                                    <li>NIC III (colo uterino)</li>
+                                    <li>Carcinoma ductal in situ (mama)</li>
+                                </ul>
+                            </li>
+                            <li><strong>Importância:</strong> Alta probabilidade de progressão para invasivo se não tratado</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-highlight">
+                        <div class="content-highlight-title">
+                            <i class="fas fa-info-circle"></i> Comparação: Adenocarcinoma vs Carcinoma Escamoso
+                        </div>
+                        <div class="content-table-container">
+                            <table class="content-table">
+                                <thead>
+                                    <tr>
+                                        <th>Característica</th>
+                                        <th>Adenocarcinoma</th>
+                                        <th>Carcinoma Escamoso</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Origem</strong></td>
+                                        <td>Epitélio glandular</td>
+                                        <td>Epitélio escamoso ou metaplasia escamosa</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Diferenciação</strong></td>
+                                        <td>Forma glândulas, produz muco</td>
+                                        <td>Queratina, pontes intercelulares</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Exemplos</strong></td>
+                                        <td>Pulmão periférico, cólon, próstata, mama</td>
+                                        <td>Pulmão central, esôfago, colo uterino, pele</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Fatores de Risco</strong></td>
+                                        <td>Varia conforme local (ex: refluxo para esôfago)</td>
+                                        <td>Tabaco, álcool, HPV, exposição solar</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="content-text">
+                        <p><strong>Sequência neoplásica:</strong> Normal → Metaplasia → Displasia → Carcinoma in situ → Carcinoma invasivo</p>
+                        <p><strong>Importância clínica:</strong> Identificação de lesões precursoras (metaplasias, in situ) permite intervenção precoce e redução da mortalidade.</p>
+                    </div>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-button" onclick="navigate('section2')">
+                        <i class="fas fa-arrow-left"></i> Anterior
+                    </button>
+                    <button class="nav-button next" onclick="navigate('section4')">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 4 - Anatomia -->
+            <div class="content-section" id="section4">
+                <h2 class="content-title">Anatomia: Nervo Trigêmeo, Dentes e Depósitos de Chumbo</h2>
+                <h3 class="content-subtitle">Estrutura e Inervação Dentária - Locais de Acúmulo de Chumbo</h3>
+                
+                <div class="content-text">
+                    <div class="content-key-point">
+                        <div class="content-key-point-title">Nervo Trigêmeo (V)</div>
+                        <p>Quinto nervo craniano, misto (predominantemente sensitivo), com três ramos:</p>
+                        <div class="content-table-container">
+                            <table class="content-table">
+                                <thead>
+                                    <tr>
+                                        <th>Ramo</th>
+                                        <th>Tipo</th>
+                                        <th>Inervação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>V1 - Oftálmico</strong></td>
+                                        <td>Sensitivo</td>
+                                        <td>Fronte, pálpebra superior, córnea, seio frontal</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>V2 - Maxilar</strong></td>
+                                        <td>Sensitivo</td>
+                                        <td>Pálpebra inferior, bochechas, lábio superior, dentes superiores</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>V3 - Mandibular</strong></td>
+                                        <td>Sensitivo e Motor</td>
+                                        <td>Lábio inferior, queixo, dentes inferiores, músculos da mastigação</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <h3 class="content-subtitle">Dentes - Estrutura e Inervação</h3>
+                    
+                    <div class="content-text">
+                        <ul class="content-list">
+                            <li><strong>Adulto:</strong> 32 dentes (16 por arcada: 4 incisivos, 2 caninos, 4 premolares, 6 molares)</li>
+                            <li><strong>Crianças:</strong> 20 dentes decíduos</li>
+                            <li><strong>Partes:</strong> Coroa (esmalte), colo, raiz (cemento), polpa dentária (vascularizada e inervada)</li>
+                            <li><strong>Inervação:</strong> 
+                                <ul>
+                                    <li>Dentes superiores: nervos alveolares superiores (V2)</li>
+                                    <li>Dentes inferiores: nervo alveolar inferior (V3)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-key-point">
+                        <div class="content-key-point-title">Depósitos de Chumbo no Organismo</div>
+                        <ul class="content-list">
+                            <li><strong>Ossos e dentes:</strong> ~94% do chumbo absorvido em adultos (70% em crianças)</li>
+                            <li><strong>Linha de Burton:</strong> Linha azul-escura na gengiva por sulfeto de chumbo</li>
+                            <li><strong>Radiografias:</strong> Linhas densas nas metáfises ósseas de crianças</li>
+                            <li><strong>Importância:</strong> Os depósitos ósseos podem liberar chumbo lentamente por anos</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-highlight">
+                        <div class="content-highlight-title">
+                            <i class="fas fa-exclamation-triangle"></i> Achados Clínicos do Saturnismo
+                        </div>
+                        <ul class="content-list">
+                            <li>Linha de Burton na gengiva</li>
+                            <li>Anemia com pontilhado basofílico</li>
+                            <li>Neuropatia periférica motora (queda do punho)</li>
+                            <li>Déficit cognitivo em crianças</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-button" onclick="navigate('section3')">
+                        <i class="fas fa-arrow-left"></i> Anterior
+                    </button>
+                    <button class="nav-button next" onclick="navigate('home')">
+                        <i class="fas fa-home"></i> Voltar para Home
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>Sobre</h3>
+                <ul>
+                    <li><a href="#">Portal de Estudos</a></li>
+                    <li><a href="#">Práticas Funcionais</a></li>
+                    <li><a href="#">Patologia</a></li>
+                    <li><a href="#">Anatomia</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Recursos</h3>
+                <ul>
+                    <li><a href="#">Bibliografia</a></li>
+                    <li><a href="#">Protocolos</a></li>
+                    <li><a href="#">Referências</a></li>
+                    <li><a href="#">Atividades</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Contato</h3>
+                <ul>
+                    <li><a href="#">Email</a></li>
+                    <li><a href="#">Suporte</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Feedback</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 Portal de Morfologia. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navigation function
+        function navigate(section) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(s => {
+                s.classList.remove('active');
+            });
+            
+            if (section === 'home') {
+                // Scroll to top
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+                // Show first section
+                document.getElementById('section1').classList.add('active');
+            } else {
+                // Show selected section
+                document.getElementById(section).classList.add('active');
+                // Scroll to content
+                document.getElementById('content').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        }
+        
+        // Animate title words on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleWords = document.querySelectorAll('.title-word');
+            titleWords.forEach(word => {
+                word.style.opacity = '1';
+            });
+            
+            const subtitle = document.querySelector('.subtitle');
+            subtitle.style.opacity = '1';
+            
+            const headerCta = document.querySelector('.header-cta');
+            headerCta.style.opacity = '1';
+            
+            const headerScroll = document.querySelector('.header-scroll');
+            if (headerScroll) headerScroll.style.opacity = '1';
+        });
+    </script>
+</body>
+</html>

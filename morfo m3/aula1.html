@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Morfologia - Aulas 1 a 5</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3f37c9;
+            --primary-light: #4895ef;
+            --secondary: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --success: #43aa8b;
+            --dark: #1b263b;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Header Styles */
+        header {
+            position: relative;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+            color: white;
+            padding: 5rem 2rem 8rem;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 0%, transparent 45%);
+            z-index: 1;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 3;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        
+        .header-text {
+            max-width: 600px;
+        }
+        
+        .header-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #fff, #e0f2fe);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .title-word {
+            display: inline-block;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .title-word-1 { animation-delay: 0.2s; }
+        .title-word-2 { animation-delay: 0.4s; }
+        .title-word-3 { animation-delay: 0.6s; }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            font-weight: 300;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 0.8s forwards;
+            max-width: 90%;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .highlight {
+            font-weight: 600;
+            color: #fff;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.3);
+            z-index: -1;
+            border-radius: 3px;
+        }
+        
+        .header-cta {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 1s forwards;
+        }
+        
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: white;
+            color: var(--primary);
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            color: var(--primary-dark);
+        }
+        
+        .cta-button i {
+            transition: transform 0.3s ease;
+        }
+        
+        .cta-button:hover i {
+            transform: translateY(3px);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+            border-radius: 50%;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+        }
+        
+        .header-image {
+            position: relative;
+            opacity: 0;
+            animation: fadeInRight 1s ease-out 0.5s forwards;
+        }
+        
+        .header-img {
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            transform: perspective(1000px) rotateY(-15deg);
+            transform-origin: left;
+            transition: transform 0.5s ease;
+        }
+        
+        .header-image:hover .header-img {
+            transform: perspective(1000px) rotateY(-5deg);
+        }
+        
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(67, 97, 238, 0.3), rgba(76, 201, 240, 0.2));
+            border-radius: 20px;
+            mix-blend-mode: overlay;
+        }
+        
+        .header-scroll {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 1.5s forwards;
+        }
+        
+        .scroll-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+        }
+        
+        .scroll-line {
+            width: 2px;
+            height: 50px;
+            background: rgba(255,255,255,0.5);
+            margin-top: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scroll-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: white;
+            animation: scrollIndicator 2s infinite ease-in-out;
+        }
+        
+        /* Main Content Styles */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+        
+        .aulas-section {
+            margin-top: -5rem;
+            position: relative;
+            z-index: 5;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+        
+        .section-title p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+        
+        .buttons-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .aula-btn {
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        
+        .aula-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary);
+        }
+        
+        .aula-btn:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .aula-btn:nth-child(1)::before { background: var(--primary); }
+        .aula-btn:nth-child(2)::before { background: var(--danger); }
+        .aula-btn:nth-child(3)::before { background: var(--warning); }
+        .aula-btn:nth-child(4)::before { background: var(--success); }
+        .aula-btn:nth-child(5)::before { background: var(--info); }
+        
+        .icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .aula-btn:nth-child(1) .icon { color: var(--primary); }
+        .aula-btn:nth-child(2) .icon { color: var(--danger); }
+        .aula-btn:nth-child(3) .icon { color: var(--warning); }
+        .aula-btn:nth-child(4) .icon { color: var(--success); }
+        .aula-btn:nth-child(5) .icon { color: var(--info); }
+        
+        .aula-btn:hover .icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .btn-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark);
+            position: relative;
+        }
+        
+        .btn-desc {
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-number {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0,0,0,0.1);
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Content Section Styles */
+        .content-section {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .content-title {
+            font-size: 2rem;
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(67, 97, 238, 0.1);
+        }
+        
+        .content-subtitle {
+            font-size: 1.4rem;
+            color: var(--dark);
+            margin: 2rem 0 1rem;
+            font-weight: 600;
+        }
+        
+        .content-text {
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            color: #444;
+        }
+        
+        .content-list {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+        }
+        
+        .content-list li {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+        }
+        
+        .content-highlight {
+            background: rgba(67, 97, 238, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .content-highlight-title {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+        
+        .nav-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .nav-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .nav-button i {
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-button:hover i {
+            transform: translateX(-3px);
+        }
+        
+        .nav-button.next:hover i {
+            transform: translateX(3px);
+        }
+        
+        /* Footer Styles */
+        footer {
+            text-align: center;
+            margin-top: 6rem;
+            padding: 3rem 2rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+            position: relative;
+            background-color: var(--dark);
+            color: rgba(255,255,255,0.7);
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: left;
+        }
+        
+        .footer-column h3 {
+            color: white;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-column ul li a {
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-column ul li a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Floating Shapes */
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            border-radius: 50%;
+            filter: blur(40px);
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+        
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--danger);
+            bottom: -150px;
+            left: -100px;
+            animation-delay: 3s;
+        }
+        
+        .shape-3 {
+            width: 250px;
+            height: 250px;
+            background: var(--success);
+            top: 50%;
+            left: 10%;
+            animation-delay: 6s;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from { 
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes scrollIndicator {
+            0% { transform: translateY(-20px); opacity: 0; }
+            30% { opacity: 1; }
+            100% { transform: translateY(50px); opacity: 0; }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+        
+        /* Responsividade */
+        @media (max-width: 1200px) {
+            h1 {
+                font-size: 3.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .header-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .header-text {
+                max-width: 100%;
+                margin-bottom: 3rem;
+            }
+            
+            .header-cta {
+                justify-content: center;
+            }
+            
+            .header-image {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                padding: 3rem 1.5rem 6rem;
+                clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 2rem;
+            }
+            
+            .header-cta {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            .buttons-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .aula-btn {
+                padding: 2rem;
+            }
+            
+            .content-section {
+                padding: 2rem;
+            }
+            
+            .content-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-overlay"></div>
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+        <div class="header-content">
+            <div class="header-text">
+                <span class="header-badge">Morfologia - Aulas 1 a 5</span>
+                <h1>
+                    <span class="title-word title-word-1">Portal de</span>
+                    <span class="title-word title-word-2">Estudos</span>
+                    <span class="title-word title-word-3">Médicos</span>
+                </h1>
+                <p class="subtitle">
+                    Conteúdo completo sobre <span class="highlight">Morfologia</span>, <span class="highlight">Práticas Funcionais</span> e <span class="highlight">Anatomia</span> da tireoide e acetilcolinesterase.
+                </p>
+                <div class="header-cta">
+                    <a href="#content" class="cta-button">
+                        Começar Estudo
+                        <i class="fas fa-arrow-down"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="header-scroll">
+            <div class="scroll-indicator">
+                Role para baixo
+                <div class="scroll-line"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" id="content">
+        <section class="aulas-section">
+            <div class="section-title">
+                <h2>Conteúdo Detalhado</h2>
+                <p>Explore os tópicos de Morfologia, Práticas Funcionais e Anatomia de forma organizada e completa.</p>
+            </div>
+
+            <!-- Section 1 - Perguntas Norteadoras -->
+            <div class="content-section active" id="section1">
+                <h2 class="content-title">Perguntas Norteadoras</h2>
+                
+                <h3 class="content-subtitle">ATIVIDADE MORFOLOGIA 1</h3>
+                <div class="content-text">
+                    <p>1. Identificar e descrever a glândula tireoide: seus lobos, sua vascularização e inervação.</p>
+                    <p>2. Caracterizar seu desenvolvimento embriológico e seus tipos celulares constituintes (H-51).</p>
+                    <p>3. Descrever as alterações morfológicas presentes no bócio difuso atóxico.</p>
+                </div>
+                
+                <div class="content-highlight">
+                    <div class="content-highlight-title">Referências:</div>
+                    <p>● Lâmina: <a href="http://anatpat.unicamp.br/lamendo9.html" target="_blank">http://anatpat.unicamp.br/lamendo9.html</a></p>
+                    <p>● Lâmina: <a href="http://anatpat.unicamp.br/lamendo10.html" target="_blank">http://anatpat.unicamp.br/lamendo10.html</a></p>
+                    <p>Referências recomendadas de Morfologia:</p>
+                    <p>- Consultar na bibliografia sugerida do módulo</p>
+                    <p>- Lâminas = anatpat</p>
+                    <p>- Lâminas H = pannoramic viewer</p>
+                </div>
+                
+                <h3 class="content-subtitle">ATIVIDADE PRÁTICAS FUNCIONAIS 1</h3>
+                <div class="content-text">
+                    <p><strong>Atividade 1:</strong> Determinação da atividade da acetilconisterase.</p>
+                    <p><strong>Objetivos:</strong></p>
+                    <ul class="content-list">
+                        <li>Identificar a epidemiologia da intoxicação causada pela inibição de acetilcolinesterase, de acordo com a faixa etária e sexo.</li>
+                        <li>Identificar os diversos tipos de acetilcolinesterase no organismo.</li>
+                        <li>Descrever o mecanismo de ação no organismo dos principais compostos que inibem a aceticolinesterase.</li>
+                        <li>Identificar a forma e importância do diagnóstico de intoxicação inibição da acetilcolinesterase.</li>
+                    </ul>
+                    <p><strong>Desenvolvimento:</strong></p>
+                    <p>Aula expositiva: Identificação dos diferentes tipos de acetilcolinesterase no organismo humano, os sintomas que causam sua inibição e seu mecanismo de diagnóstico.</p>
+                    <p>Aula prática: Determinação da atividade de acetilcolinesterase em amostra de plasma humano.</p>
+                </div>
+                
+                <div class="content-highlight">
+                    <div class="content-highlight-title">Referências recomendadas de Práticas Funcionais:</div>
+                    <p>Consultar na bibliografia sugerida do módulo</p>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-button" onclick="navigate('home')">
+                        <i class="fas fa-home"></i> Voltar para Home
+                    </button>
+                    <button class="nav-button next" onclick="navigate('section2')">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 2 - Aula 1 Práticas Funcionais -->
+            <div class="content-section" id="section2">
+                <h2 class="content-title">Aula 1 - Práticas Funcionais: Acetilcolinesterase (AChE)</h2>
+                <h3 class="content-subtitle">Tipos, Mecanismo de Inibição, Diagnóstico e Epidemiologia da Intoxicação</h3>
+                
+                <div class="content-text">
+                    <p>A acetilcolinesterase (AChE) é a enzima responsável por degradar o neurotransmissor acetilcolina na fenda sináptica, encerrando assim os sinais colinérgicos. No organismo humano há duas colinesterases principais: a acetilcolinesterase verdadeira, presente nas sinapses e nas membranas de eritrócitos, e a butirilcolinesterase (BChE), ou colinesterase plasmática, encontrada no sangue e fígado. As intoxicações por organofosforados (inseticidas, agentes neurotóxicos) devem-se ao mecanismo de inibição irreversível da AChE:</p>
+                    
+                    <ol class="content-list">
+                        <li><strong>Ligação do inibidor:</strong> Compostos organofosforados ligam-se covalentemente ao sítio ativo da AChE, bloqueando a hidrólise da acetilcolina.</li>
+                        <li><strong>Acúmulo de acetilcolina:</strong> A acetilcolina se acumula nas sinapses colinérgicas (muscarínicas e nicotínicas), produzindo estimulação excessiva dos receptores.</li>
+                        <li><strong>Síndrome colinérgica:</strong> Clinicamente surgem sinais de hiperestimulação colinérgica: salivação intensa, sudorese, lacrimejamento, diarreia, vômitos, broncoconstrição e bradicardia, além de fasciculações musculares e fraqueza (devido à despolarização contínua nas junções neuromusculares). Em casos graves, ocorre paralisia respiratória central e periférica, levando ao óbito se não tratado.</li>
+                        <li><strong>"Envelhecimento" da enzima:</strong> Com o tempo, a ligação organofosforado-AChE se torna praticamente irreversível ("envelhecimento"), dificultando a reativação enzimática.</li>
+                    </ol>
+                    
+                    <p>Para diagnóstico de intoxicação aguda por organofosforados, pode-se dosar a atividade da colinesterase plasmática e eritrocitária (tipicamente estão reduzidas). O tratamento inclui atropina (antagonista muscarínico) e reativadores da colinesterase (como pralidoxima) antes que o complexo enzima-inibidor se torne permanente. Epidemiologicamente, intoxicações por inibidores de AChE ocorrem com maior frequência em zonas agrícolas (exposição a pesticidas) e são um importante problema de saúde ocupacional em muitos países. Em casos de ataques com agentes neurotóxicos (ex.: gás sarin), vítimas apresentam quadro semelhante. A mortalidade é elevada se não houver intervenção rápida, e surtos de intoxicação podem ocorrer em comunidades rurais devido ao uso indevido de pesticidas.</p>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-button" onclick="navigate('section1')">
+                        <i class="fas fa-arrow-left"></i> Anterior
+                    </button>
+                    <button class="nav-button next" onclick="navigate('section3')">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 3 - Patologia -->
+            <div class="content-section" id="section3">
+                <h2 class="content-title">Patologia: Bócio Difuso Atóxico (Bócio Colóide Simples)</h2>
+                <h3 class="content-subtitle">Morfologia, Tipos Celulares e Desenvolvimento Embrionário da Tireóide</h3>
+                
+                <div class="content-text">
+                    <p>O bócio difuso atóxico, também conhecido como bócio colóide ou simples, é caracterizado por aumento difuso da glândula tireóide sem sinais de hipertireoidismo.</p>
+                    
+                    <p>Macroscopicamente, a tireóide encontra-se simetricamente aumentada, de consistência elástica, podendo ultrapassar 40 gramas. Microscopicamente, há proliferação e dilatação de folículos tireoidianos repletos de coloide, revestidos por epitélio cúbico baixo ou achatado (células foliculares) quando o coloide se acumula em excesso. Nos casos iniciais (bócio difuso), o parênquima é homogêneo; com o tempo, podem surgir áreas nodulares (evolução para bócio multinodular) sem cápsula evidente separando os nódulos. Alterações secundárias frequentes incluem hemorragias focais, fibrose, calcificações e até metaplasia óssea nos nódulos de longa data. Podem ser vistas pequenas projeções papilares benígnas (chamadas Sanderson polsters) projetando-se para dentro dos folículos dilatados, sem atipia nuclear (diferenciando-se de carcinoma papilífero).</p>
+                    
+                    <p>Os tipos celulares principais da tireóide normal e presentes no bócio são: as células foliculares (tireócitos), que produzem as hormonas T3 e T4 e formam os folículos; e as células parafoliculares (células C), localizadas entre os folículos, produtoras de calcitonina. Apesar do crescimento glandular, no bócio simples a maioria dos pacientes permanece eutireóideo, pois o aumento é uma resposta adaptativa à deficiência de iodo ou leve disfunção hormonal.</p>
+                    
+                    <p>Do ponto de vista do desenvolvimento embrionário, a tireoide é a primeira glândula endócrina a se formar no embrião. Ela origina-se de uma proliferação endodérmica no assoalho da faringe primitiva (forame cego na base da língua) por volta da 4ª semana de gestação. A partir daí, o esboço tireoidiano desce no pescoço através do ducto tireoglosso (que normalmente atrofia, podendo deixar como remanescente o lobo piramidal da tireóide). Por volta da 7ª semana, a glândula atinge sua posição definitiva anterior à traqueia. As células foliculares derivam desse endoderma faringeano, enquanto as células parafoliculares (C) derivam do corpo ultimobranquial (4ª bolsa branquial), incorporado à tireoide em desenvolvimento. Essa origem dupla explica a presença de dois tipos celulares distintos na glândula. Alterações no desenvolvimento embrionário podem resultar em ectopias tireoidianas (por exemplo, tireoide lingual) ou cistos do ducto tireoglosso.</p>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-button" onclick="navigate('section2')">
+                        <i class="fas fa-arrow-left"></i> Anterior
+                    </button>
+                    <button class="nav-button next" onclick="navigate('section4')">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Section 4 - Anatomia -->
+            <div class="content-section" id="section4">
+                <h2 class="content-title">Anatomia: Tireoide</h2>
+                <h3 class="content-subtitle">Lobos, Vascularização e Inervação</h3>
+                
+                <div class="content-text">
+                    <p>A glândula tireóide localiza-se na região anterior do pescoço, diante da traqueia, e apresenta dois lobos laterais (direito e esquerdo) conectados por um ístmo mediano. Eventualmente pode haver um lobo piramidal, projeção superior remanescente do ducto tireoglosso, mais comum originando-se à esquerda do istmo. Cada lobo mede cerca de 4–6 cm de altura.</p>
+                    
+                    <p>A tireoide é ricamente vascularizada: a irrigação arterial provém principalmente das artérias tireoidianas superiores (ramos da artéria carótida externa) e das artérias tireoidianas inferiores (ramos do tronco tireocervical da subclávia). Essas artérias formam extensas anastomoses e garantem suprimento sanguíneo abundante à glândula. O drenagem venosa é feita por um plexo venoso tiroideo, desembocando nas veias tireoidianas superior e média (que drenam para a veia jugular interna) e na veia tireoidiana inferior (drenando nos troncos braquiocefálicos). Em virtude dessa vascularização exuberante, sopros ou frêmitos podem ser audíveis/palpáveis em bócios hipervascularizados.</p>
+                    
+                    <p>A inervação da tireoide é fornecida pelo sistema nervoso autônomo. Fibras simpáticas pós-ganglionares originam-se dos gânglios simpáticos cervicais (superior, médio e inferior) e acompanham os vasos tireoidianos, regulando o tônus vascular glandular. Já a inervação parassimpática provém dos ramos do nervo vago (nervo X), especialmente via nervos laríngeos recorrentes e externo, que emitem fibras para a glândula. Importante notar que a regulação da função hormonal tireoidiana é principalmente endócrina (por TSH hipofisário) e não neurógena – ou seja, os nervos controlam sobretudo a vasomotricidade, não a secreção hormonal.</p>
+                    
+                    <p>Durante cirurgias da tireoide, deve-se ter cuidado para não lesar o nervo laríngeo recorrente, que passa próximo à artéria tireoidiana inferior e cuja lesão leva à paralisia das pregas vocais (rouquidão). Em suma, a tireoide apresenta dois lobos unidos por istmo, vascularização proveniente de ramos da carótida externa e subclávia, drenagem para veias jugulares e braquiocefálicas, e inervação autônoma (simpática cervical e parassimpática via vago).</p>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-button" onclick="navigate('section3')">
+                        <i class="fas fa-arrow-left"></i> Anterior
+                    </button>
+                    <button class="nav-button next" onclick="navigate('home')">
+                        <i class="fas fa-home"></i> Voltar para Home
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>Sobre</h3>
+                <ul>
+                    <li><a href="#">Portal de Estudos</a></li>
+                    <li><a href="#">Morfologia</a></li>
+                    <li><a href="#">Práticas Funcionais</a></li>
+                    <li><a href="#">Anatomia</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Recursos</h3>
+                <ul>
+                    <li><a href="#">Bibliografia</a></li>
+                    <li><a href="#">Lâminas</a></li>
+                    <li><a href="#">Referências</a></li>
+                    <li><a href="#">Atividades</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Contato</h3>
+                <ul>
+                    <li><a href="#">Email</a></li>
+                    <li><a href="#">Suporte</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Feedback</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 Portal de Morfologia. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navigation function
+        function navigate(section) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(s => {
+                s.classList.remove('active');
+            });
+            
+            if (section === 'home') {
+                // Scroll to top
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+                // Show first section
+                document.getElementById('section1').classList.add('active');
+            } else {
+                // Show selected section
+                document.getElementById(section).classList.add('active');
+                // Scroll to content
+                document.getElementById('content').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        }
+        
+        // Animate title words on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const titleWords = document.querySelectorAll('.title-word');
+            titleWords.forEach(word => {
+                word.style.opacity = '1';
+            });
+            
+            const subtitle = document.querySelector('.subtitle');
+            subtitle.style.opacity = '1';
+            
+            const headerCta = document.querySelector('.header-cta');
+            headerCta.style.opacity = '1';
+            
+            const headerImage = document.querySelector('.header-image');
+            headerImage.style.opacity = '1';
+            
+            const headerScroll = document.querySelector('.header-scroll');
+            headerScroll.style.opacity = '1';
+        });
+    </script>
+</body>
+</html>
