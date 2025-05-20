@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliação da apresentação e impacto na prática dos ACSs</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --info-color: #2980b9;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 25px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .chart-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        h2 {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        .responses {
+            font-size: 13px;
+            color: #7f8c8d;
+            background-color: #f8f9fa;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
+            margin: 10px 0;
+        }
+        
+        .percentages {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .percentage-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .percentage-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        
+        .comments-section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin-top: 30px;
+        }
+        
+        .comments-title {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comment-list {
+            list-style: none;
+        }
+        
+        .comment-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--secondary-color);
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .comment-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .challenge-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+        
+        .challenge-item {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .challenge-item:before {
+            content: "•";
+            color: var(--secondary-color);
+            font-size: 20px;
+            position: absolute;
+            left: 10px;
+            top: 5px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px 0;
+            color: #7f8c8d;
+            font-size: 13px;
+            border-top: 1px solid #eee;
+        }
+        
+        .page-info {
+            font-size: 12px;
+            color: #95a5a6;
+            text-align: right;
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Avaliação da apresentação e impacto na prática dos ACSs</h1>
+            <p class="subtitle">Relatório de análise das respostas - 10 participantes</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Primeira linha de gráficos -->
+        <div class="grid-container">
+            <!-- Gráfico 1 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>Como você avalia o conteúdo apresentado no encontro sobre saúde masculina?</h2>
+                    <span class="responses">10 respostas</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart1"></canvas>
+                </div>
+                <div class="percentages">
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                        <span>Muito claro e relevante: 100%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico 2 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>Você se sentiu à vontade para participar e expressar suas opiniões durante a roda de conversa?</h2>
+                    <span class="responses">10 respostas</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart2"></canvas>
+                </div>
+                <div class="percentages">
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                        <span>Sim, totalmente: 100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Segunda linha de gráficos -->
+        <div class="grid-container">
+            <!-- Gráfico 3 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>A metodologia utilizada (palestra e roda de conversa) contribuiu para o seu aprendizado?</h2>
+                    <span class="responses">10 respostas</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart3"></canvas>
+                </div>
+                <div class="percentages">
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                        <span>Sim, muito: 100%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico 4 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>O material utilizado (slide) foi útil para sua compreensão a respeito do tema?</h2>
+                    <span class="responses">10 respostas</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart4"></canvas>
+                </div>
+                <div class="percentages">
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                        <span>Sim: 80%</span>
+                    </div>
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(54, 162, 235, 0.8);"></span>
+                        <span>Parcialmente: 20%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terceira linha de gráficos -->
+        <div class="grid-container">
+            <!-- Gráfico 5 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>Após o encontro, você passou a se sentir mais preparado(a) para abordar a saúde do homem nas visitas domiciliares?</h2>
+                    <span class="responses">10 respostas</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart5"></canvas>
+                </div>
+                <div class="percentages">
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                        <span>Sim, me sinto mais seguro(a): 90%</span>
+                    </div>
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(255, 206, 86, 0.8);"></span>
+                        <span>Não me sinto preparado(a): 10%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico 6 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>Você já aplicou algum conhecimento ou estratégia discutida no encontro em sua rotina de trabalho?</h2>
+                    <span class="responses">10 respostas</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart6"></canvas>
+                </div>
+                <div class="percentages">
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                        <span>Sim, em várias situações: 30%</span>
+                    </div>
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(54, 162, 235, 0.8);"></span>
+                        <span>Sim, em algumas situações: 30%</span>
+                    </div>
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(255, 206, 86, 0.8);"></span>
+                        <span>Ainda não tive oportunidade: 40%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quarta linha de gráficos -->
+        <div class="grid-container">
+            <!-- Gráfico 7 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>Na sua percepção, o conteúdo apresentado ajudou a mudar sua forma de enxergar a masculinidade e a saúde do homem?</h2>
+                    <span class="responses">10 respostas</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart7"></canvas>
+                </div>
+                <div class="percentages">
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                        <span>Sim, totalmente: 90%</span>
+                    </div>
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(255, 206, 86, 0.8);"></span>
+                        <span>Não houve mudança: 10%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico 8 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>Você conseguiu discutir esse tema com alguma mãe ou cuidadora durante visitas domiciliares?</h2>
+                    <span class="responses">10 respostas</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart8"></canvas>
+                </div>
+                <div class="percentages">
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                        <span>Sim: 60%</span>
+                    </div>
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(255, 99, 132, 0.8);"></span>
+                        <span>Não: 10%</span>
+                    </div>
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(255, 206, 86, 0.8);"></span>
+                        <span>Não, mas ainda pretendo: 30%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desafios encontrados -->
+        <div class="chart-card" style="grid-column: 1 / -1;">
+            <div class="chart-header">
+                <h2>Qual foi o maior desafio que você encontrou para aplicar o que aprendeu na prática?</h2>
+                <span class="responses">6 respostas</span>
+            </div>
+            <ul class="challenge-list">
+                <li class="challenge-item">A resistência do paciente por conta estrutura social, o modelo em que a sociedade vive</li>
+                <li class="challenge-item">A resistência do homem em relação à saúde</li>
+                <li class="challenge-item">O mais difícil é conseguir o vínculo e a confiança da população masculina</li>
+                <li class="challenge-item">Nenhum</li>
+                <li class="challenge-item">Sobre vc ter que ser forte o tempo todo.</li>
+                <li class="challenge-item">Não tive</li>
+            </ul>
+        </div>
+
+        <!-- Comentários -->
+        <div class="comments-section">
+            <h3 class="comments-title">O que mais te marcou na apresentação e por quê?</h3>
+            <ul class="comment-list">
+                <li class="comment-item">Tema muito interessante, o impacto das nossas acoes na vida do outro</li>
+                <li class="comment-item">A forma mais clara e sucinta dos alunos. Parabéns!</li>
+                <li class="comment-item">As atitudes dos palestrantes eram a maioria homens gostei muito das atitudes</li>
+                <li class="comment-item">Todos informações apresentadas sobre a saúde do homem</li>
+                <li class="comment-item">Gostei da explicação, foram bem esclarecedor</li>
+                <li class="comment-item">Ver que o jeito que tratamento nossos filhos. Como impacta o futuro deles</li>
+                <li class="comment-item">Sobre a violência na infância, pq sofri isso e meus irmãos homens também viveu a situações na infância.</li>
+                <li class="comment-item">O esclarecimento dos efeitos e impactos que os pais podem ter na vida dos filhos</li>
+            </ul>
+        </div>
+
+        <div class="page-info">
+            <p>https://docs.google.com/forms/d/1ER157HvUac6fEM2c-y4bc22znHkOptOkzR4q-p5hWw/viewanalytics 14/05/2025, 09:45</p>
+            <p>Página 6 de 6</p>
+        </div>
+
+        <footer>
+            <p>Este conteúdo não foi criado nem aprovado pelo Google. - Termos de Serviço - Política de Privacidade</p>
+            <p>Este formulário parece suspeito? Relatório</p>
+            <p>Google Formulários</p>
+        </footer>
+    </div>
+
+    <script>
+        // Configurações comuns para todos os gráficos
+        Chart.defaults.font.family = "'Roboto', sans-serif";
+        Chart.defaults.color = '#7f8c8d';
+        Chart.defaults.borderColor = 'rgba(0, 0, 0, 0.1)';
+
+        // Função para criar gráficos de barra
+        function createBarChart(id, labels, data, colors) {
+            const ctx = document.getElementById(id).getContext('2d');
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.8', '1')),
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Função para criar gráficos de pizza
+        function createPieChart(id, labels, data, colors) {
+            const ctx = document.getElementById(id).getContext('2d');
+            return new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${percentage}%`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        // Gráfico 1: Avaliação do conteúdo
+        createBarChart('chart1', 
+            ['Muito claro e relevante', 'Claro, mas poderia ser mais aprofundado', 'Pouco claro ou confuso', 'Não agregou ao meu conhecimento'], 
+            [100, 0, 0, 0], 
+            ['rgba(75, 192, 192, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(255, 99, 132, 0.8)']
+        );
+
+        // Gráfico 2: Sentiu-se à vontade
+        createBarChart('chart2', 
+            ['Sim, totalmente', 'Em parte', 'Não me senti à vontade', 'Não participei'], 
+            [100, 0, 0, 0], 
+            ['rgba(75, 192, 192, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(255, 99, 132, 0.8)']
+        );
+
+        // Gráfico 3: Metodologia contribuiu
+        createBarChart('chart3', 
+            ['Sim, muito', 'Parcialmente', 'Não contribuiu'], 
+            [100, 0, 0], 
+            ['rgba(75, 192, 192, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)']
+        );
+
+        // Gráfico 4: Material útil
+        createPieChart('chart4', 
+            ['Sim', 'Parcialmente', 'Não'], 
+            [80, 20, 0], 
+            ['rgba(75, 192, 192, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)']
+        );
+
+        // Gráfico 5: Sentiu-se preparado
+        createPieChart('chart5', 
+            ['Sim, me sinto mais seguro(a)', 'Em parte, ainda tenho dúvidas', 'Não me sinto preparado(a)'], 
+            [90, 0, 10], 
+            ['rgba(75, 192, 192, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)']
+        );
+
+        // Gráfico 6: Aplicou conhecimento
+        createPieChart('chart6', 
+            ['Sim, em várias situações', 'Sim, em algumas situações', 'Ainda não tive oportunidade', 'Não apliquei'], 
+            [30, 30, 40, 0], 
+            ['rgba(75, 192, 192, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(255, 99, 132, 0.8)']
+        );
+
+        // Gráfico 7: Mudou percepção
+        createPieChart('chart7', 
+            ['Sim, totalmente', 'Em parte', 'Não houve mudança'], 
+            [90, 0, 10], 
+            ['rgba(75, 192, 192, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)']
+        );
+
+        // Gráfico 8: Discutiu tema
+        createPieChart('chart8', 
+            ['Sim', 'Não', 'Não, mas ainda pretendo'], 
+            [60, 10, 30], 
+            ['rgba(75, 192, 192, 0.8)', 'rgba(255, 99, 132, 0.8)', 'rgba(255, 206, 86, 0.8)']
+        );
+    </script>
+</body>
+</html>
