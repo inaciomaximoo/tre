@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Percepções e Desafios na Promoção da Saúde do Homem</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --info-color: #2980b9;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 25px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .chart-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        h2 {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        .responses {
+            font-size: 13px;
+            color: #7f8c8d;
+            background-color: #f8f9fa;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
+            margin: 10px 0;
+        }
+        
+        .percentages {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .percentage-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .percentage-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        
+        .comments-section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin-top: 30px;
+        }
+        
+        .comments-title {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comment-list {
+            list-style: none;
+        }
+        
+        .comment-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--secondary-color);
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .comment-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .challenge-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+        
+        .challenge-item {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .challenge-item:before {
+            content: "•";
+            color: var(--secondary-color);
+            font-size: 20px;
+            position: absolute;
+            left: 10px;
+            top: 5px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px 0;
+            color: #7f8c8d;
+            font-size: 13px;
+            border-top: 1px solid #eee;
+        }
+        
+        .page-info {
+            font-size: 12px;
+            color: #95a5a6;
+            text-align: right;
+            margin-top: 15px;
+        }
+        
+        .horizontal-bar-chart {
+            height: 200px !important;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Percepções e Desafios na Promoção da Saúde do Homem</h1>
+            <p class="subtitle">Relatório de análise das respostas - 6 participantes</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Primeira linha de gráficos -->
+        <div class="grid-container">
+            <!-- Gráfico 1 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>Em sua experiência, os homens costumam buscar atendimento médico com a mesma frequência que as mulheres?</h2>
+                    <span class="responses">6 respostas</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart1"></canvas>
+                </div>
+                <div class="percentages">
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(255, 99, 132, 0.8);"></span>
+                        <span>Não, eles buscam menos: 100%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico 2 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>Você acredita que a expectativa social de que o homem deve ser sempre forte e independente pode impactar sua saúde?</h2>
+                    <span class="responses">6 respostas</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart2"></canvas>
+                </div>
+                <div class="percentages">
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                        <span>Sim, pode levá-los a evitar buscar ajuda médica e emocional: 100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Segunda linha de gráficos -->
+        <div class="grid-container">
+            <!-- Gráfico 3 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>Em sua comunidade, os homens costumam conversar sobre suas emoções e dificuldades com amigos e familiares?</h2>
+                    <span class="responses">6 respostas</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart3"></canvas>
+                </div>
+                <div class="percentages">
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(54, 162, 235, 0.8);"></span>
+                        <span>As vezes, mas com restrição: 66.7%</span>
+                    </div>
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(255, 206, 86, 0.8);"></span>
+                        <span>Sim, com frequência: 33.3%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico 4 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>Durante suas visitas domiciliares, com qual frequência você orienta os homens sobre a importância da saúde preventiva?</h2>
+                    <span class="responses">6 respostas</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart4"></canvas>
+                </div>
+                <div class="percentages">
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(54, 162, 235, 0.8);"></span>
+                        <span>Apenas quando percebo que há um problema: 66.7%</span>
+                    </div>
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                        <span>Sempre que possível: 33.3%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terceira linha de gráficos -->
+        <div class="grid-container">
+            <!-- Gráfico 5 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>Você se sente confortável para abordar temas como saúde mental e emoções com os homens da comunidade?</h2>
+                    <span class="responses">6 respostas</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart5"></canvas>
+                </div>
+                <div class="percentages">
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(54, 162, 235, 0.8);"></span>
+                        <span>As vezes, mas percebo resistência por parte deles: 66.7%</span>
+                    </div>
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                        <span>Sim, falo com naturalidade: 33.3%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico 6 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2>O que você considera mais necessário para melhorar sua atuação na promoção da saúde do homem?</h2>
+                    <span class="responses">6 respostas</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="chart6"></canvas>
+                </div>
+                <div class="percentages">
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                        <span>Materiais educativos para apoiar as visitas domiciliares: 50%</span>
+                    </div>
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(54, 162, 235, 0.8);"></span>
+                        <span>Apoio da equipe de saúde para realizar ações voltadas para homens: 33.3%</span>
+                    </div>
+                    <div class="percentage-item">
+                        <span class="percentage-color" style="background-color: rgba(255, 206, 86, 0.8);"></span>
+                        <span>Capacitações e treinamentos específicos: 16.7%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico 7 -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h2>Na sua opinião, quais são os principais fatores que fazem com que muitos homens não procurem os serviços de saúde regularmente?</h2>
+                <span class="responses">6 respostas (múltipla escolha)</span>
+            </div>
+            <div class="chart-wrapper horizontal-bar-chart">
+                <canvas id="chart7"></canvas>
+            </div>
+            <div class="percentages">
+                <div class="percentage-item">
+                    <span class="percentage-color" style="background-color: rgba(54, 162, 235, 0.8);"></span>
+                    <span>Falta de tempo devido ao trabalho: 83.3% (5)</span>
+                </div>
+                <div class="percentage-item">
+                    <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                    <span>Medo de descobrir doenças: 50% (3)</span>
+                </div>
+                <div class="percentage-item">
+                    <span class="percentage-color" style="background-color: rgba(255, 206, 86, 0.8);"></span>
+                    <span>Desconhecimento sobre a importância: 50% (3)</span>
+                </div>
+                <div class="percentage-item">
+                    <span class="percentage-color" style="background-color: rgba(153, 102, 255, 0.8);"></span>
+                    <span>Medo de serem vistos como "fracos": 33.3% (2)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico 8 -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h2>Você já ouviu de um homem alguma dessas frases quando sugeriu que ele procurasse atendimento médico?</h2>
+                <span class="responses">6 respostas (múltipla escolha)</span>
+            </div>
+            <div class="chart-wrapper horizontal-bar-chart">
+                <canvas id="chart8"></canvas>
+            </div>
+            <div class="percentages">
+                <div class="percentage-item">
+                    <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                    <span>"Não estou doente, não preciso": 100% (6)</span>
+                </div>
+                <div class="percentage-item">
+                    <span class="percentage-color" style="background-color: rgba(54, 162, 235, 0.8);"></span>
+                    <span>"Se eu for ao médico, ele vai achar que estou exagerando": 33.3% (2)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico 9 -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h2>Na sua opinião, quais destes comportamentos podem ser resultados da pressão social para que os homens provem sua masculinidade?</h2>
+                <span class="responses">6 respostas (múltipla escolha)</span>
+            </div>
+            <div class="chart-wrapper horizontal-bar-chart">
+                <canvas id="chart9"></canvas>
+            </div>
+            <div class="percentages">
+                <div class="percentage-item">
+                    <span class="percentage-color" style="background-color: rgba(54, 162, 235, 0.8);"></span>
+                    <span>Não falar sobre sentimentos e vulnerabilidades: 66.7% (4)</span>
+                </div>
+                <div class="percentage-item">
+                    <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                    <span>Evitar consultas médicas: 50% (3)</span>
+                </div>
+                <div class="percentage-item">
+                    <span class="percentage-color" style="background-color: rgba(255, 206, 86, 0.8);"></span>
+                    <span>Excesso de consumo de álcool: 33.3% (2)</span>
+                </div>
+                <div class="percentage-item">
+                    <span class="percentage-color" style="background-color: rgba(153, 102, 255, 0.8);"></span>
+                    <span>Prática de atividade de risco: 16.7% (1)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico 10 -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h2>Como você acredita que a comunidade pode contribuir para incentivar os homens a cuidarem mais da própria saúde?</h2>
+                <span class="responses">6 respostas (múltipla escolha)</span>
+            </div>
+            <div class="chart-wrapper horizontal-bar-chart">
+                <canvas id="chart10"></canvas>
+            </div>
+            <div class="percentages">
+                <div class="percentage-item">
+                    <span class="percentage-color" style="background-color: rgba(75, 192, 192, 0.8);"></span>
+                    <span>Criando espaços onde os homens se sintam confortáveis para conversar: 50% (3)</span>
+                </div>
+                <div class="percentage-item">
+                    <span class="percentage-color" style="background-color: rgba(54, 162, 235, 0.8);"></span>
+                    <span>Estimulando conversas sobre o tema na família e entre amigos: 33.3% (2)</span>
+                </div>
+                <div class="percentage-item">
+                    <span class="percentage-color" style="background-color: rgba(255, 206, 86, 0.8);"></span>
+                    <span>Através de campanhas específicas sobre saúde masculina: 16.7% (1)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-info">
+            <p>https://docs.google.com/forms/d/1Ac10Uw2FG7ro4XoOEZefPG7OQ6fEd1lPzKQ0pHTBBBk/viewanalytics 14/05/2025, 09:11</p>
+            <p>Página 6 de 6</p>
+        </div>
+
+        <footer>
+            <p>Este conteúdo não foi criado nem aprovado pelo Google. - Termos de Serviço - Política de Privacidade</p>
+            <p>Este formulário parece suspeito? Relatório</p>
+            <p>Google Formulários</p>
+        </footer>
+    </div>
+
+    <script>
+        // Configurações comuns para todos os gráficos
+        Chart.defaults.font.family = "'Roboto', sans-serif";
+        Chart.defaults.color = '#7f8c8d';
+        Chart.defaults.borderColor = 'rgba(0, 0, 0, 0.1)';
+
+        // Função para criar gráficos de barra
+        function createBarChart(id, labels, data, colors) {
+            const ctx = document.getElementById(id).getContext('2d');
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.8', '1')),
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Função para criar gráficos de pizza
+        function createPieChart(id, labels, data, colors) {
+            const ctx = document.getElementById(id).getContext('2d');
+            return new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${percentage}%`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        // Função para criar gráficos de barra horizontal
+        function createHorizontalBarChart(id, labels, data, colors) {
+            const ctx = document.getElementById(id).getContext('2d');
+            return new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.8', '1')),
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.x + '% (' + Math.round(context.parsed.x * 6 / 100) + ')';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Gráfico 1: Busca por atendimento médico
+        createBarChart('chart1', 
+            ['Não, eles buscam menos', 'Sim, eles buscam igualmente', 'Não sei dizer'], 
+            [100, 0, 0], 
+            ['rgba(255, 99, 132, 0.8)', 'rgba(75, 192, 192, 0.8)', 'rgba(255, 206, 86, 0.8)']
+        );
+
+        // Gráfico 2: Expectativa social impactando saúde
+        createBarChart('chart2', 
+            ['Sim, pode levá-los a evitar buscar ajuda médica e emocional', 'Não, acredito que isso não afeta sua saúde', 'Nunca pensei sobre isso'], 
+            [100, 0, 0], 
+            ['rgba(75, 192, 192, 0.8)', 'rgba(255, 99, 132, 0.8)', 'rgba(255, 206, 86, 0.8)']
+        );
+
+        // Gráfico 3: Conversa sobre emoções
+        createPieChart('chart3', 
+            ['As vezes, mas com restrição', 'Sim, com frequência', 'Não, quase nunca falam sobre sentimentos'], 
+            [66.7, 33.3, 0], 
+            ['rgba(54, 162, 235, 0.8)', 'rgba(75, 192, 192, 0.8)', 'rgba(255, 206, 86, 0.8)']
+        );
+
+        // Gráfico 4: Frequência de orientação sobre saúde preventiva
+        createPieChart('chart4', 
+            ['Apenas quando percebo que há um problema', 'Sempre que possível', 'Raramente, pois eles não se interessam', 'Nunca, pois priorizo outros temas'], 
+            [66.7, 33.3, 0, 0], 
+            ['rgba(54, 162, 235, 0.8)', 'rgba(75, 192, 192, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(255, 99, 132, 0.8)']
+        );
+
+        // Gráfico 5: Conforto para abordar saúde mental
+        createPieChart('chart5', 
+            ['As vezes, mas percebo resistência por parte deles', 'Sim, falo com naturalidade', 'Não, sinto dificuldade em abordar esses temas'], 
+            [66.7, 33.3, 0], 
+            ['rgba(54, 162, 235, 0.8)', 'rgba(75, 192, 192, 0.8)', 'rgba(255, 206, 86, 0.8)']
+        );
+
+        // Gráfico 6: Necessidades para melhorar atuação
+        createPieChart('chart6', 
+            ['Materiais educativos para apoiar as visitas domiciliares', 'Apoio da equipe de saúde para realizar ações voltadas para homens', 'Capacitações e treinamentos específicos', 'Outras sugestões'], 
+            [50, 33.3, 16.7, 0], 
+            ['rgba(75, 192, 192, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(153, 102, 255, 0.8)']
+        );
+
+        // Gráfico 7: Fatores que impedem busca por saúde
+        createHorizontalBarChart('chart7', 
+            ['Falta de tempo devido ao trabalho', 'Medo de descobrir doenças', 'Desconhecimento sobre a importância', 'Medo de serem vistos como "fracos"', 'Falta de atendimento especializado'], 
+            [83.3, 50, 50, 33.3, 0], 
+            ['rgba(54, 162, 235, 0.8)', 'rgba(75, 192, 192, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(255, 99, 132, 0.8)']
+        );
+
+        // Gráfico 8: Frases ouvidas sobre atendimento médico
+        createHorizontalBarChart('chart8', 
+            ['"Não estou doente, não preciso"', '"Se eu for ao médico, ele vai achar que estou exagerando"', '"Isso é coisa de mulher"', '"Homem que é homem aguenta"', 'Nunca ouvi nada parecido'], 
+            [100, 33.3, 0, 0, 0], 
+            ['rgba(75, 192, 192, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(255, 99, 132, 0.8)']
+        );
+
+        // Gráfico 9: Comportamentos por pressão social
+        createHorizontalBarChart('chart9', 
+            ['Não falar sobre sentimentos e vulnerabilidades', 'Evitar consultas médicas', 'Excesso de consumo de álcool', 'Prática de atividade de risco', 'Todas as opções acima'], 
+            [66.7, 50, 33.3, 16.7, 16.7], 
+            ['rgba(54, 162, 235, 0.8)', 'rgba(75, 192, 192, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(255, 99, 132, 0.8)']
+        );
+
+        // Gráfico 10: Como a comunidade pode contribuir
+        createHorizontalBarChart('chart10', 
+            ['Criando espaços onde os homens se sintam confortáveis para conversar', 'Estimulando conversas sobre o tema na família e entre amigos', 'Através de campanhas específicas sobre saúde masculina', 'Todas as opções acima'], 
+            [50, 33.3, 16.7, 0], 
+            ['rgba(75, 192, 192, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(153, 102, 255, 0.8)']
+        );
+    </script>
+</body>
+</html>
