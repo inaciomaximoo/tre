@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Questões - Epidemio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .import-btn {
+            background-color: #9C27B0;
+        }
+        .import-btn:hover {
+            background-color: #7B1FA2;
+        }
+        .generate-btn {
+            background-color: #4CAF50;
+        }
+        .generate-btn:hover {
+            background-color: #45a049;
+        }
+        .copy-btn {
+            background-color: #2196F3;
+        }
+        .copy-btn:hover {
+            background-color: #0b7dda;
+        }
+        .clear-btn {
+            background-color: #f44336;
+        }
+        .clear-btn:hover {
+            background-color: #d32f2f;
+        }
+        .add-btn {
+            background-color: #FF9800;
+        }
+        .add-btn:hover {
+            background-color: #e68a00;
+        }
+        .save-btn {
+            background-color: #607D8B;
+        }
+        .save-btn:hover {
+            background-color: #455A64;
+        }
+        .format-example {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            border-left: 4px solid #2196F3;
+        }
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: #2196F3;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .instructions {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .question-container {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .remove-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .field-group {
+            margin-bottom: 15px;
+        }
+        .field-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .field-group input[type="text"],
+        .field-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .alternatives-container {
+            margin-top: 15px;
+        }
+        .alternative-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .alternative-row label {
+            width: 20px;
+            margin-right: 10px;
+        }
+        .alternative-row input[type="text"] {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .correct-option {
+            background-color: #e8f5e9;
+            padding: 5px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gerador de Questões - Importação Fácil</h1>
+        
+        <div class="tab-container">
+            <div class="tab active" onclick="switchTab('import')">Importar Questões</div>
+            <div class="tab" onclick="switchTab('manual')">Adicionar Manualmente</div>
+            <div class="tab" onclick="switchTab('json')">Visualizar JSON</div>
+        </div>
+        
+        <div id="import-tab" class="tab-content active">
+            <div class="instructions">
+                <h3>Como formatar suas questões:</h3>
+                <p>Cole cada questão no formato abaixo (uma por linha, com linha em branco entre questões):</p>
+                <div class="format-example">
+                    "enunciado: ++Qual é a capital do Brasil?++
+                    url da foto: (opcional - deixe vazio se não tiver)
+                    a): Rio de Janeiro
+                    b): São Paulo
+                    c): Brasília
+                    d): Salvador
+                    correta: c
+                                    
+                    enunciado: ++Qual destes é um planeta do sistema solar?
+                    (marque todas as opções corretas)++
+                    url da foto: https://exemplo.com/planetas.jpg
+                    a): Terra
+                    b): Lua
+                    c): Marte
+                    d): Sol
+                    correta: a"
+                </div>
+            </div>
+            
+            <textarea id="bulkInput" placeholder="Cole suas questões formatadas aqui..."></textarea>
+            <button class="import-btn" onclick="parseBulkInput()">Importar Questões</button>
+            <button class="clear-btn" onclick="document.getElementById('bulkInput').value = ''">Limpar Área de Importação</button>
+        </div>
+        
+        <div id="manual-tab" class="tab-content">
+            <button class="add-btn" onclick="addQuestion()">+ Adicionar Nova Questão</button>
+            <div id="questions-container">
+                <!-- As questões adicionadas manualmente aparecerão aqui -->
+            </div>
+        </div>
+        
+        <div id="json-tab" class="tab-content">
+            <textarea id="jsonOutput" readonly></textarea>
+            <div class="button-group">
+                <button class="generate-btn" onclick="generateJSON()">Atualizar JSON</button>
+                <button class="copy-btn" onclick="copyJSON()">Copiar JSON</button>
+                <button class="save-btn" onclick="saveToFile()">Baixar JSON</button>
+                <button class="save-btn" onclick="embedJSONIntoHTML()">Salvar</button>
+                <button class="clear-btn" onclick="clearAll()">Limpar Tudo</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let questionCount = 0;
+        
+        // Alternar entre abas
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+        
+        // Carrega questões do <script> embutido no HTML
+        function loadSavedQuestions() {
+            const embeddedScript = document.getElementById('embeddedQuestions').textContent;
+            try {
+                const questions = JSON.parse(embeddedScript);
+                questions.forEach(q => addQuestion(q, true));
+                generateJSON();
+            } catch (e) {
+                console.error("Erro ao carregar questões do HTML:", e);
+            }
+        }
+        
+        // Processa o texto de importação em massa
+        function parseBulkInput() {
+            const input = document.getElementById('bulkInput').value.trim();
+            if (!input) return;
+            
+            const questionBlocks = input.split(/\n\s*\n/); // Divide por linhas em branco
+            let importedCount = 0;
+            
+            questionBlocks.forEach(block => {
+                if (!block.trim()) return;
+                
+                try {
+                    const questionData = parseQuestionBlock(block);
+                    addQuestion(questionData, true);
+                    importedCount++;
+                } catch (e) {
+                    console.error("Erro ao analisar bloco de questão:", e);
+                }
+            });
+            
+            alert(`Foram importadas ${importedCount} questões com sucesso!`);
+            generateJSON();
+            switchTab('manual');
+        }
+        
+        // Analisa um bloco de texto no formato especificado
+        function parseQuestionBlock(block) {
+            const lines = block.split('\n').map(line => line.trim()).filter(line => line);
+            const data = {
+                enunciado: '',
+                imagem: null,
+                alternativas: { a: '', b: '', c: '', d: '' },
+                correta: []
+            };
+            
+            lines.forEach(line => {
+                if (line.toLowerCase().startsWith('enunciado:')) {
+                    const match = line.match(/enunciado:\s*\+\+(.*?)\+\+/is);
+                    if (match && match[1]) {
+                        data.enunciado = match[1].trim();
+                    }
+                } 
+                else if (line.toLowerCase().startsWith('url da foto:')) {
+                    const url = line.replace('url da foto:', '').trim();
+                    if (url) data.imagem = url;
+                }
+                else if (line.toLowerCase().startsWith('a):')) {
+                    data.alternativas.a = line.replace('a):', '').trim();
+                }
+                else if (line.toLowerCase().startsWith('b):')) {
+                    data.alternativas.b = line.replace('b):', '').trim();
+                }
+                else if (line.toLowerCase().startsWith('c):')) {
+                    data.alternativas.c = line.replace('c):', '').trim();
+                }
+                else if (line.toLowerCase().startsWith('d):')) {
+                    data.alternativas.d = line.replace('d):', '').trim();
+                }
+                else if (line.toLowerCase().startsWith('correta:')) {
+                    const corretas = line.replace('correta:', '').trim().toLowerCase().split(',');
+                    data.correta = corretas.map(c => c.trim()).filter(c => ['a', 'b', 'c', 'd'].includes(c));
+                }
+            });
+            
+            // Se só tiver uma correta, mantém como string para compatibilidade
+            if (data.correta.length === 1) {
+                data.correta = data.correta[0];
+            } else if (data.correta.length === 0) {
+                data.correta = 'a'; // Padrão caso não especifique
+            }
+            
+            return data;
+        }
+        
+        // Adiciona uma nova questão (para adição manual)
+        function addQuestion(questionData = null, fromImport = false) {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'question-container';
+            questionDiv.id = `question${questionCount}`;
+            
+            // Valores padrão ou carregados
+            const data = questionData || {
+                enunciado: '',
+                imagem: null,
+                alternativas: { a: '', b: '', c: '', d: '' },
+                correta: 'a'
+            };
+            
+            // Converte correta para array se não for
+            const corretaArray = Array.isArray(data.correta) ? data.correta : [data.correta];
+            
+            questionDiv.innerHTML = `
+                <div class="question-header">
+                    <h3>Questão ${questionCount + 1}</h3>
+                    <button class="remove-btn" onclick="removeQuestion('question${questionCount}')">Remover</button>
+                </div>
+                
+                <div class="field-group">
+                    <label for="enunciado${questionCount}">Enunciado:</label>
+                    <textarea id="enunciado${questionCount}" rows="4">${data.enunciado}</textarea>
+                </div>
+                
+                <div class="field-group">
+                    <label for="imagem${questionCount}">URL da Imagem (opcional):</label>
+                    <input type="text" id="imagem${questionCount}" value="${data.imagem || ''}">
+                </div>
+                
+                <div class="alternatives-container">
+                    <label>Alternativas:</label>
+                    <div class="alternative-row ${corretaArray.includes('a') ? 'correct-option' : ''}">
+                        <label>a)</label>
+                        <input type="text" id="alt_a_${questionCount}" value="${data.alternativas.a}">
+                        <input type="checkbox" name="correct${questionCount}" value="a" ${corretaArray.includes('a') ? 'checked' : ''}>
+                        <label>Correta</label>
+                    </div>
+                    <div class="alternative-row ${corretaArray.includes('b') ? 'correct-option' : ''}">
+                        <label>b)</label>
+                        <input type="text" id="alt_b_${questionCount}" value="${data.alternativas.b}">
+                        <input type="checkbox" name="correct${questionCount}" value="b" ${corretaArray.includes('b') ? 'checked' : ''}>
+                        <label>Correta</label>
+                    </div>
+                    <div class="alternative-row ${corretaArray.includes('c') ? 'correct-option' : ''}">
+                        <label>c)</label>
+                        <input type="text" id="alt_c_${questionCount}" value="${data.alternativas.c}">
+                        <input type="checkbox" name="correct${questionCount}" value="c" ${corretaArray.includes('c') ? 'checked' : ''}>
+                        <label>Correta</label>
+                    </div>
+                    <div class="alternative-row ${corretaArray.includes('d') ? 'correct-option' : ''}">
+                        <label>d)</label>
+                        <input type="text" id="alt_d_${questionCount}" value="${data.alternativas.d}">
+                        <input type="checkbox" name="correct${questionCount}" value="d" ${corretaArray.includes('d') ? 'checked' : ''}>
+                        <label>Correta</label>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('questions-container').appendChild(questionDiv);
+            
+            // Adiciona listeners para salvar automaticamente
+            const inputs = questionDiv.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('input', generateJSON);
+            });
+            
+            const checkboxes = questionDiv.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    // Atualiza destaque da alternativa correta
+                    const container = this.closest('.alternative-row');
+                    if (this.checked) {
+                        container.classList.add('correct-option');
+                    } else {
+                        container.classList.remove('correct-option');
+                    }
+                    generateJSON();
+                });
+            });
+            
+            questionCount++;
+        }
+        
+        // Remove uma questão
+        function removeQuestion(id) {
+            if (confirm('Tem certeza que deseja remover esta questão?')) {
+                document.getElementById(id).remove();
+                generateJSON();
+                // Renumerar as questões restantes
+                const questions = document.querySelectorAll('.question-container');
+                questions.forEach((question, index) => {
+                    question.querySelector('h3').textContent = `Questão ${index + 1}`;
+                });
+            }
+        }
+        
+        // Gera o JSON final
+        function generateJSON() {
+            const questionsArray = [];
+            const questionContainers = document.querySelectorAll('.question-container');
+            
+            questionContainers.forEach(container => {
+                const id = container.id.replace('question', '');
+                questionsArray.push(getQuestionData(id));
+            });
+            
+            document.getElementById('jsonOutput').value = JSON.stringify(questionsArray, null, 2);
+        }
+        
+        // Obtém os dados de uma questão específica
+        function getQuestionData(id) {
+            const checkboxes = document.querySelectorAll(`input[name="correct${id}"]:checked`);
+            const corretas = Array.from(checkboxes).map(cb => cb.value);
+            
+            return {
+                enunciado: document.getElementById(`enunciado${id}`).value,
+                imagem: document.getElementById(`imagem${id}`).value || null,
+                alternativas: {
+                    a: document.getElementById(`alt_a_${id}`).value,
+                    b: document.getElementById(`alt_b_${id}`).value,
+                    c: document.getElementById(`alt_c_${id}`).value,
+                    d: document.getElementById(`alt_d_${id}`).value
+                },
+                correta: corretas.length === 1 ? corretas[0] : corretas
+            };
+        }
+        
+        // Copia o JSON para a área de transferência
+        function copyJSON() {
+            const jsonOutput = document.getElementById('jsonOutput');
+            jsonOutput.select();
+            document.execCommand('copy');
+            alert('JSON copiado para a área de transferência!');
+        }
+        
+        // Salva o JSON em um arquivo
+        function saveToFile() {
+            const data = document.getElementById('jsonOutput').value;
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'banco-de-questoes.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Atualiza o <script> embutido com o JSON atual
+        function embedJSONIntoHTML() {
+            generateJSON(); // Garante que o JSON está atualizado
+            const jsonData = document.getElementById('jsonOutput').value;
+            document.getElementById('embeddedQuestions').textContent = jsonData;
+            alert('JSON incorporado ao HTML! Salve o arquivo (Ctrl+S) para manter as alterações.');
+        }
+        
+        // Limpa todas as questões
+        function clearAll() {
+            if (confirm('Tem certeza que deseja limpar TODAS as questões? Isso não pode ser desfeito.')) {
+                document.getElementById('questions-container').innerHTML = '';
+                document.getElementById('jsonOutput').value = '[]';
+                document.getElementById('embeddedQuestions').textContent = '[]';
+                document.getElementById('bulkInput').value = '';
+                questionCount = 0;
+            }
+        }
+        
+        // Inicializa o aplicativo
+        window.onload = function() {
+            loadSavedQuestions();
+        };
+    </script>
+
+    <!-- Script que armazena as questões (editável manualmente) -->
+    <script id="embeddedQuestions" type="application/json">
+        []
+    </script>
+</body>
+</html>
