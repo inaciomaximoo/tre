@@ -3,191 +3,318 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcards Completos - Habilidades Semiológicas</title>
+    <title>Flashcards Super Completos com Imagens - Habilidades Semiológicas</title>
     <style>
+        :root {
+            /* Cores Modo Claro */
+            --day-bg: #f4f7f9;
+            --day-card-bg: #ffffff;
+            --day-card-border: #79A6DC; /* Azul Suave */
+            --day-text: #4a4a4a;      /* Cinza Escuro */
+            --day-heading-text: #004a8c; /* Azul mais escuro para títulos */
+            --day-accent: #0062cc;    /* Azul para botões */
+            --day-accent-hover: #004c9e;
+            --day-mark-bg: #fff3cd;   /* Amarelo Suave */
+            --day-mark-text: #664d03;
+            --day-status-bg: rgba(0, 98, 204, 0.08);
+            --day-status-text: #005A9C;
+
+
+            /* Cores Modo Noturno */
+            --night-bg: #1c1c1e;
+            --night-card-bg: #2c2c2e;
+            --night-card-border: #5a8bbf; 
+            --night-text: #d1d1d1;    /* Cinza Claro */
+            --night-heading-text: #8cb6e2;
+            --night-accent: #5a8bbf;
+            --night-accent-hover: #7da7c9;
+            --night-mark-bg: #575730;   
+            --night-mark-text: #fffacd;
+            --night-status-bg: rgba(90, 139, 191, 0.15);
+            --night-status-text: #a8c7e4;
+
+
+            /* Pesos de Fonte */
+            --font-weight-normal: 400;
+            --font-weight-light: 300;
+            --font-weight-bold: 700;
+        }
+
         /* --- Estilos Gerais --- */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--day-bg);
+            color: var(--day-text);
             line-height: 1.6;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: background-color 0.3s, color 0.3s;
+            font-weight: var(--font-weight-normal);
         }
+        body.night-mode {
+            background-color: var(--night-bg);
+            color: var(--night-text);
+            font-weight: var(--font-weight-light);
+        }
+
         .main-container {
             max-width: 800px;
             width: 100%;
         }
         h1 {
-            color: #0056b3;
+            color: var(--day-heading-text);
             text-align: center;
             margin-bottom: 10px;
+            font-weight: var(--font-weight-bold);
+        }
+        body.night-mode h1 {
+            color: var(--night-heading-text);
         }
         h2 {
-            color: #0056b3;
+            color: var(--day-heading-text);
             text-align: center;
             font-size: 1.5em;
             margin-bottom: 20px;
+            font-weight: var(--font-weight-bold);
+        }
+        body.night-mode h2 {
+            color: var(--night-heading-text);
         }
         .instructions {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             font-size: 0.9em;
             color: #555;
         }
+        body.night-mode .instructions {
+            color: #aaa;
+        }
+
+        /* --- Botão de Alternar Tema --- */
+        #theme-toggle {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            padding: 8px 12px;
+            background-color: var(--day-accent);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 1000;
+            transition: background-color 0.3s;
+        }
+        body.night-mode #theme-toggle {
+            background-color: var(--night-accent);
+        }
+        #theme-toggle:hover {
+            background-color: var(--day-accent-hover);
+        }
+        body.night-mode #theme-toggle:hover {
+            background-color: var(--night-accent-hover);
+        }
+
 
         /* --- Container de cada Tema --- */
         .theme-container {
             margin-bottom: 40px;
-            background-color: #fff;
+            background-color: var(--day-card-bg); 
             padding: 25px;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: background-color 0.3s;
         }
+        body.night-mode .theme-container {
+            background-color: var(--night-card-bg);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
 
         /* --- Estilo do Flashcard --- */
         .flashcard-viewport {
             width: 100%;
-            max-width: 600px; /* Aumentado para melhor visualização */
-            height: 450px; /* Aumentado para caber mais texto */
+            max-width: 600px;
+            height: 450px; 
             perspective: 1200px;
-            margin-bottom: 20px; /* Espaço antes dos botões */
+            margin-bottom: 20px; 
         }
         .flashcard {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-            transform-style: preserve-3d;
+            position: relative; width: 100%; height: 100%;
+            cursor: pointer; transform-style: preserve-3d;
             transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
             display: none; 
         }
-        .flashcard.active {
-            display: block; 
-        }
-        .flashcard.is-flipped {
-            transform: rotateX(180deg); 
-        }
+        .flashcard.active { display: block; }
+        .flashcard.is-flipped { transform: rotateX(180deg); }
 
         /* --- Frente e Verso do Cartão --- */
         .flashcard-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* Centraliza o conteúdo principal */
-            align-items: center;
-            padding: 30px 25px 25px 25px; /* Mais padding superior para status */
-            box-sizing: border-box;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; -webkit-backface-visibility: hidden;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: flex-start; 
+            padding: 20px; padding-top: 45px; 
+            box-sizing: border-box; border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             overflow-y: auto;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+        .flashcard-content { 
+            width: 100%;
+            text-align: left; 
         }
         .flashcard-front {
-            background-color: #ffffff;
-            border: 2px solid #007bff;
-            color: #333;
-            font-size: 1.1rem;
+            background-color: var(--day-card-bg);
+            border: 2px solid var(--day-card-border);
+            color: var(--day-text);
+            font-size: 1.05rem; /* Leve ajuste no tamanho da fonte */
         }
-        .flashcard-front p, .flashcard-back p, .flashcard-back ul {
-             width: 100%; /* Faz o texto ocupar a largura */
-             text-align: left; /* Alinha o texto à esquerda */
+        body.night-mode .flashcard-front {
+            background-color: var(--night-card-bg);
+            border: 2px solid var(--night-card-border);
+            color: var(--night-text);
         }
+
         .flashcard-back {
-            background-color: #f8f9fa;
-            color: black;
+            background-color: var(--day-card-bg); 
+            border: 2px solid var(--day-card-border); 
+            color: var(--day-text);
             transform: rotateX(180deg); 
-            align-items: flex-start; /* Alinha conteúdo do verso no topo */
-            justify-content: flex-start;
+        }
+        body.night-mode .flashcard-back {
+            background-color: var(--night-card-bg);
+            border: 2px solid var(--night-card-border);
+            color: var(--night-text);
+        }
+        
+        .flashcard-back .flashcard-content { 
+             padding-top: 15px; 
+        }
+
+        .flashcard-front p, .flashcard-back p, .flashcard-back ul {
+             width: 100%; 
+             text-align: left; 
         }
         .flashcard-back ul { list-style: none; padding: 0; margin: 0; }
-        .flashcard-back li { margin-bottom: 8px; }
-        .flashcard-back li::before { content: "➔ "; color: #007bff; font-weight: bold; margin-right: 5px; }
-        .flashcard-back p { margin: 5px 0; } /* Espaçamento entre parágrafos no verso */
+        .flashcard-back li { margin-bottom: 10px; line-height: 1.5; }
+        .flashcard-back li::before { content: "➔ "; color: var(--day-accent); font-weight: var(--font-weight-bold); margin-right: 6px; }
+        body.night-mode .flashcard-back li::before { color: var(--night-accent); }
+        .flashcard-back p { margin: 8px 0; } 
         
         mark {
-            background-color: yellow;
-            padding: 0.1em; /* Pequeno padding para não cortar o texto */
+            background-color: var(--day-mark-bg);
+            color: var(--day-mark-text);
+            padding: 0.1em 0.2em;
+            border-radius: 3px;
+            font-weight: var(--font-weight-normal); 
         }
+        body.night-mode mark {
+            background-color: var(--night-mark-bg);
+            color: var(--night-mark-text);
+        }
+        
+        .flashcard-image { /* Estilo para as imagens nos flashcards */
+            max-width: 70%; /* Ajustado para não ocupar tanto espaço vertical */
+            max-height: 150px; /* Limita a altura da imagem */
+            height: auto;
+            object-fit: contain; /* Garante que a imagem caiba sem distorcer */
+            margin-top: 10px; /* Espaçamento acima da imagem */
+            margin-bottom: 10px; /* Espaçamento abaixo da imagem */
+            border-radius: 5px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid #ccc; 
+        }
+        body.night-mode .flashcard-image {
+            border: 1px solid #555;
+        }
+
 
         /* --- Indicador de Status (Frente/Verso e contagem) --- */
         .card-status {
             position: absolute;
-            top: 10px;
+            top: 12px;
             left: 15px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            color: #444;
-            background-color: rgba(0, 123, 255, 0.1);
+            font-size: 0.8rem;
+            font-weight: var(--font-weight-bold);
+            color: var(--day-status-text);
+            background-color: var(--day-status-bg);
             padding: 3px 8px;
             border-radius: 4px;
             z-index: 10;
         }
+        body.night-mode .card-status {
+            color: var(--night-status-text);
+            background-color: var(--night-status-bg);
+        }
 
         /* --- Botões de Navegação --- */
         .navigation-controls {
-            display: flex;
-            width: 100%;
-            max-width: 600px; /* Mesma largura do viewport */
+            display: flex; width: 100%;
+            max-width: 600px; 
         }
         .nav-button {
-            flex: 1; 
-            padding: 15px 10px; /* Botões maiores */
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-            background-color: #007bff;
+            flex: 1; padding: 15px 10px; 
+            font-size: 17px; font-weight: var(--font-weight-bold);
+            cursor: pointer; border: none;
+            background-color: var(--day-accent);
             color: white;
             transition: background-color 0.2s ease-in-out;
             text-align: center;
         }
-        .nav-button:first-child { 
-            border-radius: 8px 0 0 8px; 
-            margin-right: 1px; /* Pequena separação */
+        body.night-mode .nav-button {
+            background-color: var(--night-accent);
         }
-        .nav-button:last-child { 
-            border-radius: 0 8px 8px 0; 
-            margin-left: 1px; /* Pequena separação */
-        }
-        .nav-button:hover { background-color: #0056b3; }
+        .nav-button:first-child { border-radius: 8px 0 0 8px; margin-right: 1px; }
+        .nav-button:last-child { border-radius: 0 8px 8px 0; margin-left: 1px; }
+        .nav-button:hover { background-color: var(--day-accent-hover); }
+        body.night-mode .nav-button:hover { background-color: var(--night-accent-hover); }
         .nav-button:disabled {
-            background-color: #c0c0c0;
+            background-color: #c0c0c0 !important; 
             cursor: not-allowed;
         }
-        .nav-button:disabled:hover { background-color: #c0c0c0; }
+        body.night-mode .nav-button:disabled {
+             background-color: #555 !important;
+             color: #888 !important;
+        }
 
 
         /* --- Container de Recomeço --- */
         .restart-quiz-container {
-            display: none; 
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            max-width: 600px; /* Mesma largura do viewport */
-            height: 450px; /* Mesma altura do viewport */
-            cursor: pointer;
-            background-color: #e9f5ff;
-            border: 2px dashed #007bff;
-            border-radius: 10px;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
+            display: none; flex-direction: column;
+            justify-content: center; align-items: center;
+            width: 100%; max-width: 600px; height: 450px; 
+            cursor: pointer; background-color: var(--day-card-bg); 
+            border: 2px dashed var(--day-card-border);
+            border-radius: 10px; text-align: center;
+            padding: 20px; box-sizing: border-box;
+            transition: background-color 0.3s, border-color 0.3s;
         }
-        .restart-quiz-container h3 { color: #0056b3; font-size: 1.5em; margin-bottom: 15px; }
-        .restart-quiz-container p { color: #333; font-size: 1.1em; }
+        body.night-mode .restart-quiz-container {
+            background-color: var(--night-card-bg);
+            border: 2px dashed var(--night-card-border);
+        }
+        .restart-quiz-container h3 { 
+            color: var(--day-heading-text); font-size: 1.5em; 
+            margin-bottom: 15px; font-weight: var(--font-weight-bold);
+        }
+        body.night-mode .restart-quiz-container h3 { color: var(--night-heading-text); }
+        .restart-quiz-container p { 
+            color: var(--day-text); font-size: 1.1em; 
+            font-weight: var(--font-weight-normal); 
+        }
+        body.night-mode .restart-quiz-container p { color: var(--night-text); }
     </style>
 </head>
 <body>
+    <button id="theme-toggle">Alternar Modo</button>
 
     <div class="main-container">
         <h1>Flashcards de Estudo</h1>
@@ -197,57 +324,57 @@
             <h2>TEMA 9 - EXAME PROCTOLÓGICO E PROPEDÊUTICA DA PRÓSTATA</h2>
             <div class="flashcard-viewport">
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quais as manobras semiológicas devem ser feitas para analisar as características da <mark>ampola retal</mark> e a mobilidade da <mark>parede retal</mark>, durante o <mark>toque retal</mark>? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quais as manobras semiológicas devem ser feitas para analisar as características da <mark>ampola retal</mark> e a mobilidade da <mark>parede retal</mark>, durante o <mark>toque retal</mark>? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>DEVE FAZER A ROTAÇÃO A 360% DO DEDO, O PRIMEIRO MOVIMENTO COM O DEDO INDICADOR SEM PRESSÃO, RODANDO A 360° E SENTINDO QUALQUER ESPESSAMENTO OU IRREGULARIDADE NA <mark>AMPOLA RETAL</mark></li>
                             <li>EM SEGUIDA O SEGUNDO MOVIMENTO COM O DEDO INDICADOR COM PRESSÃO, RODANDO A 360° NOVAMENTE, DEVE-SE NOTAR A MOBILIDADE NA <mark>PAREDE RETAL</mark>, ALÉM DE NOTAR QUALQUER PONTO DOLOROSO</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Cite os achados semiológicos encontrados no <mark>exame prostático</mark> num homem com <mark>próstata</mark> normal.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Cite os achados semiológicos encontrados no <mark>exame prostático</mark> num homem com <mark>próstata</mark> normal.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li><mark>PRÓSTATA</mark> DE TAMANHO PRESERVADO</li>
                             <li>CONSISTÊNCIA FIBROELÁSTICA</li>
                             <li>INDOLOR</li>
                             <li><mark>SULCO CENTRAL</mark> PRESERVADO</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>CITE os critérios semiológicos que devem ser pesquisadas no <mark>reto</mark> durante o exame de <mark>toque retal</mark>.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>CITE os critérios semiológicos que devem ser pesquisadas no <mark>reto</mark> durante o exame de <mark>toque retal</mark>.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                          <ul>
                             <li>Consistência mole.</li>
                             <li>Vazio ou com fezes</li>
                             <li>Pouco móvel (mobilidade)</li>
                             <li>Paredes (anteriores, laterais e posteriores) são moles e depressíveis.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Cite os achados semiológicos observadas no <mark>toque retal</mark> num indivíduo com <mark>carcinoma de reto</mark>.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Cite os achados semiológicos observadas no <mark>toque retal</mark> num indivíduo com <mark>carcinoma de reto</mark>.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>O <mark>reto</mark> apresenta perda da mobilidade</li>
                             <li>consistência de "madeira"</li>
                             <li>lesões vegetantes</li>
-                            <li>estreitamento retal</li>
+                            <li>e estreitamento retal</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Cite os achados semiológicos encontrados no <mark>exame prostático</mark> num homem com <mark>próstata</mark> normal. (Outra versão)</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Cite os achados semiológicos encontrados no <mark>exame prostático</mark> num homem com <mark>próstata</mark> normal. (Outra versão)</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>A <mark>próstata</mark> de tamanho de 2 a 3 cm de diâmetro</li>
                             <li>consistência fibroelástica</li>
                             <li>presença do <mark>sulco central</mark></li>
                             <li>e indolor</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
             </div>
             <div class="restart-quiz-container"><h3>Parabéns!</h3><p>Você concluiu este tema.<br>Clique aqui para recomeçar.</p></div>
@@ -261,17 +388,20 @@
             <h2>TEMA 10 - PROPEDÊUTICA FÍSICA MAMÁRIA</h2>
             <div class="flashcard-viewport">
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Qual o objetivo de realizar a <mark>expressão papilar</mark> das <mark>mamas</mark>? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Qual o objetivo de realizar a <mark>expressão papilar</mark> das <mark>mamas</mark>? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>PESQUISAR A SAÍDA DE SECREÇÃO PELA <mark>PAPILA MAMÁRIA</mark></li>
                             <li>PARA RASTREAMENTO NO <mark>CÂNCER DE MAMA</mark>.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Uma mulher de 53 anos, que durante a <mark>palpação mamária</mark>, observou-se lesão com características sugestivas de malignidade conforme a figura abaixo. Descreva conforme REGISTRO DE PRONTUÁRIO as características semiológicas que devem ser pesquisadas num <mark>nódulo mamário</mark>.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content">
+                        <p>Uma mulher de 53 anos, que durante a <mark>palpação mamária</mark>, observou-se lesão com características sugestivas de malignidade conforme a figura abaixo. Descreva conforme REGISTRO DE PRONTUÁRIO as características semiológicas que devem ser pesquisadas num <mark>nódulo mamário</mark>.</p>
+                        <img src="https://imgur.com/yRIpMdR.png" alt="Figura do caso clínico - Nódulo maligno mama esquerda" class="flashcard-image">
+                    </div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>➔ Descrever por extenso (não em itens)</p>
                         <p>Presença de <mark>NÓDULO EM MAMA ESQUERDA</mark>,</p>
                         <p>LOCALIZADO em <mark>QSI – quadrante superior interno</mark> (ou <mark>QSM - quadrante superior medial</mark>),</p>
@@ -280,21 +410,24 @@
                         <p><mark>CONSISTÊNCIA ENDURECIDA</mark> (ou pétrea)</p>
                         <p>E <mark>FIXO</mark></p>
                         <p>(*) por definição: <mark>Nódulo</mark> < 3,0cm</p>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Como deve ser realizado a <mark>inspeção dinâmica das mamas</mark>? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Como deve ser realizado a <mark>inspeção dinâmica das mamas</mark>? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>LEVANTAR E ABAIXAR OS BRAÇOS -----> AVALIA A SIMETRIA DO DESLIZAMENTO DAS <mark>MAMAS</mark> NO <mark>GRADEADO COSTAL</mark></li>
                             <li>CONTRAÇÃO VOLUNTÁRIA DOS <mark>MM. PEITORAIS</mark> COM AS MÃOS NA CINTURA IMPULSIONANDO OS COTOVELOS PARA FRENTE -----> AVALIA POSSÍVEIS ABAULAMENTOS</li>
                             <li>CONTRAÇÃO VOLUNTÁRIA DOS <mark>MM. PEITORAIS</mark> COM AS MÃOS NA CINTURA IMPULSIONANDO OS COTOVELOS PARA TRÁS -----> AVALIAR POSSÍVEIS RETRAÇÕES</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Uma senhora de 63 anos, que durante a <mark>palpação mamária</mark>, observou-se lesão com características sugestivas de malignidade conforme a figura abaixo. Descreva conforme REGISTRO DE PRONTUÁRIO as características semiológicas que devem ser pesquisadas num <mark>nódulo mamário</mark>.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content">
+                        <p>Uma senhora de 63 anos, que durante a <mark>palpação mamária</mark>, observou-se lesão com características sugestivas de malignidade conforme a figura abaixo. Descreva conforme REGISTRO DE PRONTUÁRIO as características semiológicas que devem ser pesquisadas num <mark>nódulo mamário</mark>.</p>
+                        <img src="https://imgur.com/kTvyfuS.png" alt="Figura do caso clínico - Nódulo maligno mama direita" class="flashcard-image">
+                    </div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>➔ Descrever por extenso (não em itens)</p>
                         <p>Presença de <mark>NÓDULO EM MAMA DIREITA</mark>,</p>
                         <p>LOCALIZADO em <mark>QSI – quadrante superior interno</mark> (ou <mark>QSM - quadrante superior medial</mark>),</p>
@@ -303,11 +436,11 @@
                         <p><mark>CONSISTÊNCIA ENDURECIDA</mark> (ou pétrea)</p>
                         <p>E <mark>FIXO</mark></p>
                         <p>(*) por definição: <mark>Nódulo</mark> < 3,0cm</p>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quais as características semiológicas a serem observadas na <mark>inspeção estática das mamas</mark>?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quais as características semiológicas a serem observadas na <mark>inspeção estática das mamas</mark>?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>NÚMERO</li>
                             <li>SIMETRIA</li>
@@ -317,11 +450,14 @@
                             <li>ABAULAMENTOS E RETRAÇÕES</li>
                             <li>MODIFICAÇÕES NA PELE -----> <mark>ARÉOLA</mark>, <mark>PAPILA</mark> E INTEGRIDADE DA PELE</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Uma mulher de 41 anos, que durante a <mark>palpação mamária</mark>, observou-se lesão com características sugestivas de benignidade conforme a figura anexa. Descreva conforme REGISTRO DE PRONTUÁRIO as características semiológicas que devem ser pesquisadas num <mark>nódulo mamário</mark>.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content">
+                        <p>Uma mulher de 41 anos, que durante a <mark>palpação mamária</mark>, observou-se lesão com características sugestivas de benignidade conforme a figura anexa. Descreva conforme REGISTRO DE PRONTUÁRIO as características semiológicas que devem ser pesquisadas num <mark>nódulo mamário</mark>.</p>
+                        <img src="https://imgur.com/y4DwACi.png" alt="Figura do caso clínico - Nódulo benigno mama direita" class="flashcard-image">
+                    </div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>Descrever por extenso (não em itens)</p>
                         <p>Presença de <mark>NÓDULO EM MAMA DIREITA</mark>,</p>
                         <p>LOCALIZADO em <mark>QSE</mark> (ou <mark>QSL</mark>),</p>
@@ -330,20 +466,20 @@
                         <p><mark>CONSISTÊNCIA CÍSTICA</mark> (ou fibroelástica)</p>
                         <p>E <mark>MÓVEL</mark></p>
                         <p>(*) por definição: <mark>Nódulo</mark> < 3,0cm</p>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Como deve ser realizado a <mark>palpação profunda das mamas</mark>? Explique a <mark>posição da paciente</mark> e a <mark>técnica semiológica</mark>.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Como deve ser realizado a <mark>palpação profunda das mamas</mark>? Explique a <mark>posição da paciente</mark> e a <mark>técnica semiológica</mark>.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                          <ul>
                              <li><mark>POSIÇÃO DA PACIENTE</mark>: <mark>DECÚBITO DORSAL</mark> COM AS MÃOS NA REGIÃO OCCIPITAL.</li>
                             <li><mark>PALPAÇÃO PROFUNDA</mark>: deve ser realizada com a PONTA DOS DEDOS SOBRE O <mark>GRADEADO COSTAL</mark>, por meio da <mark>TÉCNICA RAIOS DE RODA</mark>. Palpar TODOS OS QUADRANTES E A <mark>REGIÃO RETROAREOLAR</mark> SEM TIRAR OS DEDOS DURANTE TODA A MANOBRA.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Uma mulher de 32 anos tem diagnóstico de <mark>neoplasia maligna de mama</mark> esquerda com lesão invasiva com comprometimento de <mark>linfonodos axilares</mark> esquerdos. Descreva conforme REGISTRO DE PRONTUÁRIO as características semiológicas que devem ser encontradas nesses <mark>linfonodos</mark>?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Uma mulher de 32 anos tem diagnóstico de <mark>neoplasia maligna de mama</mark> esquerda com lesão invasiva com comprometimento de <mark>linfonodos axilares</mark> esquerdos. Descreva conforme REGISTRO DE PRONTUÁRIO as características semiológicas que devem ser encontradas nesses <mark>linfonodos</mark>?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li><mark>LINFONODOS</mark> PALPÁVEIS EM <mark>CADEIA AXILAR</mark> ESQUERDA (localização dada no enunciado),</li>
                             <li>NÚMERO DE ... (qualquer valor ou múltiplos),</li>
@@ -354,11 +490,11 @@
                             <li>LIMITES IMPRECISOS</li>
                             <li>E INDOLORES.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>CITE as características semiológicas a serem pesquisadas num <mark>nódulo mamário</mark> durante a <mark>palpação das mamas</mark>.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>CITE as características semiológicas a serem pesquisadas num <mark>nódulo mamário</mark> durante a <mark>palpação das mamas</mark>.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>Localização (quadrante? / infrapapilar?)</li>
                             <li>Número</li>
@@ -369,11 +505,14 @@
                             <li>Limites (precisos/ imprecisos)</li>
                             <li>Dor</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Mulher de 32 anos, que durante a <mark>palpação mamária</mark>, observou-se uma lesão conforme a figura anexa. Descreva as características semiológicas da lesão observada na figura, de acordo com as características que devem ser pesquisadas num <mark>nódulo mamário</mark>.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content">
+                        <p>Mulher de 32 anos, que durante a <mark>palpação mamária</mark>, observou-se uma lesão conforme a figura anexa. Descreva as características semiológicas da lesão observada na figura, de acordo com as características que devem ser pesquisadas num <mark>nódulo mamário</mark>.</p>
+                        <img src="https://imgur.com/xCBrTR4.png" alt="Figura do caso clínico - Lesão mama esquerda" class="flashcard-image">
+                    </div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li><mark>Mama esquerda</mark> com <mark>nódulo</mark> em <mark>quadrante inferior interno</mark> (ou <mark>quadrante inferior medial</mark>),</li>
                             <li>único (ou um <mark>nódulo</mark>),</li>
@@ -382,11 +521,14 @@
                             <li>e limites imprecisos</li>
                         </ul>
                         <p>ATENÇÃO Não é possível descrever nessa figura: CONSISTÊNCIA, MOBILIDADE e DOR. No entanto se o aluno lembrar ou escrever pode considerar 0,1 ponto para cada item correto.</p>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Mulher de 41 anos, que durante a <mark>palpação mamária</mark>, observou-se uma lesão conforme a figura anexa. Descreva as características semiológicas da lesão observada na figura, de acordo com as características que devem ser pesquisadas num <mark>nódulo mamário</mark>.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content">
+                        <p>Mulher de 41 anos, que durante a <mark>palpação mamária</mark>, observou-se uma lesão conforme a figura anexa. Descreva as características semiológicas da lesão observada na figura, de acordo com as características que devem ser pesquisadas num <mark>nódulo mamário</mark>.</p>
+                        <img src="https://imgur.com/IjzOdBR.png" alt="Figura do caso clínico - Lesão mama direita" class="flashcard-image">
+                    </div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li><mark>Mama direita</mark> com <mark>nódulo</mark> em <mark>quadrante superior externo</mark> (ou <mark>quadrante superior lateral</mark>),</li>
                             <li>único (ou um <mark>nódulo</mark>),</li>
@@ -395,11 +537,11 @@
                             <li>e limites precisos</li>
                         </ul>
                         <p>ATENÇÃO Não é possível descrever nessa figura: consistência, mobilidade e dor, embora formato não seja habitual descrever se faz quando isso é possível, neste caso pode considerar OVAL ou ARREDONDADO ou algo semelhante. No entanto se o aluno lembrar ou escrever foi considerado 0,1 ponto para cada item correto.</p>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>CITE as características semiológicas a serem pesquisadas durante a <mark>inspeção estática das mamas</mark>.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>CITE as características semiológicas a serem pesquisadas durante a <mark>inspeção estática das mamas</mark>.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>Número de <mark>mamas</mark>,</li>
                             <li>Simetria,</li>
@@ -412,7 +554,7 @@
                             <li>Retrações e</li>
                             <li>Cicatrizes.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
             </div>
             <div class="restart-quiz-container"><h3>Parabéns!</h3><p>Você concluiu este tema.<br>Clique aqui para recomeçar.</p></div>
@@ -423,11 +565,11 @@
         </div>
         
         <div class="theme-container" id="tema-11">
-            <h2>TEMA 11 - PROPEDÊUTICA FÍSICA DO EXAME ESPECULAR E COLETA DE CITOLOGIA ONCÓTICA</h2>
+            <h2>TEMA 11 - PROPEDÊUTICA FÍSICA DO <mark>EXAME ESPECULAR</mark> E COLETA DE <mark>CITOLOGIA ONCÓTICA</mark></h2>
             <div class="flashcard-viewport">
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Como deve ser inserido o <mark>espéculo vaginal</mark> a fim de realização do <mark>exame especular</mark>? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Como deve ser inserido o <mark>espéculo vaginal</mark> a fim de realização do <mark>exame especular</mark>? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>Inserir OBLIQUAMENTE A 15º EM RELAÇÃO AO EIXO SAGITAL(*),</p>
                         <p>para EVITAR TRAUMA URETRAL,</p>
                         <p>fazendo PRESSÃO PARA BAIXO E PARA DENTRO,</p>
@@ -435,11 +577,11 @@
                         <p>de maneira que O <mark>COLO UTERINO</mark> FIQUE ENTRE AS <mark>VALVAS DO ESPÉCULO</mark></p>
                         <p>e a BORBOLETA DO <mark>ESPÉCULO</mark> PARA BAIXO E À DIREITA DA MULHER.</p>
                         <p>ATENÇÃO: Também considerar que os itens sublinhados possam ser respectivamente: OBLIQUAMENTE A 45º EM RELAÇÃO AO EIXO SAGITAL RODANDO NO SENTIDO ANTI-HORÁRIO</p>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quais os critérios semiológicos do <mark>colo uterino</mark> que devem ser avaliados durante no <mark>exame especular</mark>?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quais os critérios semiológicos do <mark>colo uterino</mark> que devem ser avaliados durante no <mark>exame especular</mark>?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>DESCREVER: SUPERFÍCIE,</li>
                             <li>COLORAÇÃO,</li>
@@ -447,50 +589,50 @@
                             <li>FORMA</li>
                             <li>E ÓSTIO</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quais as estruturas que são inspecionadas durante o <mark>exame especular</mark>? (Versão 1)</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quais as estruturas que são inspecionadas durante o <mark>exame especular</mark>? (Versão 1)</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li><mark>PAREDES DA VAGINA</mark></li>
                             <li><mark>FUNDOS DE SACO</mark> (ou <mark>fórnices</mark>)</li>
                             <li><mark>CONTEÚDO VAGINAL</mark></li>
                             <li><mark>COLO UTERINO</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Por que ao realizar a coleta de <mark>Papanicolaou</mark> é obrigatório saber se a paciente está grávida ou não? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Por que ao realizar a coleta de <mark>Papanicolaou</mark> é obrigatório saber se a paciente está grávida ou não? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>A GRÁVIDA DEVE COLETAR <mark>PAPANICOLAOU</mark> SE FOR INDICADO</li>
                             <li>E NÃO PODE COLETAR A <mark>ENDOCÉRVICE</mark></li>
                             <li>DEVIDO RISCO DE PROMOVER CONTRAÇÃO UTERINA.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>CITE os critérios semiológicos do <mark>conteúdo vaginal</mark> que devem ser descritos durante do <mark>exame especular</mark>.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>CITE os critérios semiológicos do <mark>conteúdo vaginal</mark> que devem ser descritos durante do <mark>exame especular</mark>.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                            <li>Quantidade</li>
                            <li>Coloração</li>
                            <li>. Fluidez</li>
                            <li>Odor</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>CITE as estruturas que são inspecionadas durante o <mark>exame especular</mark>. (Versão 2)</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>CITE as estruturas que são inspecionadas durante o <mark>exame especular</mark>. (Versão 2)</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li><mark>Paredes vaginais</mark></li>
                             <li><mark>Fórnices vaginais</mark></li>
                             <li><mark>Colo uterino</mark></li>
                             <li><mark>Conteúdo vaginal</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
             </div>
             <div class="restart-quiz-container"><h3>Parabéns!</h3><p>Você concluiu este tema.<br>Clique aqui para recomeçar.</p></div>
@@ -504,8 +646,8 @@
             <h2>TEMA 12 - PROPEDÊUTICA DO <mark>TOQUE VAGINAL</mark></h2>
             <div class="flashcard-viewport">
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quais os objetivos da realização do <mark>toque vaginal</mark>?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quais os objetivos da realização do <mark>toque vaginal</mark>?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>AVALIAR AS <mark>PAREDES VAGINAIS</mark>,</li>
                             <li><mark>FUNDOS DE SACO UTERINO</mark>,</li>
@@ -513,20 +655,20 @@
                             <li><mark>CORPO UTERINO</mark></li>
                             <li>e <mark>ANEXOS</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>O que é um <mark>útero em média posição</mark>? Qual a posição do <mark>colo uterino</mark> nessa situação?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>O que é um <mark>útero em média posição</mark>? Qual a posição do <mark>colo uterino</mark> nessa situação?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>O ÚTERO ESTÁ ENTRE A BEXIGA E O RETO,</li>
                             <li>LOGO O <mark>COLO UTERINO</mark> ENCONTRA-SE CENTRADO (ou medianizado).</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quais as estruturas que podem ser palpadas durante o <mark>toque vaginal</mark>?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quais as estruturas que podem ser palpadas durante o <mark>toque vaginal</mark>?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                          <ul>
                             <li><mark>PAREDES VAGINAIS</mark></li>
                             <li><mark>FUNDO DE SACO DO ÚTERO</mark></li>
@@ -534,20 +676,20 @@
                             <li><mark>CORPO UTERINO</mark></li>
                             <li><mark>ANEXOS</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>O que é um <mark>útero em anteversão</mark>? Qual a posição do <mark>colo uterino</mark> nessa situação?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>O que é um <mark>útero em anteversão</mark>? Qual a posição do <mark>colo uterino</mark> nessa situação?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>O ÚTERO ESTÁ VOLTADO PARA BEXIGA,</li>
                             <li>LOGO O <mark>COLO UTERINO</mark> ENCONTRA-SE POSTERIORIZADO.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quais as características semiológicas do <mark>CORPO UTERINO</mark> que devem ser avaliados durante o <mark>toque vaginal</mark>?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quais as características semiológicas do <mark>CORPO UTERINO</mark> que devem ser avaliados durante o <mark>toque vaginal</mark>?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>TAMANHO</li>
                             <li>CONSISTÊNCIA</li>
@@ -555,20 +697,20 @@
                             <li>POSIÇÃO</li>
                             <li>MOBILIDADE</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>O que é um <mark>útero em anteversoflexão</mark>? Qual a posição do <mark>colo uterino</mark> nessa situação?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>O que é um <mark>útero em anteversoflexão</mark>? Qual a posição do <mark>colo uterino</mark> nessa situação?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>O ÚTERO ESTÁ VOLTADO PARA BEXIGA E FLETIDO NA DIREÇÃO ANTERIOR DO CORPO,</li>
                             <li>LOGO O <mark>COLO UTERINO</mark> ENCONTRA-SE POSTERIORIZADO.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quais as características semiológicas do <mark>colo uterino</mark> que devem ser avaliados durante o <mark>toque vaginal</mark>?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quais as características semiológicas do <mark>colo uterino</mark> que devem ser avaliados durante o <mark>toque vaginal</mark>?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>OBSERVAR SE ESTÁ PRESENTE, então avaliar:</p>
                         <ul>
                             <li>• CONSISTÊNCIA</li>
@@ -578,20 +720,20 @@
                             <li>• MOBILIDADE</li>
                             <li>• DOR À MOBILIZAÇÃO</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>O que é um <mark>útero em retroversoflexão</mark>? Qual a posição do <mark>colo uterino</mark> nessa situação?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>O que é um <mark>útero em retroversoflexão</mark>? Qual a posição do <mark>colo uterino</mark> nessa situação?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>O ÚTERO ESTÁ VOLTADO PARA O RETO E FLETIDO NA DIREÇÃO POSTERIOR DO CORPO,</li>
                             <li>LOGO O <mark>COLO UTERINO</mark> ENCONTRA-SE ANTERIORIZADO.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>CITE cinco estruturas que podem ser palpadas durante o <mark>toque vaginal</mark>. (Outra formulação)</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>CITE cinco estruturas que podem ser palpadas durante o <mark>toque vaginal</mark>. (Outra formulação)</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li><mark>PAREDES VAGINAIS</mark></li>
                             <li><mark>FUNDO DE SACO DO ÚTERO</mark></li>
@@ -599,11 +741,11 @@
                             <li><mark>CORPO UTERINO</mark></li>
                             <li><mark>ANEXOS</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>CITE as estruturas que são palpadas durante o <mark>toque vaginal</mark>. (Versão HABILIDADES SEMIOLÓGICAS)</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>CITE as estruturas que são palpadas durante o <mark>toque vaginal</mark>. (Versão HABILIDADES SEMIOLÓGICAS)</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li><mark>Paredes vaginais</mark></li>
                             <li><mark>Fundo de saco do útero</mark></li>
@@ -611,11 +753,11 @@
                             <li><mark>Corpo uterino</mark></li>
                             <li><mark>Anexos</mark>, quando palpável</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Cite os parâmetros semiológicos do <mark>corpo uterino</mark> que devem ser avaliados durante o <mark>toque vaginal</mark>. (Versão HABILIDADES SEMIOLÓGICAS)</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Cite os parâmetros semiológicos do <mark>corpo uterino</mark> que devem ser avaliados durante o <mark>toque vaginal</mark>. (Versão HABILIDADES SEMIOLÓGICAS)</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>Posição,</li>
                             <li>Arquitetura,</li>
@@ -626,7 +768,7 @@
                             <li>Dor à palpação e</li>
                             <li>Mobilidade.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
             </div>
             <div class="restart-quiz-container"><h3>Parabéns!</h3><p>Você concluiu este tema.<br>Clique aqui para recomeçar.</p></div>
@@ -640,68 +782,68 @@
             <h2>TEMA 13 - PROPEDÊUTICA DO EXAME OBSTÉTRICO</h2>
             <div class="flashcard-viewport">
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quais os tempos da <mark>palpação no abdômen gravídico</mark>, segundo a <mark>escola alemã</mark>?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quais os tempos da <mark>palpação no abdômen gravídico</mark>, segundo a <mark>escola alemã</mark>?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>1º TEMPO – EXPLORAÇÃO DO <mark>FUNDO UTERINO</mark></li>
                             <li>2º TEMPO – EXPLORAÇÃO DO <mark>DORSO FETAL</mark> (região lateral do útero)</li>
                             <li>3º TEMPO – EXPLORAÇÃO DA MOBILIDADE FETAL (ou <mark>Manobra de Leopold</mark>)</li>
                             <li>4º TEMPO – EXPLORAÇÃO DA <mark>ESCAVA OBSTÉTRICA</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Durante a <mark>palpação obstétrica</mark> observou-se <mark>escava totalmente preenchida</mark> com <mark>dorso à esquerda</mark>. Responda: A) Qual a <mark>apresentação</mark> e <mark>situação fetal</mark>? B) Onde está localizado o <mark>foco de ausculta cardiofetal</mark>? C) O que se espera ao fazer a <mark>manobra do rechaço</mark>? Por quê?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Durante a <mark>palpação obstétrica</mark> observou-se <mark>escava totalmente preenchida</mark> com <mark>dorso à esquerda</mark>. Responda: A) Qual a <mark>apresentação</mark> e <mark>situação fetal</mark>? B) Onde está localizado o <mark>foco de ausculta cardiofetal</mark>? C) O que se espera ao fazer a <mark>manobra do rechaço</mark>? Por quê?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>A) <mark>APRESENTAÇÃO CEFÁLICA</mark> E <mark>SITUAÇÃO LONGITUDINAL</mark></li>
                             <li>B) O <mark>FOCO FETAL</mark> ESTÁ NO <mark>QUADRANTE INFERIOR ESQUERDO DO ABDOME</mark></li>
                             <li>C) <mark>MANOBRA DE RECHAÇO</mark> NÃO TEM INDICAÇÃO, SOMENTE NAS <mark>APRESENTAÇÕES PÉLVICAS</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quais os tempos da <mark>palpação no abdômen gravídico</mark>, segundo a <mark>escola francesa</mark>?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quais os tempos da <mark>palpação no abdômen gravídico</mark>, segundo a <mark>escola francesa</mark>?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>1º TEMPO – EXPLORAÇÃO DA <mark>ESCAVA OBSTÉTRICA</mark></li>
                             <li>2º TEMPO – EXPLORAÇÃO DO <mark>FUNDO UTERINO</mark></li>
                             <li>3º TEMPO – EXPLORAÇÃO DO <mark>DORSO FETAL</mark> (região lateral do útero)</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Durante a <mark>palpação obstétrica</mark> observou-se <mark>escava totalmente preenchida</mark> com <mark>dorso à direita</mark>. Responda: A) Qual a <mark>apresentação</mark> e <mark>situação fetal</mark>? B) Onde está localizado o <mark>foco de ausculta cardiofetal</mark>? C) O que se espera ao fazer a <mark>manobra do rechaço</mark>? Por quê?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Durante a <mark>palpação obstétrica</mark> observou-se <mark>escava totalmente preenchida</mark> com <mark>dorso à direita</mark>. Responda: A) Qual a <mark>apresentação</mark> e <mark>situação fetal</mark>? B) Onde está localizado o <mark>foco de ausculta cardiofetal</mark>? C) O que se espera ao fazer a <mark>manobra do rechaço</mark>? Por quê?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>A) <mark>APRESENTAÇÃO CEFÁLICA</mark> E <mark>SITUAÇÃO LONGITUDINAL</mark></li>
                             <li>B) O <mark>FOCO FETAL</mark> ESTÁ NO <mark>QUADRANTE INFERIOR DIREITO DO ABDOME</mark></li>
                             <li>C) <mark>MANOBRA DE RECHAÇO</mark> NÃO TEM INDICAÇÃO, SOMENTE NAS <mark>APRESENTAÇÕES PÉLVICAS</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Qual a finalidade da <mark>manobra de Leopold</mark> na <mark>palpação obstétrica</mark>? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Qual a finalidade da <mark>manobra de Leopold</mark> na <mark>palpação obstétrica</mark>? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>PESQUISA DE MOBILIDADE CEFÁLICA.</li>
                             <li>VERIFICAR SE HÁ OU NÃO INSINUAÇÃO, QUE É QUANDO O <mark>POLO CEFÁLICO</mark> ULTRAPASSA O <mark>ESTREITO SUPERIOR DA BACIA</mark>)</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Durante a <mark>palpação obstétrica</mark> observou-se <mark>escava vazia</mark> com <mark>dorso anteriorizado</mark>. Responda: A) Qual a <mark>apresentação</mark> e <mark>situação fetal</mark>? B) Onde está localizado o <mark>foco de ausculta cardiofetal</mark>? C) O que se espera ao fazer a <mark>manobra do rechaço</mark>? Por quê?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Durante a <mark>palpação obstétrica</mark> observou-se <mark>escava vazia</mark> com <mark>dorso anteriorizado</mark>. Responda: A) Qual a <mark>apresentação</mark> e <mark>situação fetal</mark>? B) Onde está localizado o <mark>foco de ausculta cardiofetal</mark>? C) O que se espera ao fazer a <mark>manobra do rechaço</mark>? Por quê?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>A) <mark>APRESENTAÇÃO CÓRMICA</mark> e <mark>SITUAÇÃO TRANSVERSAL</mark></li>
                             <li>B) O <mark>FOCO FETAL</mark> ESTÁ PRÓXIMO À <mark>CICATRIZ UMBILICAL</mark></li>
                             <li>C) <mark>MANOBRA DE RECHAÇO</mark> NÃO TEM INDICAÇÃO, SOMENTE NAS <mark>APRESENTAÇÕES PÉLVICAS</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Como pesquisar a mobilidade do <mark>polo cefálico</mark> numa <mark>apresentação cefálica fletida</mark>? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Como pesquisar a mobilidade do <mark>polo cefálico</mark> numa <mark>apresentação cefálica fletida</mark>? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>POR MEIO DA <mark>MANOBRA DE LEOPOLD</mark>, ONDE PRENDE-SE O <mark>POLO (CEFÁLICO)</mark> ENTRE OS DEDOS POLEGAR E MÉDIO DA MÃO DIREITA,</li>
                             <li>QUE SE APRESENTA NO <mark>ESTREITO SUPERIOR DA BACIA</mark>,</li>
@@ -709,34 +851,34 @@
                             <li>QUE INDICAM O GRAU DE PENETRAÇÃO DA APRESENTAÇÃO NA BACIA.</li>
                             <li>QUANDO A APRESENTAÇÃO ESTÁ ALTA E MÓVEL ESTE <mark>POLO (CEFÁLICO)</mark> BALANÇA DE UM LADO PARA OUTRO.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Durante a <mark>palpação obstétrica</mark> observou-se <mark>escava parcialmente preenchida</mark> com <mark>dorso à esquerda</mark>. Responda: A) Qual a <mark>apresentação</mark> e <mark>situação fetal</mark>? B) Onde está localizado o <mark>foco de ausculta cardiofetal</mark>? C) O que se espera ao fazer a <mark>manobra do rechaço</mark>? Por quê?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Durante a <mark>palpação obstétrica</mark> observou-se <mark>escava parcialmente preenchida</mark> com <mark>dorso à esquerda</mark>. Responda: A) Qual a <mark>apresentação</mark> e <mark>situação fetal</mark>? B) Onde está localizado o <mark>foco de ausculta cardiofetal</mark>? C) O que se espera ao fazer a <mark>manobra do rechaço</mark>? Por quê?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>A) <mark>APRESENTAÇÃO PÉLVICA</mark> e <mark>SITUAÇÃO</mark> A ESQUERDA</li>
                             <li>B) O <mark>FOCO FETAL</mark> ESTÁ PRÓXIMO À <mark>CICATRIZ UMBILICAL</mark></li>
                             <li>C) <mark>MANOBRA DE RECHAÇO</mark> NÃO TEM INDICAÇÃO, SOMENTE NAS <mark>APRESENTAÇÕES PÉLVICAS</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Qual a finalidade da <mark>manobra de Leopold</mark> no <mark>exame obstétrico</mark>? Explique. (Versão HABILIDADES SEMIOLÓGICAS)</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Qual a finalidade da <mark>manobra de Leopold</mark> no <mark>exame obstétrico</mark>? Explique. (Versão HABILIDADES SEMIOLÓGICAS)</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>Avaliar se o <mark>polo cefálico</mark> ultrapassou o <mark>estreito superior da bacia</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>O que é <mark>apresentação</mark> e <mark>situação fetal</mark>? Cite os seus diferentes tipos.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>O que é <mark>apresentação</mark> e <mark>situação fetal</mark>? Cite os seus diferentes tipos.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li><mark>Apresentação</mark>: É definida pela região fetal que ocupa a área do <mark>estreito superior da bacia</mark> e que nele se insinuará. Pode ser <mark>CEFÁLICA</mark>, <mark>PÉLVICA</mark> ou <mark>CÓRMICA</mark></li>
                             <li><mark>Situação</mark>: Relação entre o maior eixo da cavidade uterina e o maior eixo fetal. Pode ser <mark>LONGITUDINAL</mark>, <mark>TRANSVERSAL</mark> ou <mark>OBLÍQUA</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
             </div>
             <div class="restart-quiz-container"><h3>Parabéns!</h3><p>Você concluiu este tema.<br>Clique aqui para recomeçar.</p></div>
@@ -747,32 +889,32 @@
         </div>
 
         <div class="theme-container" id="tema-14">
-            <h2>TEMA 14 - ASSISTÊNCIA PRÉ-NATAL</h2>
+            <h2>TEMA 14 - ASSISTÊNCIA <mark>PRÉ-NATAL</mark></h2>
             <div class="flashcard-viewport">
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Considerando uma gestante de risco habitual (antigo baixo risco) e em condições ideais, pergunta-se: A) Quantas consultas de <mark>pré-natal</mark> devem ser realizadas? B) Como calcular o ganho de “peso estimado materno” conforme a idade gestacional?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Considerando uma gestante de risco habitual (antigo baixo risco) e em condições ideais, pergunta-se: A) Quantas consultas de <mark>pré-natal</mark> devem ser realizadas? B) Como calcular o ganho de “peso estimado materno” conforme a idade gestacional?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>A) MENSAIS ATÉ A 32ª SEMANA, QUINZENAIS ATÉ A 36ª SEMANA E EM SEGUIDO SEMANAIS NO ÚLTIMO MÊS.</li>
                             <li>B) AUMENTAR 0,5KG AO MÊS NO 1º TRIMESTRE, 1,0KG AO MÊS NO 2º TRIMESTRE E 1,5KG AO MÊS NO 3º TRIMESTRE.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Durante uma consulta de <mark>pré-natal</mark> ocorrida em 26/11/2021, a gestante informa <mark>DUM</mark> em 11/08/2021. Qual a <mark>idade gestacional</mark> e a <mark>data provável do parto</mark>? Demonstre os cálculos.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Durante uma consulta de <mark>pré-natal</mark> ocorrida em 26/11/2021, a gestante informa <mark>DUM</mark> em 11/08/2021. Qual a <mark>idade gestacional</mark> e a <mark>data provável do parto</mark>? Demonstre os cálculos.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>CÁLCULOS: IG: 20 + 30 + 31 + 26 = 107 → ÷ 7 = 15 inteiros e 2 de resto</p>
                         <p>IG: 15 semanas e 2 dias (ou na forma fracionada = 15 2/7)</p>
                         <p>DPP: 21/05/2022 (PRIMIGESTA) também considerar: 18/05/2022 (MULTIGESTA)</p>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quais exames complementares (laboratorial e imagem) devem ser realizados na primeira consulta de <mark>pré-natal</mark>, no estado de São Paulo, numa grávida que se encontra na 28ª semana de gestação? Explique em condições ideais.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quais exames complementares (laboratorial e imagem) devem ser realizados na primeira consulta de <mark>pré-natal</mark>, no estado de São Paulo, numa grávida que se encontra na 28ª semana de gestação? Explique em condições ideais.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>LABORATÓRIO – entre 24ª e 28ª semana de gestação repetir:</p>
                         <ul>
                             <li><mark>HEMOGRAMA</mark>,</li>
-                            <li><mark>VDRL</mark>,</li>
+                            <li><mark>VDRL</mark>, (Sorologia)</li>
                             <li><mark>ANTI-HIV</mark>,</li>
                             <li><mark>HBsAg</mark>,</li>
                             <li><mark>GLICEMIA</mark>,</li>
@@ -781,20 +923,20 @@
                         </ul>
                         <p>IMAGEM – NÃO É NECESSÁRIO <mark>ULTRASSONOGRAFIA</mark> NESTA IDADE GESTACIONAL</p>
                         <p>OBS: Pode considerar o terceiro <mark>USG</mark> (2º MORFOLÓGICO), que habitualmente se faz na 24ª semana</p>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Durante uma consulta de <mark>pré-natal</mark> ocorrida em 24/11/2021, a gestante informa <mark>DUM</mark> em 18/07/2021. Qual a <mark>idade gestacional (IG)</mark> e a <mark>data provável do parto (DPP)</mark>? Demonstre os cálculos.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Durante uma consulta de <mark>pré-natal</mark> ocorrida em 24/11/2021, a gestante informa <mark>DUM</mark> em 18/07/2021. Qual a <mark>idade gestacional (IG)</mark> e a <mark>data provável do parto (DPP)</mark>? Demonstre os cálculos.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>CÁLCULOS: IG: 13 + 31 + 30 + 31 + 24 = 129 → ÷ 7 = 18 inteiros e 3 de resto</p>
                         <p>IG: 18 semanas e 3 dias (ou na forma fracionada = 18 3/7)</p>
                         <p>DPP: 28/04/2022 (PRIMIGESTA) OU 25/04/2022 (MULTIGESTA) → o aluno tem que indicar o nº de gestação para ser válido, caso contrário deve considerar 0,5 neste item</p>
                         <p>SE NÃO FOR DEMONSTRADO OS CÁLCULOS DEVERÁ SER ZERO NESTA QUESTÃO, MESMO QUE A RESPOSTA ESTEJA CORRETA</p>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quais exames complementares (laboratorial e imagem) devem ser realizados numa consulta periódica de <mark>pré-natal</mark>, no estado de São Paulo, numa grávida que se encontra na 24ª semana de gestação? Explique em condições ideais.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quais exames complementares (laboratorial e imagem) devem ser realizados numa consulta periódica de <mark>pré-natal</mark>, no estado de São Paulo, numa grávida que se encontra na 24ª semana de gestação? Explique em condições ideais.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>LABORATÓRIO - entre 24ª e 28ª semana de gestação repetir:</p>
                         <ul>
                             <li><mark>HEMOGRAMA</mark>,</li>
@@ -806,19 +948,19 @@
                             <li><mark>UROCULTURA</mark></li>
                         </ul>
                         <p>IMAGEM – o terceiro <mark>USG</mark> (2º MORFOLÓGICO)</p>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Durante uma consulta de <mark>pré-natal</mark> ocorrida em 24/11/2021, a gestante informa <mark>DUM</mark> em 07/05/2021. Qual a <mark>idade gestacional</mark> e a <mark>data provável do parto</mark>? Demonstre os cálculos.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Durante uma consulta de <mark>pré-natal</mark> ocorrida em 24/11/2021, a gestante informa <mark>DUM</mark> em 07/05/2021. Qual a <mark>idade gestacional</mark> e a <mark>data provável do parto</mark>? Demonstre os cálculos.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>CÁLCULOS: IG: 24 + 30 + 31 + 31 + 30 + 31 + 24 = 201 → ÷ 7 = 28 inteiros e 5 de resto</p>
                         <p>IG: 28 semanas e 5 dias (ou na forma fracionada = 28 5/7)</p>
                         <p>DPP: 17/02/2022 (PRIMIGESTA) também considerar: 14/02/2022 (MULTIGESTA)</p>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quais exames complementares (laboratorial e imagem) devem ser realizados na primeira consulta de <mark>pré-natal</mark>, no estado de São Paulo, numa grávida que se encontra na 11ª semana de gestação? Explique em condições ideais.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quais exames complementares (laboratorial e imagem) devem ser realizados na primeira consulta de <mark>pré-natal</mark>, no estado de São Paulo, numa grávida que se encontra na 11ª semana de gestação? Explique em condições ideais.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>LABORATÓRIO - entre 10ª e 14ª semana de gestação na PRIMEIRA CONSULTA:</p>
                         <ul>
                             <li><mark>HEMOGRAMA</mark>,</li>
@@ -833,24 +975,24 @@
                             <li>Em especial no Estado de SP : <mark>sorologia para citomegalovírus</mark></li>
                         </ul>
                          <p>IMAGEM – o primeiro <mark>USG</mark> (1º MORFOLÓGICO)</p>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Durante uma consulta de <mark>pré-natal</mark> ocorrida em 25/11/2021, a gestante informa <mark>DUM</mark> em 21/06/2021. Qual a <mark>idade gestacional</mark> e a <mark>data provável do parto</mark>? Demonstre os cálculos.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Durante uma consulta de <mark>pré-natal</mark> ocorrida em 25/11/2021, a gestante informa <mark>DUM</mark> em 21/06/2021. Qual a <mark>idade gestacional</mark> e a <mark>data provável do parto</mark>? Demonstre os cálculos.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>CÁLCULOS: IG: 9 + 31 + 31 + 30 + 31 + 25 = 157 → ÷ 7 = 22 inteiros e 3 de resto</p>
                         <p>IG: 22 semanas e 3 dias (ou na forma fracionada = 22 3/7)</p>
                         <p>DPP: 31/03/2022 (PRIMIGESTA) também considerar: 28/03/2022 (MULTIGESTA)</p>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Durante uma consulta de <mark>pré-natal</mark> de uma primigesta ocorrida em 01/06/2022, a gestante informa <mark>DUM</mark> em 20/01/2022. Qual a <mark>idade gestacional (IG)</mark>? Demonstre os cálculos. E qual a <mark>data provável do parto (DPP)</mark>? Justifique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Durante uma consulta de <mark>pré-natal</mark> de uma primigesta ocorrida em 01/06/2022, a gestante informa <mark>DUM</mark> em 20/01/2022. Qual a <mark>idade gestacional (IG)</mark>? Demonstre os cálculos. E qual a <mark>data provável do parto (DPP)</mark>? Justifique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>CÁLCULOS: 11 + 28 + 31 + 30 + 31 + 01 = 132</p>
                         <p>132: 7 = 18 inteiros e 6 de resto</p>
                         <p>IG: 18 semanas e 6 dias</p>
                         <p>DPP: 30/12/2022 Justifique: <mark>DUM</mark>: 20/01/22 ---> 20 + 10 = 30 // 01 – 03 ----> outubro (Cálculo pela <mark>Regra de Naegele</mark> com ajuste)</p>
-                    </div>
+                    </div></div>
                 </div>
             </div>
             <div class="restart-quiz-container"><h3>Parabéns!</h3><p>Você concluiu este tema.<br>Clique aqui para recomeçar.</p></div>
@@ -861,68 +1003,68 @@
         </div>
 
         <div class="theme-container" id="tema-15">
-            <h2>TEMA 15 - ASSISTÊNCIA AO TRABALHO DE PARTO</h2>
+            <h2>TEMA 15 - ASSISTÊNCIA AO <mark>TRABALHO DE PARTO</mark></h2>
             <div class="flashcard-viewport">
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Como avaliar a <mark>vitalidade fetal</mark> durante o <mark>trabalho de parto</mark>? Quais os sinais de <mark>sofrimento fetal</mark>? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Como avaliar a <mark>vitalidade fetal</mark> durante o <mark>trabalho de parto</mark>? Quais os sinais de <mark>sofrimento fetal</mark>? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li><mark>VITALIDADE FETAL</mark> – AUSCULTAR O <mark>BATIMENTO CÁRDIO-FETAL (BCF)</mark> ANTES, DURANTE E APÓS CONTRAÇÃO UTERINA</li>
                             <li><mark>SOFRIMENTO FETAL</mark> – ATRAVÉS DA FREQ CARDÍACA FETAL < 100bpm (também considerado: > 160bpm) e PRESENÇA DE <mark>MECÔNIO</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quando a parturiente deverá ser levada à “<mark>sala de parto</mark>”? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quando a parturiente deverá ser levada à “<mark>sala de parto</mark>”? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>Quando a <mark>DILATAÇÃO CERVICAL</mark> FOR DE APROXIMADAMENTE 7,0 cm ou na <mark>DILATAÇÃO TOTAL</mark></li>
                             <li>e feto em APRESENTAÇÃO NO <mark>PLANO +2 de De Lee</mark>.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>O que é <mark>dequitação placentária</mark>? E assistência ao <mark>quarto período do parto</mark>? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>O que é <mark>dequitação placentária</mark>? E assistência ao <mark>quarto período do parto</mark>? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p><mark>DEQUITAÇÃO</mark> é o DESCOLAMENTO, DESCIDA e EXPULSÃO DA <mark>PLACENTA</mark></p>
                         <p><mark>QUARTO PERÍODO (Greenberg)</mark> é o PERÍODO ATÉ A 1ª HORA PÓS-PARTO(*) no qual o ÚTERO SE CONTRAI e forma O <mark>GLOBO DE SEGURANÇA DE PINNARD</mark> (<mark>miotamponamento</mark> e <mark>trombotamponamento</mark>). Monitora-se o RISCO DE <mark>ATONIA UTERINA</mark> E <mark>HEMORRAGIA PÓS-PARTO</mark>.</p>
                         <p>(*) alguns autores consideram até 90 minutos pós-parto</p>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Considerando um parto com <mark>apresentação cefálica fletida</mark> de feto único, como se dá a avaliação da descida e rotação interna do feto? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Considerando um parto com <mark>apresentação cefálica fletida</mark> de feto único, como se dá a avaliação da descida e rotação interna do feto? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>ATRAVÉS DO <mark>TOQUE VAGINAL</mark>:</li>
                             <li>A DESCIDA PELO PLANO DA CABEÇA FETAL EM RELAÇÃO AO <mark>PLANO ZERO de DE LEE</mark> (espinha isquiática)</li>
                             <li>E A ROTAÇÃO INTERNA PELA VARIEDADE DE POSIÇÃO (<mark>SUTURAS</mark> E <mark>FONTANELAS</mark>)</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>O que é <mark>dinâmica uterina</mark>? Como são as <mark>contrações de parto</mark>? E como se dá a <mark>cervicodilatação</mark> em primípara e multíparas? Explique comparativamente.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>O que é <mark>dinâmica uterina</mark>? Como são as <mark>contrações de parto</mark>? E como se dá a <mark>cervicodilatação</mark> em primípara e multíparas? Explique comparativamente.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>São as <mark>CONTRAÇÕES DE PARTO</mark> que seguem o tríplice gradiente descendente e rítmicas, que devem ser DUAS OU MAIS CONTRAÇÕES EM 10 minutos COM DURAÇÃO ENTRE 30 A 40 SEGUNDOS CADA, SENDO QUE NO PERÍODO EXPULSIVO DURA ENTRE 40 A 50 SEGUNDOS CADA.</p>
                         <p>Nas PRIMÍPARAS A <mark>DILATAÇÃO</mark> OCORRE EM MÉDIA 1,0 cm por hora e MULTÍPARAS 1,5 cm por hora</p>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>O que é <mark>dinâmica uterina</mark> e como devem ser as <mark>contrações</mark> durante o <mark>trabalho de parto</mark>? (Versão HABILIDADES SEMIOLÓGICAS)</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>O que é <mark>dinâmica uterina</mark> e como devem ser as <mark>contrações</mark> durante o <mark>trabalho de parto</mark>? (Versão HABILIDADES SEMIOLÓGICAS)</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li><mark>Dinâmica uterina</mark> são as <mark>contrações de parto</mark> que seguem o tríplice gradiente descendente, ritimadas.</li>
-                            <li>Devem ser de 3 a 5 em 10 minutos (devem durar de 30-40 segundos cada uma).</li>
+                            <li>Devem ser de 3 a 5 em 10 minutos (devem durar mais de 40 segundos cada uma).</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Num <mark>parto cefálico fletido</mark> de feto único, a parturiente primípara deverá ser levada à <mark>sala de parto</mark> em que momento?</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Num <mark>parto cefálico fletido</mark> de feto único, a parturiente primípara deverá ser levada à <mark>sala de parto</mark> em que momento?</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li><mark>Dilatação</mark> de 7,0 cm</li>
                             <li>e <mark>plano de De Lee</mark> +2</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
             </div>
             <div class="restart-quiz-container"><h3>Parabéns!</h3><p>Você concluiu este tema.<br>Clique aqui para recomeçar.</p></div>
@@ -936,18 +1078,18 @@
             <h2>TEMA 16 - <mark>PARTOGRAMA</mark></h2>
             <div class="flashcard-viewport">
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Quando se dá a abertura do <mark>partograma</mark>? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Quando se dá a abertura do <mark>partograma</mark>? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>QUANDO A <mark>DILATAÇÃO</mark> ATINGE 3,0cm</li>
                             <li>COM PRESENÇA DE <mark>CONTRAÇÕES REGULARES</mark>,</li>
                             <li>DÁ-SE INÍCIO A FASE ATIVA DO <mark>TRABALHO DE PARTO</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>O que é <mark>partograma</mark>? Cite os parâmetros a serem avaliados.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>O que é <mark>partograma</mark>? Cite os parâmetros a serem avaliados.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <p>É um REGISTRO GRÁFICO DO <mark>TRABALHO DE PARTO</mark></p>
                         <p>Parâmetros:</p>
                         <ul>
@@ -959,28 +1101,28 @@
                             <li>USO MEDICAÇÃO</li>
                             <li>e SITUAÇÃO <mark>BOLSA DAS ÁGUAS</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Como avaliar se há <mark>sofrimento fetal</mark> num <mark>partograma</mark>? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Como avaliar se há <mark>sofrimento fetal</mark> num <mark>partograma</mark>? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>ATRAVÉS DA <mark>FREQ CARDÍACA FETAL</mark> < 100bpm (também considerado: > 160bpm)</li>
                             <li>PRESENÇA DE <mark>MECÔNIO</mark></li>
                             <li>--> também considerado ponto-extra: <mark>linha de alerta</mark> ou <mark>linha de ação</mark></li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>O que é <mark>linha de alerta</mark> e <mark>linha de ação</mark> num <mark>partograma</mark>? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>O que é <mark>linha de alerta</mark> e <mark>linha de ação</mark> num <mark>partograma</mark>? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>SÃO LINHAS OBLÍQUAS TRAÇADAS NO <mark>PARTOGRAMA</mark></li>
                             <li>QUE FACILITAM O DIAGNÓSTICO PRECOCE DO <mark>PARTO DISFUNCIONAL</mark>.</li>
                             <li>A <mark>LINHA DE ALERTA</mark> É INSERIDA UMA HORA APÓS A ABERTURA DO <mark>PARTOGRAMA</mark>.</li>
                             <li>A <mark>LINHA DE AÇÃO</mark> É INSERIDA QUATRO HORAS À DIREITA DA <mark>LINHA DE ALERTA</mark>.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
             </div>
             <div class="restart-quiz-container"><h3>Parabéns!</h3><p>Você concluiu este tema.<br>Clique aqui para recomeçar.</p></div>
@@ -994,36 +1136,36 @@
             <h2>TEMA 17 - MECANISMO DE PARTO EM <mark>APRESENTAÇÃO CEFÁLICA FLETIDA</mark></h2>
             <div class="flashcard-viewport">
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Como ocorre a flexão da cabeça fetal e o <mark>assinclitismo</mark> durante o <mark>trabalho de parto</mark> de uma primípara na <mark>apresentação cefálica fletida</mark>? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Como ocorre a flexão da cabeça fetal e o <mark>assinclitismo</mark> durante o <mark>trabalho de parto</mark> de uma primípara na <mark>apresentação cefálica fletida</mark>? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>Na primípara a FLEXÃO DA CABEÇA ocorre pela PRESSÃO DO FETO SOB O <mark>ESTREITO SUPERIOR DA BACIA</mark> (<mark>Teoria de Zweifel</mark>) durante o processo de <mark>DILATAÇÃO</mark>.</li>
                             <li>E o <mark>ASSINCLITISMO</mark> determinará que a <mark>SUTURA SAGITAL</mark> SE APROXIME DO PÚBIS e o <mark>PARIETAL POSTERIOR</mark> DESCE ULTRAPASSANDO O <mark>PROMONTÓRIO</mark></li>
                             <li>OBS: Em primíparas predomina o <mark>assinclitismo posterior</mark>.</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                  <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Como ocorre o desprendimento do <mark>ovoide córmico</mark> durante o parto na <mark>apresentação cefálica fletida</mark>? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Como ocorre o desprendimento do <mark>ovoide córmico</mark> durante o parto na <mark>apresentação cefálica fletida</mark>? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>APÓS O MOVIMENTO DE RESTITUIÇÃO DA CABEÇA (ROTAÇÃO EXTERNA),</li>
                             <li>POR <mark>OVOIDE CÓRMICO</mark> SE DESPRENDE PELO ABAIXAMENTO DA ESPÁDUA LIBERA OMBRO ANTERIOR</li>
                             <li>E POR ELEVAÇÃO LIBERA OMBRO POSTERIOR</li>
                             <li>ATENÇÃO: Também considerado o inverso: onde se desprender primeiro o POSTERIOR em seguida desprenderá o ANTERIOR (e vice-versa)</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
                 <div class="flashcard">
-                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><p>Como ocorre o desprendimento cefálico durante o parto na <mark>apresentação cefálica fletida</mark>? Como ocorre o <mark>hipomóclio</mark>? Explique.</p></div>
-                    <div class="flashcard-face flashcard-back"><div class="card-status"></div>
+                    <div class="flashcard-face flashcard-front"><div class="card-status"></div><div class="flashcard-content"><p>Como ocorre o desprendimento cefálico durante o parto na <mark>apresentação cefálica fletida</mark>? Como ocorre o <mark>hipomóclio</mark>? Explique.</p></div></div>
+                    <div class="flashcard-face flashcard-back"><div class="card-status"></div><div class="flashcard-content">
                         <ul>
                             <li>O SUBOCCIPÍCIO DA CABEÇA SE ENCAIXA NA SUBPUBE MATERNA</li>
                             <li>FAZENDO MOVIMENTO DE DEFLEXÃO PARA EXTERIORIZAR-SE PELA VULVA.</li>
                             <li>ESTE PONTO DE FIXAÇÃO CHAMA-SE <mark>HIPOMÓCLIO</mark> (PONTO DE APOIO DE ALAVANCA)</li>
                             <li>QUE OCORRE A DEFLEXÃO DA CABEÇA FETAL QUANDO EXTERIORIZA A FRONTE DO MESMO PROPORCIONA O FENÔMENO DA RETROPULSÃO DO CÓCCIX</li>
                         </ul>
-                    </div>
+                    </div></div>
                 </div>
             </div>
             <div class="restart-quiz-container"><h3>Parabéns!</h3><p>Você concluiu este tema.<br>Clique aqui para recomeçar.</p></div>
@@ -1037,48 +1179,78 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
+        const themeToggleButton = document.getElementById('theme-toggle');
+        const body = document.body;
+
+        function applyInitialTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'night-mode') {
+                body.classList.add('night-mode');
+                themeToggleButton.textContent = "Modo Claro";
+            } else {
+                body.classList.remove('night-mode');
+                themeToggleButton.textContent = "Modo Noturno";
+            }
+        }
+
+        themeToggleButton.addEventListener('click', () => {
+            body.classList.toggle('night-mode');
+            if (body.classList.contains('night-mode')) {
+                localStorage.setItem('theme', 'night-mode');
+                themeToggleButton.textContent = "Modo Claro";
+            } else {
+                localStorage.setItem('theme', 'day-mode');
+                themeToggleButton.textContent = "Modo Noturno";
+            }
+        });
+
+        applyInitialTheme(); 
+
         document.querySelectorAll('.theme-container').forEach(themeContainer => {
             const viewport = themeContainer.querySelector('.flashcard-viewport');
             const restartContainer = themeContainer.querySelector('.restart-quiz-container');
             const navigationControls = themeContainer.querySelector('.navigation-controls');
             
-            // Clonar os cartões para poder reinseri-los no DOM ao reiniciar
-            const originalCardElements = Array.from(viewport.querySelectorAll('.flashcard'));
+            const originalCardElementsHTML = Array.from(viewport.querySelectorAll('.flashcard')).map(card => card.outerHTML);
             
             const prevButton = navigationControls.querySelector('.prev-button');
             const nextButton = navigationControls.querySelector('.next-button');
 
-            if (originalCardElements.length === 0) {
+            if (originalCardElementsHTML.length === 0) {
                 if(navigationControls) navigationControls.style.display = 'none';
-                if(viewport) viewport.style.display = 'none'; // Esconde viewport se não há cartões
+                if(viewport) viewport.style.display = 'none'; 
                 if(restartContainer) restartContainer.style.display = 'none';
                 return;
             }
 
             let currentShuffledIndices = [];
-            let currentCardDisplayIndex = 0; // Índice para a ordem de visualização (0 a N-1)
-
-            function startQuiz() {
-                // Cria uma lista de índices (0 a N-1) e a embaralha
-                currentShuffledIndices = originalCardElements.map((_, i) => i).sort(() => Math.random() - 0.5);
-                currentCardDisplayIndex = 0;
-
-                // Limpa o viewport e readiciona os cartões originais (eles serão escondidos/mostrados pelo showCard)
-                viewport.innerHTML = '';
-                originalCardElements.forEach(cardNode => {
-                    viewport.appendChild(cardNode.cloneNode(true)); // Usa clones para evitar problemas com listeners
-                });
-                
-                // Pega a nova coleção de cartões clonados
-                const activeCardsInDOM = Array.from(viewport.querySelectorAll('.flashcard'));
+            let currentCardDisplayIndex = 0; 
+            let activeCardsInDOM = [];
 
 
-                activeCardsInDOM.forEach((card, indexInDOM) => {
-                     // Adiciona listener de clique para virar, apenas uma vez por cartão.
-                    card.removeEventListener('click', flipCardHandler); // Remove listener antigo se houver
+            function flipCardHandler(event) {
+                if (event.target.closest('.card-status') || event.target.classList.contains('nav-button')) return;
+                this.classList.toggle('is-flipped');
+            }
+            
+            function setupCardListeners() {
+                activeCardsInDOM = Array.from(viewport.querySelectorAll('.flashcard'));
+                activeCardsInDOM.forEach(card => {
+                    card.removeEventListener('click', flipCardHandler);
                     card.addEventListener('click', flipCardHandler);
                 });
+            }
 
+            function startQuiz() {
+                currentShuffledIndices = originalCardElementsHTML.map((_, i) => i).sort(() => Math.random() - 0.5);
+                currentCardDisplayIndex = 0;
+
+                viewport.innerHTML = ''; 
+                originalCardElementsHTML.forEach(cardHTML => {
+                    viewport.insertAdjacentHTML('beforeend', cardHTML);
+                });
+                
+                setupCardListeners();
 
                 restartContainer.style.display = 'none';
                 viewport.style.display = 'block';
@@ -1086,31 +1258,26 @@
                 
                 showCard();
             }
-            
-            function flipCardHandler(event) {
-                 if (event.target.classList.contains('card-status') || event.target.closest('.card-status')) return;
-                 this.classList.toggle('is-flipped');
-            }
-
 
             function showCard() {
                 const totalCardsInTheme = currentShuffledIndices.length;
                 const actualCardIndexInOriginalArray = currentShuffledIndices[currentCardDisplayIndex];
                 
-                const cardsInDOM = viewport.querySelectorAll('.flashcard'); // Seleciona os cartões atualmente no DOM
+                activeCardsInDOM = Array.from(viewport.querySelectorAll('.flashcard')); // Re-query
+                
+                 activeCardsInDOM.forEach(card => card.classList.remove('active', 'is-flipped'));
+                 if (activeCardsInDOM[actualCardIndexInOriginalArray]) {
+                    const cardToShow = activeCardsInDOM[actualCardIndexInOriginalArray];
+                    cardToShow.classList.add('active');
+                    
+                    const statusFront = cardToShow.querySelector('.flashcard-front .card-status');
+                    const statusBack = cardToShow.querySelector('.flashcard-back .card-status');
+                    const statusText = `(${currentCardDisplayIndex + 1}/${totalCardsInTheme})`;
+                    
+                    if(statusFront) statusFront.textContent = `Frente ${statusText}`;
+                    if(statusBack) statusBack.textContent = `Verso ${statusText}`;
+                }
 
-                cardsInDOM.forEach((card, domIndex) => {
-                    card.classList.remove('active', 'is-flipped');
-                    if (domIndex === actualCardIndexInOriginalArray) {
-                        card.classList.add('active');
-                        const statusFront = card.querySelector('.flashcard-front .card-status');
-                        const statusBack = card.querySelector('.flashcard-back .card-status');
-                        const statusText = `(${currentCardDisplayIndex + 1}/${totalCardsInTheme})`;
-                        
-                        if(statusFront) statusFront.textContent = `Frente ${statusText}`;
-                        if(statusBack) statusBack.textContent = `Verso ${statusText}`;
-                    }
-                });
                 prevButton.disabled = currentCardDisplayIndex === 0;
             }
 
@@ -1133,7 +1300,7 @@
             });
 
             restartContainer.addEventListener('click', startQuiz);
-            startQuiz(); // Inicia o quiz para este tema
+            startQuiz(); 
         });
     });
     </script>
