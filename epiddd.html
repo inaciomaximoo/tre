@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumo Completo de Epidemiologia para Estudo</title>
+    <style>
+        /* --- Configurações Globais e Reset Sutil --- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; /* Stack de fontes moderno e legível */
+            line-height: 1.7; /* Espaçamento ideal para leitura prolongada */
+            margin: 0 auto;
+            padding: 20px;
+            max-width: 1000px;
+            color: #212529; /* Cor de texto principal (preto muito escuro) */
+            background-color: #fcfdff; /* Fundo branco gelo, muito sutil */
+            font-size: 17px; /* Tamanho base confortável */
+        }
+
+        /* --- Tipografia e Cabeçalhos --- */
+        h1, h2, h3, h4 {
+            font-weight: 600; /* Peso semibold para cabeçalhos */
+            line-height: 1.3; /* Mais compacto para títulos */
+        }
+        h1 {
+            color: #004085; /* Azul escuro e sóbrio */
+            text-align: center;
+            border-bottom: 3px solid #007bff; /* Azul primário */
+            padding-bottom: 20px;
+            margin-top: 20px;
+            margin-bottom: 50px;
+            font-size: 2.6em;
+        }
+        h2 {
+            color: #0056b3; /* Azul um pouco mais claro que H1 */
+            border-bottom: 2px solid #b8daff; /* Azul bem claro para a linha */
+            padding-bottom: 15px;
+            margin-top: 55px;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+        h3 {
+            color: #0c5460; /* Azul-petróleo escuro */
+            margin-top: 45px;
+            margin-bottom: 25px;
+            font-size: 1.9em;
+            border-left: 5px solid #17a2b8; /* Ciano para a borda */
+            padding-left: 15px;
+        }
+        h4 {
+            color: #155724; /* Verde escuro */
+            margin-top: 35px;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+        }
+
+        /* --- Listas e Parágrafos --- */
+        ul {
+            list-style-position: outside;
+            padding-left: 20px; /* Ajuste para alinhar melhor com o texto */
+        }
+        li {
+            margin-bottom: 12px;
+            padding-left: 5px;
+        }
+        p {
+            margin-bottom: 20px;
+            text-align: left; 
+        }
+        
+        /* --- Ênfase e Elementos Inline --- */
+        strong { 
+            color: #721c24; /* Vermelho escuro para forte ênfase/avisos */
+            font-weight: bold; 
+        }
+        
+        /* --- Estilo para Fórmulas e Blocos de Cálculo --- */
+        .formula-display {
+            display: block;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; /* Stack monoespaçado moderno */
+            background-color: #f0f3f5; /* Fundo acinzentado muito claro */
+            color: #333;
+            padding: 18px 25px;
+            margin: 25px auto; 
+            border-radius: 6px;
+            border: 1px solid #dae0e5; 
+            font-size: 1.1em; /* Tamanho legível para fórmulas */
+            font-weight: 500; /* Peso médio para fórmulas */
+            text-align: center;
+            width: fit-content; 
+            min-width: 250px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .calculation-block {
+            background-color: #ffffff; 
+            border: 1px solid #d6d8db; 
+            border-left: 8px solid #007bff; /* Azul de destaque */
+            padding: 20px 30px; 
+            margin: 35px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+        }
+        .calculation-block h4 { 
+            margin-top: 0;
+            color: #004085; /* Azul escuro para título do bloco */
+            font-size: 1.45em;
+            border-bottom: 1px solid #e0e6ed;
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+        }
+        .calculation-block p, .calculation-block ul {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; 
+            font-size: 1.1em; 
+            color: #495057; /* Cinza escuro para os passos */
+            text-align: left;
+            margin-bottom: 10px;
+        }
+        .calculation-block .step-label { 
+            font-weight: 600; /* Semibold para rótulos */
+            color: #0056b3; /* Azul para rótulos */
+            display: block;
+            margin-bottom: 6px;
+            margin-top: 18px;
+        }
+        .calculation-block code { /* Para os números e operações dentro das explicações */
+            background-color: #f8f9fa;
+            color: #c7254e; /* Rosa/vermelho para código */
+            font-weight: 500; /* Peso médio */
+            font-size: 1em; 
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+         .calculation-block .calculation-step { /* Nova classe para os passos de cálculo com frações */
+            margin: 10px 0;
+            padding-left: 10px; /* Leve indentação para os passos */
+         }
+         .calculation-block .calculation-step .lhs { /* Parte esquerda da equação (ex: S =) */
+             color: #495057;
+             font-weight: bold;
+         }
+        .calculation-block .result { 
+            font-weight: bold;
+            color: #1e7e34; /* Verde escuro para o resultado */
+            display: block;
+            margin-top: 20px;
+            font-size: 1.25em;
+            border-top: 2px dashed #ced4da; 
+            padding-top: 15px;
+            text-align: center;
+        }
+        .calculation-block ul {
+            list-style-type: none;
+            padding-left: 5px;
+        }
+        .calculation-block li {
+            margin-bottom: 6px;
+            padding-left: 10px;
+            border-left: 2px solid #e0e6ed;
+        }
+
+        /* Estilo para Frações "Quadro Negro" */
+        .fraction {
+            display: inline-block;
+            position: relative; 
+            vertical-align: -0.35em; /* Melhor alinhamento vertical com texto */
+            margin: 0 0.25em;
+            text-align: center;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+        }
+        .fraction > span { /* Numerador e denominador */
+            display: block;
+            padding: 0.1em 0.25em; 
+            font-size: 1.05em; /* Tamanho relativo à fonte do cálculo */
+            color: #c7254e; /* Mesma cor do 'code' para consistência */
+            font-weight: 500;
+        }
+        .fraction > span.numerator {
+            padding-bottom: 0.25em; 
+        }
+        .fraction > span.denominator {
+            border-top: 2px solid #495057; /* Linha da fração mais escura */
+            padding-top: 0.25em;
+        }
+        /* Frações embutidas (menores) */
+        .formula-display .fraction > span { font-size: 0.9em; }
+
+
+        .warning {
+            background-color: #fff8e1; /* Amarelo muito pálido */
+            border: 1px solid #ffecb3; /* Borda amarela clara */
+            border-left: 8px solid #ffc107; /* Amarelo mais forte */
+            padding: 20px 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+            color: #856404; 
+        }
+        .warning strong {
+             color: #856404;
+        }
+        .warning p:last-child {
+            margin-bottom: 0;
+        }
+
+        hr {
+            border: 0;
+            height: 2px; 
+            background-image: linear-gradient(to right, rgba(0, 64, 133, 0), rgba(0, 64, 133, 0.5), rgba(0, 64, 133, 0));
+            margin: 60px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Usar collapse para bordas mais limpas */
+            margin: 30px 0;
+            box-shadow: 0 3px 7px rgba(0,0,0,0.06);
+            font-size: 0.95em; /* Levemente menor para caber mais dados */
+        }
+        th, td {
+            border: 1px solid #dee2e6; 
+            padding: 12px 15px; 
+            text-align: center; 
+            vertical-align: middle;
+        }
+        th {
+            background-color: #0056b3; /* Azul escuro consistente */
+            color: #ffffff;
+            font-weight: 600; /* Semibold para cabeçalhos de tabela */
+            font-size: 1.05em;
+        }
+        td {
+            background-color: #ffffff;
+        }
+        tr:nth-child(even) td {
+            background-color: #f8f9fa; 
+        }
+        .table-caption {
+            caption-side: top;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.25em;
+            color: #004085;
+            margin-bottom: 12px;
+            margin-top: 10px;
+        }
+
+        /* Para telas menores */
+        @media (max-width: 768px) {
+            body { padding: 15px; font-size: 16px; } /* Aumentar um pouco a base para mobile */
+            h1 { font-size: 2.2em; }
+            h2 { font-size: 1.9em; }
+            h3 { font-size: 1.6em; }
+            h4 { font-size: 1.35em; }
+            .formula-display { font-size: 1.05em; padding: 12px 18px; }
+            .calculation-block { padding: 15px 20px; }
+            .calculation-block h4 { font-size: 1.25em; }
+            .calculation-block p, .calculation-block ul { font-size: 1em; }
+            .fraction > span { font-size: 1em; }
+            table, th, td { font-size: 0.85em; padding: 8px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Resumo Completo de Epidemiologia para Estudo</h1>
+
+    <p>Este resumo consolida os principais tópicos de epidemiologia identificados nas provas, detalhando os conceitos, cálculos e interpretações exigidos, bem como a frequência com que cada tema apareceu.</p>
+
+    <hr>
+
+    <h2>1. Testes Diagnósticos e Rastreamento: Princípios e Cálculos</h2>
+
+    <p>Este é, disparado, o tema de <strong>ALTÍSSIMA FREQUÊNCIA</strong> e profundidade em todas as provas. Múltiplas questões são dedicadas a este tópico, frequentemente utilizando cenários recorrentes (como os dados de um teste para câncer de pâncreas, um para sinusite ou um para H1N1) que exigem múltiplos cálculos e interpretações.</p>
+
+    <h3>Tópicos Abordados e Profundidade:</h3>
+    
+    <h4>Cálculos Fundamentais (Profundidade: Alta - Exige cálculo preciso e interpretação contextualizada):</h4>
+    <ul>
+        <li><strong>Tabela 2x2:</strong> Fundamental saber montar ou interpretar uma tabela com Verdadeiros Positivos (VP ou "a"), Falsos Positivos (FP ou "b"), Falsos Negativos (FN ou "c") e Verdadeiros Negativos (VN ou "d"). Os "doentes" são a soma de VP+FN (a+c), e os "não doentes" FP+VN (b+d). Os "testes positivos" são VP+FP (a+b) e os "testes negativos" FN+VN (c+d).
+            <p><em>Incidência:</em> Implícita em quase todas as questões de cálculo. Perguntas específicas sobre a localização de FN (célula "c") ou quais células deveriam ser zero em um teste ideal (FP e FN, ou seja, "b" e "c") também apareceram.</p>
+        </li>
+    </ul>
+
+    <div class="calculation-block">
+        <h4>Cenário de Exemplo: Teste para Câncer de Pâncreas</h4>
+        <p><span class="step-label">Dados Iniciais Fornecidos nas Provas:</span></p>
+        <ul>
+            <li>População Total Testada = <code>5000</code></li>
+            <li>Total de Doentes com Câncer de Pâncreas (D+) = <code>350</code></li>
+            <li>Resultados Verdadeiros Positivos (VP) = <code>200</code></li>
+            <li>Resultados Verdadeiros Negativos (VN) = <code>2350</code></li>
+        </ul>
+        <p><span class="step-label">Valores Derivados para a Tabela 2x2:</span></p>
+        <ul>
+            <li>Falsos Negativos (FN) = D+ - VP = <code>350 - 200 = 150</code></li>
+            <li>Total de Não Doentes (D-) = População Total - D+ = <code>5000 - 350 = 4650</code></li>
+            <li>Falsos Positivos (FP) = D- - VN = <code>4650 - 2350 = 2300</code></li>
+        </ul>
+        <table>
+            <caption class="table-caption">Tabela 2x2: Câncer de Pâncreas</caption>
+            <thead>
+                <tr>
+                    <th>Teste</th>
+                    <th>Doença Presente (D+)</th>
+                    <th>Doença Ausente (D-)</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Positivo (T+)</td>
+                    <td>VP = 200</td>
+                    <td>FP = 2300</td>
+                    <td>2500</td>
+                </tr>
+                <tr>
+                    <td>Negativo (T-)</td>
+                    <td>FN = 150</td>
+                    <td>VN = 2350</td>
+                    <td>2500</td>
+                </tr>
+                <tr>
+                    <td>Total</td>
+                    <td>350</td>
+                    <td>4650</td>
+                    <td>5000</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <ul>
+        <li><strong>Sensibilidade (S):</strong> Capacidade do teste de identificar corretamente os doentes. 
+            <div class="calculation-block">
+                <h4>Exemplo: Sensibilidade (S) - Câncer de Pâncreas</h4>
+                <p><span class="formula-display">S = <span class="fraction"><span class="numerator">VP</span><span class="denominator">VP + FN</span></span></span></p>
+                <p><span class="step-label">Dados do cenário:</span></p>
+                <ul>
+                    <li>Verdadeiros Positivos (VP) = <code>200</code></li>
+                    <li>Falsos Negativos (FN) = <code>150</code></li>
+                </ul>
+                <p><span class="step-label">Cálculo:</span></p>
+                <p class="calculation-step"><span class="lhs">S = </span><span class="fraction"><span class="numerator"><code>200</code></span><span class="denominator"><code>200 + 150</code></span></span> = <span class="fraction"><span class="numerator"><code>200</code></span><span class="denominator"><code>350</code></span></span></p>
+                <p class="calculation-step"><span class="lhs">S ≈ </span><code>0.5714</code></p>
+                <p class="result">S ≈ 57.14% (Frequentemente arredondado para 57% nas provas)</p>
+            </div>
+        </li>
+        <li><strong>Especificidade (E):</strong> Capacidade do teste de identificar corretamente os não doentes. 
+            <div class="calculation-block">
+                <h4>Exemplo: Especificidade (E) - Câncer de Pâncreas</h4>
+                <p><span class="formula-display">E = <span class="fraction"><span class="numerator">VN</span><span class="denominator">VN + FP</span></span></span></p>
+                <p><span class="step-label">Dados do cenário:</span></p>
+                <ul>
+                    <li>Verdadeiros Negativos (VN) = <code>2350</code></li>
+                    <li>Falsos Positivos (FP) = <code>2300</code></li>
+                </ul>
+                <p><span class="step-label">Cálculo:</span></p>
+                <p class="calculation-step"><span class="lhs">E = </span><span class="fraction"><span class="numerator"><code>2350</code></span><span class="denominator"><code>2350 + 2300</code></span></span> = <span class="fraction"><span class="numerator"><code>2350</code></span><span class="denominator"><code>4650</code></span></span></p>
+                <p class="calculation-step"><span class="lhs">E ≈ </span><code>0.5053</code></p>
+                <p class="result">E ≈ 50.53% (Frequentemente arredondado para 50% nas provas)</p>
+            </div>
+        </li>
+        <li><strong>Valor Preditivo Positivo (VPP):</strong> Probabilidade de ter a doença se o teste for positivo.
+            <div class="calculation-block">
+                <h4>Exemplo: VPP - Câncer de Pâncreas</h4>
+                <p><span class="formula-display">VPP = <span class="fraction"><span class="numerator">VP</span><span class="denominator">VP + FP</span></span></span></p>
+                <p><span class="step-label">Dados do cenário:</span></p>
+                <ul>
+                    <li>Verdadeiros Positivos (VP) = <code>200</code></li>
+                    <li>Falsos Positivos (FP) = <code>2300</code></li>
+                </ul>
+                <p><span class="step-label">Cálculo:</span></p>
+                <p class="calculation-step"><span class="lhs">VPP = </span><span class="fraction"><span class="numerator"><code>200</code></span><span class="denominator"><code>200 + 2300</code></span></span> = <span class="fraction"><span class="numerator"><code>200</code></span><span class="denominator"><code>2500</code></span></span></p>
+                <p class="calculation-step"><span class="lhs">VPP = </span><code>0.08</code></p>
+                <p class="result">VPP = 8%</p>
+                <div class="warning"><strong>Nota:</strong> Alguns gabaritos apontam para 0.05 (5%), o que exigiria dados diferentes ou arredondamentos não especificados. Com os dados fornecidos consistentemente, 0.08 é o correto.</div>
+            </div>
+        </li>
+        <li><strong>Valor Preditivo Negativo (VPN):</strong> Probabilidade de não ter a doença se o teste for negativo.
+            <div class="calculation-block">
+                <h4>Exemplo: VPN - Câncer de Pâncreas</h4>
+                <p><span class="formula-display">VPN = <span class="fraction"><span class="numerator">VN</span><span class="denominator">VN + FN</span></span></span></p>
+                <p><span class="step-label">Dados do cenário:</span></p>
+                <ul>
+                    <li>Verdadeiros Negativos (VN) = <code>2350</code></li>
+                    <li>Falsos Negativos (FN) = <code>150</code></li>
+                </ul>
+                <p><span class="step-label">Cálculo:</span></p>
+                <p class="calculation-step"><span class="lhs">VPN = </span><span class="fraction"><span class="numerator"><code>2350</code></span><span class="denominator"><code>2350 + 150</code></span></span> = <span class="fraction"><span class="numerator"><code>2350</code></span><span class="denominator"><code>2500</code></span></span></p>
+                <p class="calculation-step"><span class="lhs">VPN = </span><code>0.94</code></p>
+                <p class="result">VPN = 94%</p>
+            </div>
+        </li>
+        <li><strong>Acurácia (Ac):</strong> Proporção de todos os resultados corretos.
+            <div class="calculation-block">
+                <h4>Exemplo: Acurácia - Câncer de Pâncreas</h4>
+                <p><span class="formula-display">Ac = <span class="fraction"><span class="numerator">VP + VN</span><span class="denominator">Total</span></span></span></p>
+                <p><span class="step-label">Dados do cenário:</span></p>
+                <ul>
+                    <li>Verdadeiros Positivos (VP) = <code>200</code></li>
+                    <li>Verdadeiros Negativos (VN) = <code>2350</code></li>
+                    <li>Total de pacientes = <code>5000</code></li>
+                </ul>
+                <p><span class="step-label">Cálculo:</span></p>
+                <p class="calculation-step"><span class="lhs">Ac = </span><span class="fraction"><span class="numerator"><code>200 + 2350</code></span><span class="denominator"><code>5000</code></span></span> = <span class="fraction"><span class="numerator"><code>2550</code></span><span class="denominator"><code>5000</code></span></span></p>
+                <p class="calculation-step"><span class="lhs">Ac = </span><code>0.51</code></p>
+                <p class="result">Acurácia = 51%</p>
+            </div>
+        </li>
+        <li><strong>Prevalência (P):</strong> Proporção de indivíduos em uma população que têm a doença.
+            <div class="calculation-block">
+                <h4>Exemplo: Prevalência - Câncer de Pâncreas</h4>
+                <p><span class="formula-display">P = <span class="fraction"><span class="numerator">Total de Doentes (VP + FN)</span><span class="denominator">População Total</span></span></span></p>
+                <p><span class="step-label">Dados do cenário:</span></p>
+                <ul>
+                    <li>Total de Doentes (D+) = <code>350</code></li>
+                    <li>População Total = <code>5000</code></li>
+                </ul>
+                <p><span class="step-label">Cálculo:</span></p>
+                <p class="calculation-step"><span class="lhs">P = </span><span class="fraction"><span class="numerator"><code>350</code></span><span class="denominator"><code>5000</code></span></span></p>
+                <p class="calculation-step"><span class="lhs">P = </span><code>0.07</code></p>
+                <p class="result">Prevalência = 7%</p>
+            </div>
+        </li>
+        <li><strong>Razão de Verossimilhança Positiva (LR+):</strong>
+             <div class="calculation-block">
+                <h4>Exemplo: LR+ - Câncer de Pâncreas</h4>
+                <p><span class="formula-display">LR+ = <span class="fraction"><span class="numerator">Sensibilidade</span><span class="denominator">1 - Especificidade</span></span></span></p>
+                <p><span class="step-label">Usando S ≈ 0.5714 e E ≈ 0.5053 (calculados anteriormente):</span></p>
+                <p><span class="step-label">Cálculo:</span></p>
+                <p class="calculation-step"><span class="lhs">LR+ = </span><span class="fraction"><span class="numerator"><code>0.5714</code></span><span class="denominator"><code>1 - 0.5053</code></span></span> = <span class="fraction"><span class="numerator"><code>0.5714</code></span><span class="denominator"><code>0.4947</code></span></span></p>
+                <p class="calculation-step"><span class="lhs">LR+ ≈ </span><code>1.155</code></p>
+                <p class="result">LR+ ≈ 1.155</p>
+                <div class="warning"><strong>Nota:</strong> Nas provas, opções como 1.14 ou 1.15 são comuns. O gabarito de 1.14 provavelmente usa S=0.57 e E=0.50 (<code>0.57 / (1-0.50) = 1.14</code>).</div>
+            </div>
+        </li>
+        <li><strong>Razão de Verossimilhança Negativa (LR-):</strong>
+            <div class="calculation-block">
+                <h4>Exemplo: LR- - Câncer de Pâncreas</h4>
+                <p><span class="formula-display">LR- = <span class="fraction"><span class="numerator">1 - Sensibilidade</span><span class="denominator">Especificidade</span></span></span></p>
+                <p><span class="step-label">Usando S ≈ 0.5714 e E ≈ 0.5053:</span></p>
+                <p><span class="step-label">Cálculo:</span></p>
+                <p class="calculation-step"><span class="lhs">LR- = </span><span class="fraction"><span class="numerator"><code>1 - 0.5714</code></span><span class="denominator"><code>0.5053</code></span></span> = <span class="fraction"><span class="numerator"><code>0.4286</code></span><span class="denominator"><code>0.5053</code></span></span></p>
+                <p class="calculation-step"><span class="lhs">LR- ≈ </span><code>0.848</code></p>
+                <p class="result">LR- ≈ 0.848</p>
+                 <div class="warning"><strong>Nota:</strong> Nas provas, a opção 0.84 é listada. Alguns gabaritos apontam para 0.42, que é inconsistente com os dados brutos e parece derivar de entradas arredondadas muito específicas ou erro.</div>
+            </div>
+        </li>
+        <li><strong>Probabilidade Pós-Teste (usando LR):</strong>
+            <div class="calculation-block">
+                <h4>Exemplo: Probabilidade Pós-Teste - Sinusite com Impressão Clínica de "Alta Probabilidade"</h4>
+                 <p><span class="step-label">Dados do cenário Sinusite:</span></p>
+                <ul>
+                    <li>Total de pacientes = <code>247</code></li>
+                    <li>Pacientes com sinusite (D+) = <code>95</code></li>
+                     <li>Razão de Verossimilhança (RV ou LR+) para "alta probabilidade" = <code>4.7</code></li>
+                </ul>
+                 <table>
+                    <caption class="table-caption">Tabela 2x2: Sinusite (Dor Facial como Teste)</caption>
+                    <thead>
+                        <tr>
+                            <th>Dor Facial</th>
+                            <th>Sinusite Presente (D+)</th>
+                            <th>Sinusite Ausente (D-)</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Presente (T+)</td>
+                            <td>VP = 49</td>
+                            <td>FP = 79</td>
+                            <td>128</td>
+                        </tr>
+                        <tr>
+                            <td>Ausente (T-)</td>
+                            <td>FN = 46</td>
+                            <td>TN = 73</td>
+                            <td>119</td>
+                        </tr>
+                        <tr>
+                            <td>Total</td>
+                            <td>95</td>
+                            <td>152</td>
+                            <td>247</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><span class="step-label">Passo 1: Calcular Prevalência (Probabilidade Pré-Teste, P<sub>pré</sub>)</span></p>
+                <p class="calculation-step"><span class="lhs">P<sub>pré</sub> = </span><span class="fraction"><span class="numerator">Total D+</span><span class="denominator">Total Pacientes</span></span> = <span class="fraction"><span class="numerator"><code>95</code></span><span class="denominator"><code>247</code></span></span> ≈ <code>0.3846</code></p>
+                <p><span class="step-label">Passo 2: Calcular Odds Pré-Teste</span></p>
+                <p><span class="formula-display">Odds<sub>pré</sub> = <span class="fraction"><span class="numerator">P<sub>pré</sub></span><span class="denominator">1 - P<sub>pré</sub></span></span></span></p>
+                <p class="calculation-step"><span class="lhs">Odds<sub>pré</sub> = </span><span class="fraction"><span class="numerator"><code>0.3846</code></span><span class="denominator"><code>1 - 0.3846</code></span></span> = <span class="fraction"><span class="numerator"><code>0.3846</code></span><span class="denominator"><code>0.6154</code></span></span> ≈ <code>0.6249</code></p>
+                <p><span class="step-label">Passo 3: Calcular Odds Pós-Teste</span></p>
+                <p><span class="formula-display">Odds<sub>pós</sub> = Odds<sub>pré</sub> * LR+</span></p>
+                <p class="calculation-step"><span class="lhs">Odds<sub>pós</sub> = </span><code>0.6249 * 4.7</code> ≈ <code>2.937</code></p>
+                <p><span class="step-label">Passo 4: Converter Odds Pós-Teste para Probabilidade Pós-Teste (P<sub>pós</sub>)</span></p>
+                <p><span class="formula-display">P<sub>pós</sub> = <span class="fraction"><span class="numerator">Odds<sub>pós</sub></span><span class="denominator">1 + Odds<sub>pós</sub></span></span></span></p>
+                <p class="calculation-step"><span class="lhs">P<sub>pós</sub> = </span><span class="fraction"><span class="numerator"><code>2.937</code></span><span class="denominator"><code>1 + 2.937</code></span></span> = <span class="fraction"><span class="numerator"><code>2.937</code></span><span class="denominator"><code>3.937</code></span></span> ≈ <code>0.7459</code></p>
+                <p class="result">Probabilidade Pós-Teste ≈ 74.59% (Nas provas, arredondado para 75%)</p>
+            </div>
+        </li>
+        <li><strong>Cálculo de VP, FP, VN, FN a partir de Cenários com Prevalência Dada:</strong>
+            <div class="calculation-block">
+                <h4>Exemplo: Cenário Teste de Câncer Genérico</h4>
+                <p><span class="step-label">Dados do cenário:</span></p>
+                <ul>
+                    <li>População Total = <code>5000</code></li>
+                    <li>Prevalência da Doença (P) = <code>1%</code> (ou 0.01)</li>
+                    <li>Sensibilidade do Teste (S) = <code>80%</code> (ou 0.80)</li>
+                    <li>Taxa de Falsos Positivos (TFP) = <code>2%</code> (ou 0.02, aplicada aos Não Doentes)</li>
+                </ul>
+                <p><span class="step-label">Cálculos:</span></p>
+                <p class="calculation-step"><span class="lhs">Número de Doentes (D+) = </span>P * População = <code>0.01 * 5000 = 50</code></p>
+                <p class="calculation-step"><span class="lhs">Número de Não Doentes (D-) = </span>População - D+ = <code>5000 - 50 = 4950</code></p>
+                <p class="calculation-step"><span class="lhs">Verdadeiros Positivos (VP) = </span>S * D+ = <code>0.80 * 50 = 40</code></p>
+                <p class="calculation-step"><span class="lhs">Falsos Negativos (FN) = </span>D+ - VP = <code>50 - 40 = 10</code></p>
+                <p class="calculation-step"><span class="lhs">Falsos Positivos (FP) = </span>TFP * D- = <code>0.02 * 4950 = 99</code></p>
+                <p class="calculation-step"><span class="lhs">Verdadeiros Negativos (VN) = </span>D- - FP = <code>4950 - 99 = 4851</code></p>
+                <table>
+                    <caption class="table-caption">Tabela 2x2: Teste de Câncer Genérico</caption>
+                     <thead>
+                        <tr>
+                            <th>Teste</th>
+                            <th>Doença Presente (D+)</th>
+                            <th>Doença Ausente (D-)</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Positivo (T+)</td>
+                            <td>VP = 40</td>
+                            <td>FP = 99</td>
+                            <td>139</td>
+                        </tr>
+                        <tr>
+                            <td>Negativo (T-)</td>
+                            <td>FN = 10</td>
+                            <td>VN = 4851</td>
+                            <td>4861</td>
+                        </tr>
+                        <tr>
+                            <td>Total</td>
+                            <td>50</td>
+                            <td>4950</td>
+                            <td>5000</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="result">Uma questão associada: "Haverá cerca de 2,5 resultados falsos positivos para cada verdadeiro positivo." (<span class="lhs">FP/VP = </span><span class="fraction"><span class="numerator"><code>99</code></span><span class="denominator"><code>40</code></span></span> = <code>2.475</code>)</p>
+            </div>
+        </li>
+    </ul>
+    
+    <div class="calculation-block">
+        <h4>Cenário de Exemplo: Teste para H1N1</h4>
+        <p><span class="step-label">Dados Iniciais Fornecidos nas Provas:</span></p>
+        <ul>
+            <li>Total de escolares testados = <code>320</code></li>
+            <li>Verdadeiros Positivos (VP) = <code>38</code></li>
+            <li>Falsos Positivos (FP) = <code>6</code></li>
+            <li>Falsos Negativos (FN) = <code>28</code></li>
+            <li>Verdadeiros Negativos (VN) = <code>248</code></li>
+        </ul>
+        <table>
+            <caption class="table-caption">Tabela 2x2: Teste H1N1</caption>
+            <thead>
+                <tr>
+                    <th>Teste de Rastreio</th>
+                    <th>H1N1 Presente (Padrão-Ouro D+)</th>
+                    <th>H1N1 Ausente (Padrão-Ouro D-)</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Positivo (T+)</td>
+                    <td>VP = 38</td>
+                    <td>FP = 6</td>
+                    <td>44</td>
+                </tr>
+                <tr>
+                    <td>Negativo (T-)</td>
+                    <td>FN = 28</td>
+                    <td>VN = 248</td>
+                    <td>276</td>
+                </tr>
+                <tr>
+                    <td>Total</td>
+                    <td>D+ = 66</td>
+                    <td>D- = 254</td>
+                    <td>320</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><span class="step-label">Cálculo da Prevalência:</span></p>
+        <p class="calculation-step"><span class="lhs">P = </span><span class="fraction"><span class="numerator">Total de Doentes (VP + FN)</span><span class="denominator">População Total</span></span> = <span class="fraction"><span class="numerator"><code>38 + 28</code></span><span class="denominator"><code>320</code></span></span> = <span class="fraction"><span class="numerator"><code>66</code></span><span class="denominator"><code>320</code></span></span></p>
+        <p><span class="step-label">Cálculo da Acurácia:</span></p>
+        <p class="calculation-step"><span class="lhs">Ac = </span><span class="fraction"><span class="numerator">VP + VN</span><span class="denominator">Total</span></span> = <span class="fraction"><span class="numerator"><code>38 + 248</code></span><span class="denominator"><code>320</code></span></span> = <span class="fraction"><span class="numerator"><code>286</code></span><span class="denominator"><code>320</code></span></span> ≈ <code>0.89375</code></p>
+        <p class="result">Prevalência = <span class="fraction"><span class="numerator"><code>66</code></span><span class="denominator"><code>320</code></span></span> e Acurácia ≈ <code>0.89</code></p>
+    </div>
+
+
+    <h4>Princípios e Interpretação (Profundidade: Média-Alta - Exige compreensão conceitual e aplicação em diferentes contextos):</h4>
+    <ul>
+        <li><strong>Escolha do Teste (Sensível vs. Específico):</strong> Um teste sensível deve ser usado quando não se quer correr o risco de não se diagnosticar uma doença grave. Para identificar o maior número de portadores, mesmo que alguns não sejam doentes, usa-se um teste de elevada sensibilidade.
+            <p><em>Incidência:</em> Alta.</p>
+        </li>
+        <li><strong>Impacto da Prevalência no VPP e VPN:</strong> O valor preditivo de um teste diagnóstico é determinado pela sensibilidade e especificidade do teste e pela prevalência da doença na população testada. A prevalência da doença é geralmente maior em um contexto diagnóstico do que em um de rastreamento. A prevalência da doença na população é equivalente à probabilidade pré-teste. Se o percentual encontrado de resultados falsos positivos entre os resultados positivos na população A é mais baixa de que os resultados positivos na população B, a explicação mais provável é que a prevalência da doença é mais alta na população A.
+            <p><em>Incidência:</em> Média-Alta.</p>
+        </li>
+        <li><strong>Testes em Série vs. Paralelo:</strong> O uso de testes diagnósticos em série geralmente aumenta a especificidade e o valor preditivo positivo. Quando se utilizam testes diagnósticos em paralelo ou em série, cada teste deve trazer informações independentes.
+            <p><em>Incidência:</em> Média-Alta.</p>
+        </li>
+        <li><strong>Rastreamento vs. Diagnóstico:</strong> Quando o mesmo teste é usado em situações de diagnóstico e rastreamento, a prevalência da doença será maior na situação diagnóstica. A sensibilidade e a especificidade provavelmente serão as mesmas em ambas as situações. O sobrediagnóstico é uma consideração.
+            <p><em>Incidência:</em> Média-Alta.</p>
+        </li>
+        <li><strong>Características de Testes de Rastreamento:</strong> São aplicados a pacientes assintomáticos. Devem ter alta sensibilidade. São características dos exames de rastreamento, EXCETO: Apresentam alto valor preditivo positivo (não garantido em baixa prevalência) ou apresentam elevado impacto na incidência (o foco principal é geralmente mortalidade/morbidade). A qualidade essencial de um teste para rastrear uma doença de alta letalidade e transmissibilidade é a alta sensibilidade.
+            <p><em>Incidência:</em> Média-Alta.</p>
+        </li>
+        <li><strong>Padrão-Ouro:</strong> O teste de Kato Katz (KK), usado para detecção de ovos de Schistossoma mansoni em amostras fecais, é usado para avaliação comparativa e efetiva de novas metodologias diagnósticas dessa parasitose, o que significa que o exame de KK é considerado padrão ouro. Uma forma de não penalizar uma metodologia antiga, mediante uma nova técnica diagnóstica também efetiva para a detecção de uma doença seria combinar as técnicas.
+            <p><em>Incidência:</em> Baixa.</p>
+        </li>
+        <li><strong>Paradoxo da Imperfeição do Teste / Raciocínio Circular:</strong> Imagine que um novo teste fosse mais sensível que o teste padrão, os pacientes identificados pelo novo teste seriam considerados falso-positivos em relação ao teste antigo; isso ocorre devido à imperfeição do teste mais antigo, que faz o teste novo parecer pior. Quando não há padrão-ouro estabelecido, os clínicos podem valer-se do exame laboratorial, com seu resultado comparado com o diagnóstico clínico feito com base na história dos sintomas e um exame físico cuidadoso; a esse processo dá-se o nome de raciocínio circular. A escolha de um teste diagnóstico mais simples como substituto de formas mais elaboradas, se justifica embasado na segurança e conveniência dos testes mais simples (uma das opções corretas, a outra seria o alto custo).
+            <p><em>Incidência:</em> Baixa.</p>
+        </li>
+        <li><strong>Curva ROC (Receiver Operating Characteristic):</strong> A curva ROC pode ser utilizada para ajudar a decidir onde deve ficar o melhor ponto de corte de um teste. Para sua construção, necessita tanto dos falsos-positivos e falsos-negativos (ou, de forma equivalente, sensibilidade e 1-especificidade). O teste com bom poder discriminatório concentra-se na parte superior esquerda da curva ROC (a afirmação de que se concentra na parte inferior é incorreta).
+            <p><em>Incidência:</em> Baixa.</p>
+        </li>
+         <li><strong>Probabilidade Pré-Teste:</strong> Antes da realização de um teste diagnóstico, temos que a probabilidade a priori da doença em um indivíduo é equivalente à prevalência da doença na população.
+            <p><em>Incidência:</em> Baixa.</p>
+        </li>
+        <li><strong>Conceito de Acurácia:</strong> A frase "proporção de todos os resultados de um teste, tanto positivos quanto negativos, que estejam corretos" exprime o conceito de acurácia.
+            <p><em>Incidência:</em> Baixa.</p>
+        </li>
+    </ul>
+    <hr>
+
+    <h2>2. Delineamentos de Estudos Epidemiológicos</h2>
+    <p>Este tema tem <strong>ALTA FREQUÊNCIA</strong>, com foco na identificação correta do tipo de estudo a partir de uma descrição e na compreensão de suas principais características e limitações.</p>
+    <h3>Tópicos Abordados e Profundidade:</h3>
+    <h4>Identificação de Tipos de Estudo (Profundidade: Média - Exige reconhecimento a partir de descrições concisas):</h4>
+    <ul>
+        <li><strong>Série de Casos:</strong> Um estudo que descreve o curso clínico dos pacientes que apresentam uma doença neurológica incomum, são identificados em um centro de referência especializado nessas doenças, e seus registros médicos são revisados quanto às características dos pacientes, aos tratamentos e ao estado atual de sua doença, é melhor descrito como uma série de casos.
+            <p><em>Incidência:</em> Média-Alta.</p>
+        </li>
+        <li><strong>Ensaio Clínico (Randomizado Controlado):</strong> Pesquisadores querem descrever o curso clínico da esclerose múltipla. Eles fazem uso de um ensaio clínico, já concluído, em que os pacientes-controles receberam o cuidado habitual. Os pacientes no estudo haviam sido identificados em centros de referência, ingressaram no estudo no momento do diagnóstico e satisfizeram critérios rigorosos de entrada.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+        <li><strong>Estudo de Coorte:</strong> Um estudo de coorte descreve a recorrência de convulsão, em um período de um ano, em crianças hospitalizadas por um primeiro episódio de convulsão febril. O estudo comparou a recorrência em crianças que tiveram infecção versus imunização como uma causa subjacente para febre no momento da primeira convulsão. Um estudo de coorte sobre o tratamento do câncer de próstata compara taxas de incontinência em pacientes que foram tratados com procedimentos cirúrgicos versus apenas cuidado médico.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+        <li><strong>Estudo Transversal (Estudo de Prevalência):</strong> Quais dos seguintes tipos de estudo não pode ser usado para identificar fatores prognósticos? Estudos de prevalência.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+        <li><strong>Estudo de Caso-Controle:</strong> Aparece como opção em "Quais dos seguintes tipos de estudo não pode ser usado para identificar fatores prognósticos?" (Estudos de caso-controle *podem* ser usados, embora com limitações).
+            <p><em>Incidência:</em> Baixa.</p>
+        </li>
+    </ul>
+    <h4>Limitações e Características Específicas:</h4>
+    <ul>
+        <li><strong>Generalização (Validade Externa):</strong> A credibilidade do estudo sobre esclerose múltipla (ensaio clínico com pacientes de centros de referência e critérios rigorosos de entrada) foi limitada principalmente por sua capacidade de generalização.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+    </ul>
+    <hr>
+    
+    <h2>3. Vieses (Erros Sistemáticos) em Estudos Epidemiológicos</h2>
+    <p>Este é um tema de <strong>ALTA FREQUÊNCIA</strong>, exigindo a identificação do tipo de viés em cenários específicos, a compreensão de seu impacto nos resultados e, ocasionalmente, como podem ser controlados.</p>
+    <h3>Tópicos Abordados e Profundidade:</h3>
+    <h4>Identificação e Definição de Vieses (Profundidade: Média-Alta - Reconhecer e entender o mecanismo):</h4>
+    <ul>
+        <li><strong>Viés de Seleção:</strong> O viés de seleção distorce os resultados pelo modo como os participantes são recrutados. Em um estudo, voluntários para um novo teste de rastreamento tiveram desfechos de saúde melhores que pessoas que não quiseram fazer o teste. A explicação mais provável é que os voluntários tendem a ser mais interessados em sua saúde do que aqueles que não participam de atividades preventivas.
+            <p><em>Incidência:</em> Alta.</p>
+        </li>
+        <li><strong>Viés de Aferição (ou de Informação/Medição):</strong> Em um estudo de coorte sobre o tratamento do câncer de próstata, onde a incontinência foi avaliada por meio de revisão dos registros médicos, um exemplo de afirmação que NÃO é um exemplo de viés de aferição é: "As taxas de incontinência foram mais altas nos homens que sofreram cirurgia" (este é um resultado). Exemplos de possível viés de aferição seriam: os cirurgiões tinham menos tendência a registrar complicações; os homens que sofreram cirurgia estavam mais propensos a ter consultas de seguimento (oportunidade de aferição); os revisores de prontuários usaram seu julgamento para decidir. A afirmação "o processo de coleta das variáveis do estudo é sistematicamente igual nos 2 grupos" não descreve o viés de aferição, que implica uma *diferença* sistemática ou erro.
+            <p><em>Incidência:</em> Média-Alta.</p>
+        </li>
+        <li><strong>Viés de Confusão:</strong> O viés de confusão pode ocorrer quando o fator de confusão está distribuído de maneira *desigual* entre os grupos (a opção "distribuído de maneira igual" é incorreta).
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+        <li><strong>Viés de Tempo de Ganho (Lead-Time Bias):</strong> Em um ensaio clínico randomizado sobre o rastreamento de câncer de pulmão, o viés que melhor explica a melhora na sobrevida mesmo sem nenhuma melhora na taxa de mortalidade no estudo é o viés de tempo ganho.
+            <p><em>Incidência:</em> Alta.</p>
+        </li>
+        <li><strong>Erro Tipo I (alfa):</strong> O erro tipo I ou alfa acontece quando o teste mostra significância quando na verdade *não* existe (rejeitar uma hipótese nula verdadeira). A afirmação "o teste não mostra significância quando na verdade existe" descreve o erro tipo II (beta), não o tipo I.
+            <p><em>Incidência:</em> Baixa-Média.</p>
+        </li>
+    </ul>
+    <h4>Impacto e Controle de Vieses:</h4>
+    <ul>
+        <li><strong>Perda de Seguimento (Attrition Bias/Viés de Migração):</strong> Em um estudo de coorte que descreve a recorrência de convulsão em crianças, onde algumas não faziam mais parte do estudo quando o desfecho foi avaliado, o item que teve o maior efeito sobre os resultados do estudo foi se o abandono estava relacionado ao prognóstico.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+        <li><strong>Randomização:</strong> Em estudos de intervenção, a randomização permite que os grupos de tratamento e controle sejam alocados de forma aleatória. Constitui a melhor técnica para evitar vieses de <strong>seleção</strong>, além de reduzir a possibilidade de vieses de <strong>confundimento</strong>, embora não impeça os de <strong>aferição</strong>.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+    </ul>
+    <hr>
+
+    <h2>4. Prognóstico e Análise de Sobrevida</h2>
+    <p>Este tema aparece com <strong>MÉDIA-ALTA FREQUÊNCIA</strong>, cobrindo conceitos sobre a predição do curso da doença e a análise do tempo até a ocorrência de um evento.</p>
+    <h3>Tópicos Abordados e Profundidade:</h3>
+    <h4>Modelos e Ferramentas de Predição de Risco (Profundidade: Média - Compreensão da utilidade e dos componentes):</h4>
+    <ul>
+        <li><strong>Utilidade:</strong> Assinale a alternativa correta em relação à utilidade dos modelos de predição de risco: Predizer o prognóstico.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+        <li><strong>Objetivo:</strong> Assinale a alternativa correta em relação às ferramentas de predição de risco: Predizer quais indivíduos desenvolverão e quais não desenvolverão a doença OU Predizer doença futura em um grupo de pacientes.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+        <li><strong>Calibração:</strong> Quando se pensa nas ferramentas de predição de risco, a calibração é fundamental para o bom desempenho destas. Assinale a alternativa correta a respeito da calibração: A calibração avalia se a ferramenta prediz corretamente a proporção de um grupo que irá desenvolver uma doença. (A opção "Uma razão fruto da calibração de 1,0 significa que a ferramenta de risco não está bem calibrada" está incorreta, pois 1.0 indica boa calibração).
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+    </ul>
+    <h4>Estudos Prognósticos (Profundidade: Média - Entendimento dos elementos de um estudo de prognóstico):</h4>
+    <ul>
+        <li><strong>Amostra Adequada:</strong> Qual das seguintes opções é a amostra mais adequada para um estudo prognóstico? Depende de quem irá usar os resultados do estudo.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+        <li><strong>Identificação de Fatores Prognósticos:</strong> Quais dos seguintes tipos de estudo não pode ser usado para identificar fatores prognósticos? Estudos de prevalência. Análise de tempo até o evento e estudo de coorte são adequados.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+        <li><strong>Tempo Zero:</strong> Para um estudo sobre risco para câncer de esôfago em pacientes com esôfago de Barrett (uma lesão pré-neoplásica), qual dos seguintes momentos no curso da doença é o melhor exemplo de tempo zero? O diagnóstico de esôfago de Barrett para cada paciente.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+    </ul>
+    <h4>Análise de Tempo até o Evento (Análise de Sobrevida) (Profundidade: Média - Compreensão dos conceitos básicos):</h4>
+    <ul>
+        <li><strong>O Evento:</strong> Em análises de tempo até o evento, o evento é dicotômico. Também pode ocorrer somente uma vez (como morte).
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+        <li><strong>Censura:</strong> Um estudo utilizou a análise de tempo até o evento para descrever a sobrevida a partir do diagnóstico de cem pacientes com insuficiência cardíaca congestiva. Qual das seguintes afirmações NÃO seria uma razão para um dos pacientes ter sido censurado? "O paciente desenvolveu outra doença que poderia ser fatal" (a menos que isso leve diretamente à morte por outra causa ou à saída do estudo por decisão relacionada a essa nova doença). Razões válidas: O paciente decidiu não continuar no estudo; O paciente morreu por uma outra causa antes do terceiro ano; O paciente fazia parte do estudo há menos de três anos (quando o estudo terminou).
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+        <li><strong>Curvas de Sobrevida:</strong> Qual das seguintes afirmações melhor descreve a informação em uma curva de sobrevida? A probabilidade estimada de sobrevida a partir do tempo zero.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+    </ul>
+     <h4>Regras de Predição Clínica (Profundidade: Média - Entendimento da finalidade e validação):</h4>
+    <ul>
+        <li><strong>Característica Principal:</strong> Uma regra de predição clínica foi desenvolvida para classificar o prognóstico da pneumonia adquirida na comunidade. Qual das seguintes afirmações é mais característica de tal regra? Os resultados são utilizados para orientar o tratamento do paciente.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+        <li><strong>Razão para Escolha:</strong> Muitas regras de predição clínica foram desenvolvidas para avaliar a gravidade da pneumonia adquirida na comunidade. Qual das seguintes afirmações é a razão mais importante para escolher uma para usar? A regra de predição foi validada em cenários diferentes.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+    </ul>
+    <hr>
+
+    <h2>5. Medidas de Frequência e Associação/Impacto</h2>
+    <p>Este tema tem <strong>MÉDIA-ALTA FREQUÊNCIA</strong>, exigindo tanto o cálculo quanto a interpretação conceitual dessas medidas.</p>
+    <h3>Tópicos Abordados e Profundidade:</h3>
+    <h4>Medidas de Frequência (Profundidade: Média - Cálculo e compreensão dos fatores determinantes):</h4>
+    <ul>
+        <li><strong>Prevalência:</strong> Já detalhada na seção de testes diagnósticos (cálculo a partir de dados de testes). Com relação às medidas de frequência em estudos epidemiológicos, é correto afirmar que a prevalência de uma doença varia conforme sua incidência, sua duração e os movimentos migratórios. A fração atribuível populacional de um fator de risco se associa a uma medida de morbidade da doença nessa população, que seria a prevalência.
+            <p><em>Incidência:</em> Média-Alta.</p>
+        </li>
+        <li><strong>Incidência:</strong> Refere-se a casos novos. A incidência de uma doença é caracteristicamente calculada em estudos que permitem acompanhamento (coortes, ensaios clínicos), não em estudos transversais (inquéritos epidemiológicos) que fornecem prevalência.
+            <p><em>Incidência:</em> Baixa-Média (mais conceitual).</p>
+        </li>
+        <li><strong>Coeficiente de Incidência / Risco Absoluto:</strong>
+            <div class="calculation-block">
+                <h4>Exemplo: Risco Absoluto - Dengue</h4>
+                <p><span class="step-label">Dados do cenário:</span></p>
+                <ul>
+                    <li>Pessoas suscetíveis = <code>1000</code></li>
+                    <li>Casos novos em 3 meses = <code>10</code></li>
+                </ul>
+                <p><span class="formula-display">Risco Absoluto = <span class="fraction"><span class="numerator">Número de casos novos</span><span class="denominator">Número de pessoas suscetíveis</span></span> x 100%</span></p>
+                <p><span class="step-label">Cálculo:</span></p>
+                <p class="calculation-step"><span class="lhs">Risco Absoluto = </span><span class="fraction"><span class="numerator"><code>10</code></span><span class="denominator"><code>1000</code></span></span> x 100%</p>
+                <p class="calculation-step"><span class="lhs">Risco Absoluto = </span><code>0.01</code> x 100%</p>
+                <p class="result">Risco Absoluto = 1%</p>
+            </div>
+        </li>
+    </ul>
+    <h4>Medidas de Associação e Impacto (Profundidade: Média-Alta - Cálculo e interpretação clara do que a medida representa):</h4>
+    <ul>
+        <li><strong>Risco Relativo (RR):</strong> Compara o risco de um desfecho em um grupo exposto com o risco em um grupo não exposto. 
+            <div class="calculation-block">
+                <h4>Exemplo: Risco Relativo (RR) - TVP, Contraceptivos Orais (CO) e Fator V Leiden (FVL)</h4>
+                <p>(Comparando usuárias de CO com FVL vs. usuárias de CO sem FVL)</p>
+                <p><span class="formula-display">RR = <span class="fraction"><span class="numerator">Incidência<sub>(CO + FVL)</sub></span><span class="denominator">Incidência<sub>(CO sem FVL)</sub></span></span></span></p>
+                <p><span class="step-label">Dados do cenário:</span></p>
+                <ul>
+                    <li>Incidência em usuárias de CO com FVL = <code>28,5 / 10.000</code> mulheres/ano</li>
+                    <li>Incidência em usuárias de CO sem FVL = <code>3,0 / 10.000</code> mulheres/ano</li>
+                </ul>
+                <p><span class="step-label">Cálculo:</span></p>
+                <p class="calculation-step"><span class="lhs">RR = </span><span class="fraction"><span class="numerator"><code>28.5</code></span><span class="denominator"><code>3.0</code></span></span> (as bases /10.000 se cancelam)</p>
+                <p class="result">RR = 9.5</p>
+            </div>
+        </li>
+        <li><strong>Razão de Riscos (Hazard Ratio - HR):</strong> Em um estudo sobre pacientes que fumam e desenvolveram doenças arterial periférica, a razão de azares para amputação em pacientes que continuaram fumando, em relação àqueles que pararam, é 5. A opção que melhor caracteriza a razão de azares é que ela traz informações semelhantes ao risco relativo.
+            <p><em>Incidência:</em> Média.</p>
+        </li>
+        <li><strong>Redução Relativa do Risco (RRR):</strong> Percentual de redução no risco do desfecho no grupo tratado em comparação com o grupo controle. 
+            <div class="calculation-block">
+                <h4>Exemplo: Redução Relativa do Risco (RRR) - Rastreamento FOBT</h4>
+                <p><span class="formula-display">RRR = 1 - RR &nbsp;&nbsp; <em>ou</em> &nbsp;&nbsp; RRR = <span class="fraction"><span class="numerator">Risco<sub>controle</sub> - Risco<sub>tratado</sub></span><span class="denominator">Risco<sub>controle</sub></span></span></span></p>
+                <p><span class="step-label">Dados do cenário (calculados anteriormente):</span></p>
+                <ul>
+                    <li>Risco<sub>tratado</sub> (mortalidade grupo rastreado) ≈ <code>0.0052665</code></li>
+                    <li>Risco<sub>controle</sub> (mortalidade grupo controle) ≈ <code>0.0078608</code></li>
+                    <li>RR ≈ <code>0.66995</code></li>
+                </ul>
+                <p><span class="step-label">Cálculo do RRR:</span></p>
+                <p class="calculation-step"><span class="lhs">RRR = </span><code>1 - 0.66995</code></p>
+                <p class="calculation-step"><span class="lhs">RRR ≈ </span><code>0.33005</code></p>
+                <p class="result">RRR ≈ 33% (Nas provas, aparece como 33%)</p>
+            </div>
+        </li>
+        <li><strong>Número Necessário para Rastrear/Tratar (NNS/NNT):</strong> Número de pacientes que precisam ser rastreados ou tratados para prevenir um desfecho adicional.
+            <div class="calculation-block">
+                <h4>Exemplo: Número Necessário para Rastrear (NNS) - Rastreamento FOBT para prevenir uma morte</h4>
+                <p><span class="formula-display">RAR = Risco<sub>controle</sub> - Risco<sub>rastreado</sub></span></p>
+                <p><span class="formula-display">NNS = <span class="fraction"><span class="numerator">1</span><span class="denominator">RAR</span></span></span></p>
+                 <p><span class="step-label">Dados do cenário (calculados anteriormente):</span></p>
+                <ul>
+                    <li>Risco<sub>controle</sub> ≈ <code>0.0078608</code></li>
+                    <li>Risco<sub>rastreado</sub> ≈ <code>0.0052665</code></li>
+                </ul>
+                <p><span class="step-label">Cálculo da Redução Absoluta do Risco (RAR):</span></p>
+                <p class="calculation-step"><span class="lhs">RAR = </span><code>0.0078608 - 0.0052665 = 0.0025943</code></p>
+                <p><span class="step-label">Cálculo do NNS:</span></p>
+                <p class="calculation-step"><span class="lhs">NNS = </span><span class="fraction"><span class="numerator"><code>1</code></span><span class="denominator"><code>0.0025943</code></span></span></p>
+                <p class="result">NNS ≈ 385.45 (Aproximadamente 385 pacientes)</p>
+                <div class="warning"><strong>Nota:</strong> Nas provas, as opções são 385 ou 480. O cálculo direto resulta em ~385. No entanto, alguns gabaritos indicam 480. Esta é uma inconsistência notável.</div>
+            </div>
+        </li>
+    </ul>
+    <h4>Letalidade:</h4>
+    <ul>
+        <li>O cálculo da proporção de óbitos entre os casos de uma determinada doença representa um indicativo de gravidade da doença. O nome atribuído a este coeficiente é <strong>Letalidade</strong>. Pode-se afirmar categoricamente que uma doença de alta Letalidade é aquela em que é grande o risco de haver morte entre os indivíduos por ela acometidos. Se a taxa de letalidade da doença A é igual à da doença B, pode-se afirmar que o risco de morrer é o mesmo para os acometidos pela doença A e B.
+            <p><em>Incidência:</em> Baixa-Média.</p>
+        </li>
+    </ul>
+    <hr>
+
+    <h2>6. Níveis de Prevenção</h2>
+    <p>Este tema tem <strong>MÉDIA FREQUÊNCIA</strong>, focando na correta identificação do nível de prevenção aplicado em diferentes ações de saúde.</p>
+    <h3>Tópicos Abordados e Profundidade (Profundidade: Média - Requer identificação do nível apropriado em um contexto dado):</h3>
+    <ul>
+        <li><strong>Prevenção Primária:</strong> Evitar a ocorrência da doença.</li>
+        <li><strong>Prevenção Secundária:</strong> Detecção precoce e tratamento imediato de doenças. Você lê, em pequena nota de jornal: "Desde 2003, o número de testes de PSA passou de 1 para 3.000.000 anuais na rede do SUS. Para o Ministério da Saúde, o salto mostra homens mais prevenidos". A notícia sinaliza um comportamento inserido em ações de prevenção secundária. A atividade de rastreio (screening) das doenças refere-se à prevenção secundária.</li>
+        <li><strong>Prevenção Terciária:</strong> Reduzir complicações e incapacidades.</li>
+        <li><strong>Prevenção Quaternária:</strong> Evitar intervenções médicas excessivas.</li>
+        <p><em>Incidência:</em> Média (com ênfase na secundária).</p>
+    </ul>
+    <hr>
+
+    <h2>7. Avaliação de Intervenções (Ex: Vacinas, Rastreamento)</h2>
+    <p>Este tema aparece com <strong>MÉDIA FREQUÊNCIA</strong>, abordando a avaliação crítica de intervenções de saúde e a interpretação dos resultados de estudos sobre elas.</p>
+    <h3>Tópicos Abordados e Profundidade (Profundidade: Média - Requer análise conceitual e interpretação de dados de estudos):</h3>
+    <ul>
+        <li><strong>Avaliação de Novas Vacinas:</strong> Quando se avalia uma nova vacina, qual das alternativas abaixo é a menos importante? Custo de aplicação da vacina (em comparação com eficácia na prevenção da doença, segurança da vacina e perigo da doença).
+            <p><em>Incidência:</em> Baixa-Média.</p>
+        </li>
+        <li><strong>Interpretação de Estudos de Rastreamento:</strong>
+            <ul>
+                <li><strong>Aumento de Casos no Grupo Rastreado:</strong> Em um ensaio clínico randomizado sobre o rastreamento de câncer de pulmão, qual é a razão mais provável para o fato de que 206 casos de câncer de pulmão foram descobertos no grupo rastreado e somente 160 no grupo-controle? O rastreamento encontrou alguns casos que não teriam chegado à atenção médica sem ele.
+                    <p><em>Incidência:</em> Média.</p>
+                </li>
+                <li><strong>Sobrevida vs. Mortalidade:</strong> Em um ensaio clínico randomizado sobre o rastreamento de câncer de pulmão, a mortalidade por câncer de pulmão foi a mesma em ambos os grupos, contudo, a sobrevida mediana para pacientes diagnosticados com câncer de pulmão foi maior no grupo rastreado. Qual viés melhor explica a melhora na sobrevida mesmo sem nenhuma melhora na taxa de mortalidade no estudo? Viés de tempo ganho. Qual é a melhor conclusão após ler um estudo como esse? Uma vez que a mortalidade não mudou, o rastreamento pode ter resultados em mais "tempo de doença" para aqueles diagnosticados com câncer de pulmão.
+                    <p><em>Incidência:</em> Média-Alta.</p>
+                </li>
+                <li><strong>Interpretação de Achados Específicos em Rastreamento (FOBT):</strong> Foi realizado um estudo para determinar se o rastreamento utilizando o teste de sangue oculto nas fezes (FOBT) reduzia a mortalidade por câncer colorretal. A análise dos testes positivos mostrou que cerca de 30% do grupo rastreado tinha pólipo no colo. O fato de que 30% do grupo rastreado tinham pólipos no colo sugere todas as alternativas a seguir, EXCETO: O valor preditivo negativo do teste foi baixo.
+                    <p><em>Incidência:</em> Baixa-Média.</p>
+                </li>
+                <li><strong>Sucesso de um Programa de Rastreamento:</strong> Qual dos seguintes aspectos não contribui para o sucesso de um programa de rastreamento (screening) de uma determinada doença? Resultados terapêuticos excelentes em todos os estágios da doença. (Longa duração da doença subclínica e especificidade elevada do teste aplicado SÃO favoráveis).
+                    <p><em>Incidência:</em> Baixa.</p>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <hr>
+
+    <h2>8. Fatores de Risco</h2>
+    <p>Este é um tema de <strong>ALTA FREQUÊNCIA</strong>, cobrindo a identificação, classificação (modificáveis vs. não modificáveis, causas imediatas vs. distais) e a compreensão de como os fatores de risco influenciam a probabilidade de doença.</p>
+    <h3>Tópicos Abordados e Profundidade:</h3>
+    <h4>Identificação e Classificação (Profundidade: Média - Requer reconhecimento de exemplos e categorias):</h4>
+    <ul>
+        <li><strong>Fatores de Risco Modificáveis vs. Não Modificáveis:</strong> É crucial distinguir entre eles.
+            <ul>
+                <li><strong>Não Modificáveis:</strong> Exemplos incluem envelhecimento (fator de risco NÃO modificável para câncer), fatores biológicos e hereditários/genética (fator de risco cardiovascular não modificável; fator de risco não modificável para doença arterial coronariana), etnia negra (fator de risco modificável para AVC, EXCETO etnia negra), Síndrome de Down (como fator de risco genético para problemas de desenvolvimento da criança).</li>
+                <li><strong>Modificáveis:</strong> Exemplos incluem uso de tabaco, alimentação inadequada, agentes infecciosos (para câncer); níveis elevados de colesterol, fumo, hipertensão arterial (para doença arterial coronariana); diabetes, hipercolesterolemia, hipertrigliceridemia (fatores de risco cardiovasculares modificáveis, EXCETO genética); hipertensão arterial, obesidade, tabagismo e vida sedentária (fatores de risco modificáveis para AVC, EXCETO etnia negra).</li>
+            </ul>
+            <p><em>Incidência:</em> Alta (múltiplas questões pedem para identificar exemplos de cada categoria ou o "exceto" em uma lista).</p>
+        </li>
+        <li><strong>Causas Imediatas vs. Causas Distais:</strong>
+            <ul>
+                <li><strong>Causa Imediata:</strong> É exemplo de causa imediata - coronavírus causando a SARS-COV2; é exemplo de causa imediata hipocalcemia levando a convulsão. Falta de cuidado pré-natal é citada como exemplo de causa imediata em uma das opções.</li>
+                <li><strong>Causa Distal:</strong> É exemplo de causa distal escolaridade materna.</li>
+            </ul>
+            <p><em>Incidência:</em> Baixa-Média.</p>
+        </li>
+        <li><strong>Fatores de Risco para Problemas de Desenvolvimento da Criança (Caderno de Atenção Básica nº 33):</strong>
+            <ul>
+                <li>(1) Fatores de risco genéticos: Síndrome de Down.</li>
+                <li>(2) Fatores de risco biológicos: Prematuridade, hipóxia neonatal, meningites.</li>
+                <li>(3) Fatores de risco ambientais: Fatores familiares, de ambiente físico, fatores sociais.</li>
+            </ul>
+             A sequência CORRETA para associar ( ) Fatores familiares..., ( ) Prematuridade..., ( ) Síndrome de Down é 3, 2, 1.
+            <p><em>Incidência:</em> Baixa.</p>
+        </li>
+        <li><strong>Fatores de Risco para Quedas:</strong> Na avaliação de risco de quedas, é considerado com alto risco de queda o paciente independente, que se locomove e realiza suas atividades, mas possui um fator de risco.
+            <p><em>Incidência:</em> Baixa.</p>
+        </li>
+    </ul>
+    <h4>Interpretação e Implicações (Profundidade: Média - Compreensão de como os fatores de risco são percebidos e atuam):</h4>
+    <ul>
+        <li><strong>Reconhecimento de Fatores de Risco:</strong> Assinale a alternativa correta, a respeito de fatores de risco são mais fáceis de reconhecer: Quando a exposição ao fator de risco está associada com uma nova doença.
+            <p><em>Incidência:</em> Baixa.</p>
+        </li>
+        <li><strong>Impressões Clínicas sobre Fatores de Risco:</strong> Na metade do século XX, cirurgiões torácicos na Grã-Bretanha ficaram impressionados por estarem fazendo cirurgias em mais homens com câncer de pulmão, a maioria dos quais era fumante. Como as impressões do cirurgião de que o tabagismo era um fator de risco para desenvolver câncer de pulmão poderiam estar erradas? O tabagismo havia se tornado tão comum que mais homens teriam uma história de fumo, independentemente de estarem se submetendo a cirurgias para câncer de pulmão.
+            <p><em>Incidência:</em> Baixa.</p>
+        </li>
+        <li><strong>Fatores de Risco como Preditores:</strong> Os fatores de risco ajudam a desenvolvermos probabilidades pré-teste diagnósticos para termos ideia da doença. De acordo com esse texto, a pressão arterial elevada no momento é um preditor para futuras elevações. Doença coronariana é um fator preditor para uma morte súbita. Doença renal é preditora de insuficiência renal. Colesterol elevado é preditor de acidente vascular encefálico. (As opções "não é preditor" nas provas estavam incorretas).
+            <p><em>Incidência:</em> Baixa.</p>
+        </li>
+        <li><strong>Período de Latência vs. Incubação:</strong> São exemplos de períodos de latência exposição ao risco, EXCETO: Infecção por Rubivirus causando rubéola (esta tem um período de incubação definido, não um período de latência longo como em doenças crônicas).
+            <p><em>Incidência:</em> Baixa.</p>
+        </li>
+         <li><strong>Conceito Geral de Fator de Risco:</strong> O conceito "São as circunstâncias do ambiente ou as características das pessoas, herdadas ou adquiridas, que lhes conferem uma maior probabilidade de acometimento, imediato ou futuro, por um dano à saúde" refere-se a Fatores de risco.
+            <p><em>Incidência:</em> Baixa.</p>
+        </li>
+    </ul>
+    <hr>
+
+    <h2>Observações Gerais sobre as Provas Analisadas:</h2>
+    <ul>
+        <li><strong>Foco Intenso em Cálculos de Testes Diagnósticos:</strong> Uma proporção muito grande das questões envolve calcular sensibilidade, especificidade, VPP, VPN, acurácia, prevalência, LR+ e LR- a partir de tabelas 2x2 ou dados brutos. É essencial dominar essas fórmulas e sua aplicação.</li>
+        <li><strong>Interpretação de Cenários Clínicos e de Pesquisa:</strong> Muitas questões fornecem um breve resumo de um estudo ou situação clínica e pedem para identificar o tipo de estudo, um possível viés, a melhor conclusão, ou a interpretação correta de um resultado.</li>
+        <li><strong>Repetição de Cenários Chave:</strong> Os cenários envolvendo o teste para câncer de pâncreas, o estudo sobre sinusite e dor facial, o rastreamento de câncer de pulmão e o rastreamento de câncer colorretal com FOBT são usados extensivamente para testar múltiplos conceitos epidemiológicos. Dominar a análise desses cenários é crucial.</li>
+        <li><strong>Atenção a Pequenas Variações e "Pistas" nas Perguntas:</strong> Muitas vezes, a resposta correta depende de uma interpretação cuidadosa da pergunta, especialmente em questões do tipo "EXCETO" ou "NÃO é um exemplo de".</li>
+        <li><strong>Inconsistências em Gabaritos/Opções:</strong> Como destacado em pontos específicos (NNS do FOBT, LR- e VPP do câncer de pâncreas, especificidade da dor facial para sinusite), houve algumas discrepâncias entre os gabaritos fornecidos e os cálculos diretos. Isso sugere que, em alguns casos, os exames podem usar valores de entrada arredondados que não são explicitados, ou pode haver erros nos próprios gabaritos. É importante entender o método de cálculo fundamental e estar ciente dessas potenciais variações.</li>
+    </ul>
+
+    <p>Este resumo completo deve fornecer uma base sólida para seus estudos, cobrindo os tópicos mais prevalentes e a profundidade de conhecimento esperada com base nas provas analisadas.</p>
+
+</body>
+</html>
