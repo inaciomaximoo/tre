@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-P">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage do Aplicativo</title>
+    <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage do Aplicativo de Estudos</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-      /* CSS Fornecido por você */
+      /* CSS :root e Reset */
       :root {
         --bg-gradient-start: #ece9e6;
         --bg-gradient-end: #ffffff;
@@ -32,6 +31,7 @@
         padding: 0;
       }
 
+      /* Estilos do Body e Main Container */
       body {
         font-family: 'Poppins', sans-serif;
         background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
@@ -40,7 +40,7 @@
         min-height: 100vh;
         display: flex;
         justify-content: center;
-        align-items: flex-start; /* Alinha no topo para ver a animação */
+        align-items: flex-start;
       }
 
       .main-container {
@@ -48,7 +48,8 @@
         width: 100%;
       }
 
-      .quiz-card, .results-card { /* Estilo base para cards */
+      /* CSS Original Fornecido (Quiz, Results, etc.) */
+      .quiz-card, .results-card {
         background-color: var(--card-bg);
         border-radius: 16px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.08);
@@ -232,6 +233,8 @@
         font-size: 1rem;
         transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
         box-shadow: 0 4px 10px rgba(41, 121, 255, 0.3);
+        text-decoration: none;
+        display: inline-block;
       }
 
       .button:hover {
@@ -315,6 +318,7 @@
         font-weight: 600;
       }
 
+      /* Animações */
       @keyframes slideUpFadeIn {
         from {
           opacity: 0;
@@ -341,37 +345,24 @@
         to { opacity: 1; }
       }
 
-      @media (max-width: 600px) {
-        body { padding: 20px 10px; }
-        .quiz-card, .results-card, .homepage-card { padding: 20px; } /* Inclui homepage-card na regra */
-        .quiz-title { font-size: 1.4rem; }
-        #question-text { font-size: 1.05rem; }
-        .option { padding: 12px 15px; }
-        .button { padding: 10px 20px; font-size: 0.95rem;}
-        .results-card h2 { font-size: 1.5rem; }
-        .results-card p { font-size: 1rem; }
-        .app-title { font-size: 1.6rem; } /* Ajuste para telas menores */
-        .theme-title { font-size: 1.2rem; } /* Ajuste para telas menores */
-      }
-
       /* Estilos Adicionais para a Homepage */
-      .homepage-card { /* Herdando e adaptando de .quiz-card */
+      .homepage-card {
         background-color: var(--card-bg);
         border-radius: 16px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.08);
         padding: 35px;
-        margin-top: 20px; /* Adiciona um pouco de margem no topo */
+        margin-top: 20px;
         margin-bottom: 30px;
         animation: slideUpFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         opacity: 0;
-        width: 100%; /* Para ocupar o espaço do main-container */
+        width: 100%;
       }
 
       .app-header {
         display: flex;
-        flex-direction: column; /* Ícone acima do título */
+        flex-direction: column;
         align-items: center;
-        margin-bottom: 35px; /* Mais espaço abaixo do cabeçalho */
+        margin-bottom: 35px;
         padding-bottom: 25px;
         border-bottom: 1px solid var(--border);
       }
@@ -379,18 +370,16 @@
       .app-icon-placeholder {
         width: 80px;
         height: 80px;
-        margin-bottom: 20px; /* Mais espaço abaixo do ícone */
+        margin-bottom: 20px;
       }
 
       .app-icon-placeholder svg {
         width: 100%;
         height: 100%;
-        border-radius: 18px; /* Raio de borda um pouco maior */
-        box-shadow: 0 6px 12px var(--shadow-color); /* Sombra mais pronunciada */
       }
 
       .app-title {
-        font-size: 2.2rem; /* Título do app um pouco maior */
+        font-size: 2.2rem;
         font-weight: 700;
         color: var(--primary-dark);
         text-align: center;
@@ -399,38 +388,63 @@
       .app-menu {
         display: flex;
         flex-direction: column;
-        gap: 25px; /* Espaço entre as seções de temas */
+        gap: 25px;
       }
 
       .theme-section {
         padding: 25px;
         background-color: #fdfdff; /* Fundo muito sutil para a seção */
-        border-radius: 12px; /* Bordas mais arredondadas */
+        border-radius: 12px;
         border: 1px solid var(--border);
         box-shadow: 0 4px 8px rgba(0,0,0,0.05); /* Sombra leve para a seção */
       }
 
       .theme-title {
-        font-size: 1.5rem; /* Título do tema um pouco maior */
+        font-size: 1.5rem;
         font-weight: 600;
         color: var(--primary);
         margin-bottom: 20px;
         padding-bottom: 10px;
         border-bottom: 1px solid #e0e0e0; /* Linha divisória sutil */
         text-align: center;
+        display: flex; /* Para alinhar ícone e texto */
+        align-items: center; /* Alinhar verticalmente */
+        justify-content: center; /* Centralizar o conjunto (ícone + texto) */
       }
 
-      .theme-section .button {
+      .section-icon {
+        width: 26px; /* Tamanho do ícone */
+        height: 26px;
+        margin-right: 10px; /* Espaço entre o ícone e o título */
+        color: var(--primary); /* Cor padrão para os ícones */
+        flex-shrink: 0; /* Impede que o ícone encolha */
+      }
+
+      .theme-section .button, .theme-section a.button { /* Aplica aos botões e links com classe .button */
         display: block;
         width: 100%;
         margin-bottom: 15px;
         text-align: center;
       }
 
-      .theme-section .button:last-child {
+      .theme-section .button:last-child, .theme-section a.button:last-child {
         margin-bottom: 0;
       }
 
+      /* Media Queries (original + ajustes) */
+      @media (max-width: 600px) {
+        body { padding: 20px 10px; }
+        .quiz-card, .results-card, .homepage-card { padding: 20px; } /* Inclui homepage-card na regra */
+        .quiz-title { font-size: 1.4rem; }
+        #question-text { font-size: 1.05rem; } /* Se #question-text for usado na homepage, senão pode ser removido daqui se específico de quiz */
+        .option { padding: 12px 15px; }
+        .button { padding: 10px 20px; font-size: 0.95rem;}
+        .results-card h2 { font-size: 1.5rem; }
+        .results-card p { font-size: 1rem; }
+        .app-title { font-size: 1.8rem; } /* Ajuste para telas menores */
+        .theme-title { font-size: 1.3rem; } /* Ajuste para telas menores */
+        .section-icon { width: 22px; height: 22px; margin-right: 8px;} /* Ícones menores em telas pequenas */
+      }
     </style>
 </head>
 <body>
@@ -440,33 +454,71 @@
                 <div class="app-icon-placeholder">
                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <linearGradient id="iconGradientHeader" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" style="stop-color:var(--primary-dark);stop-opacity:1" />
                                 <stop offset="100%" style="stop-color:var(--primary);stop-opacity:1" />
                             </linearGradient>
                         </defs>
-                        <circle cx="50" cy="50" r="48" fill="url(#iconGradient)"/>
-                        <text x="50%" y="50%" dy=".3em" text-anchor="middle" font-size="40" fill="white" font-family="Poppins, sans-serif" font-weight="bold">A+</text>
+                        <path d="M5 55 Q50 35 95 55 L50 75 Z" fill="url(#iconGradientHeader)"/>
+                        <rect x="0" y="25" width="100" height="15" rx="2" fill="url(#iconGradientHeader)"/>
+                        <line x1="80" y1="40" x2="80" y2="60" stroke="var(--accent)" stroke-width="3"/>
+                        <circle cx="80" cy="60" r="4" fill="var(--accent)"/>
+                        <circle cx="50" cy="32.5" r="5" fill="#FFFFFF"/>
                     </svg>
                 </div>
-                <h1 class="app-title">Meu Aplicativo de Estudos</h1> </header>
+                <h1 class="app-title">Plataforma de Estudos</h1> </header>
 
             <main class="app-menu">
                 <section class="theme-section">
-                    <h2 class="theme-title">Cálculo de Notas</h2>
-                    <button class="button" id="btnCalcNotas">Calcular Minhas Notas</button>
+                    <h2 class="theme-title">
+                        <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <title>Ícone de Provas</title>
+                            <path d="M17 3H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V5C19 3.89543 18.1046 3 17 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 7H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 11H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 15H12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M13.5 14.5L14.5 15.5L16.5 13.5" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Simulados e Provas
+                    </h2>
+                    <a href="#" class="button" id="btnProvaMorfo">Prova de Morfofisiologia</a>
+                    <a href="#" class="button" id="btnProvaAPS">Prova de APS</a>
+                    <a href="#" class="button" id="btnProvaFarmaco">Prova de Farmacologia</a>
+                    <a href="#" class="button" id="btnProvaOSCE">Prova OSCE</a>
                 </section>
 
                 <section class="theme-section">
-                    <h2 class="theme-title">Provas</h2>
-                    <button class="button" id="btnProvaRapida">Prova Rápida</button>
-                    <button class="button" id="btnSimuladoCompleto">Simulado Completo</button>
+                    <h2 class="theme-title">
+                        <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <title>Ícone de Calculadora</title>
+                            <rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <rect x="7" y="6" width="10" height="4.5" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                            <circle cx="8.5" cy="13.5" r="1" fill="currentColor"/>
+                            <circle cx="12" cy="13.5" r="1" fill="currentColor"/>
+                            <circle cx="15.5" cy="13.5" r="1" fill="currentColor"/>
+                            <circle cx="8.5" cy="17.5" r="1" fill="currentColor"/>
+                            <circle cx="12" cy="17.5" r="1" fill="currentColor"/>
+                            <circle cx="15.5" cy="17.5" r="1" fill="currentColor"/>
+                        </svg>
+                        Ferramentas
+                    </h2>
+                    <a href="#" class="button" id="btnCalculadora">Calculadora Acadêmica</a>
                 </section>
 
                 <section class="theme-section">
-                    <h2 class="theme-title">Explicações de Conteúdo</h2>
-                    <button class="button" id="btnMaterialEstudo">Material de Estudo</button>
-                    <button class="button" id="btnVideoaulas">Videoaulas Explicativas</button>
+                    <h2 class="theme-title">
+                        <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <title>Ícone de Materiais de Estudo</title>
+                            <path d="M9 18H15V21C15 21.5523 14.5523 22 14 22H10C9.44772 22 9 21.5523 9 21V18Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 2C8.13401 2 5 5.13401 5 9C5 11.3836 6.23518 13.4699 8 14.7176V18H16V14.7176C17.7648 13.4699 19 11.3836 19 9C19 5.13401 15.866 2 12 2Z" stroke="currentColor" stroke-width="2"/>
+                            <line x1="11" y1="9" x2="13" y2="11" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+                             <line x1="13" y1="9" x2="11" y2="11" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        Materiais de Estudo
+                    </h2>
+                    <a href="#" class="button" id="btnExplicaMorfo">Conteúdo: Morfofisiologia</a>
+                    <a href="#" class="button" id="btnExplicaFarmaco">Conteúdo: Farmacologia</a>
+                    <a href="#" class="button" id="btnExplicaAPS">Conteúdo: APS</a>
                 </section>
             </main>
         </div>
