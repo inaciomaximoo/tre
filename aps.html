@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+ <html lang="pt-BR">
+ <head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+   <title>Simulado</title>
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   <!-- Sons para acerto e erro -->
+  <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
+  <audio id="wrongSound" src="wrong.mp3" preload="auto"></audio>
+ 
+   <style>
+     :root {
+       --bg-gradient-start: #ece9e6;
+       --bg-gradient-end: #ffffff;
+       --primary: #2979ff;
+       --primary-dark: #1c54b2;
+       --accent: #00c853;
+       --accent-light: #0cd85a;
+       --danger: #f44336;
+       --danger-light: #ffebee;
+       --text: #263238;
+       --text-light: #546e7a;
+       --border: #cfd8dc;
+       --card-bg: #ffffff;
+       --shadow-color: rgba(0, 0, 0, 0.1);
+       --disabled-bg: #e0e0e0;
+       --disabled-text: #9e9e9e;
+       --transition-speed: 0.3s;
+     }
+ 
+     * {
+       box-sizing: border-box;
+       margin: 0;
+       padding: 0;
+     }
+ 
+     body {
+       font-family: 'Poppins', sans-serif;
+       background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+       color: var(--text);
+       padding: 30px 15px;
+       min-height: 100vh;
+       display: flex;
+       justify-content: center;
+       align-items: flex-start;
+     }
+ 
+     .main-container {
+       max-width: 850px;
+       width: 100%;
+     }
+ 
+     .quiz-card, .results-card {
+       background-color: var(--card-bg);
+       border-radius: 16px;
+       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+       padding: 35px;
+       margin-bottom: 30px;
+       animation: slideUpFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+       opacity: 0;
+     }
+ 
+     .quiz-header {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       margin-bottom: 25px;
+       padding-bottom: 15px;
+       border-bottom: 1px solid var(--border);
+     }
+ 
+     .quiz-title {
+       font-size: 1.6rem;
+       font-weight: 700;
+       color: var(--primary);
+     }
+ 
+     .question-counter {
+       font-size: 0.9rem;
+       font-weight: 600;
+       background-color: #e3f2fd;
+       color: var(--primary-dark);
+       padding: 5px 12px;
+       border-radius: 15px;
+     }
+ 
+     #question-text {
+       font-size: 1.15rem;
+       margin-bottom: 25px;
+       line-height: 1.6;
+       font-weight: 600;
+     }
+ 
+     .image-container {
+       margin-bottom: 25px;
+       text-align: center;
+     }
+ 
+     .image-container img {
+       max-width: 100%;
+       max-height: 400px;
+       border-radius: 10px;
+       border: 1px solid var(--border);
+       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+       transition: transform 0.3s ease, box-shadow 0.3s ease;
+       cursor: zoom-in;
+     }
+ 
+     .image-container img:hover {
+       transform: scale(1.03);
+       box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+     }
+ 
+     .image-modal {
+       display: none;
+       position: fixed;
+       z-index: 1001;
+       padding-top: 50px;
+       left: 0;
+       top: 0;
+       width: 100%;
+       height: 100%;
+       overflow: auto;
+       background-color: rgba(0,0,0,0.9);
+       animation: fadeInModal 0.3s ease;
+     }
+ 
+     .modal-content {
+       margin: auto;
+       display: block;
+       max-width: 90%;
+       max-height: 90vh;
+       animation: zoomInModal 0.3s ease;
+     }
+ 
+     .close-modal {
+       position: absolute;
+       top: 15px;
+       right: 35px;
+       color: #f1f1f1;
+       font-size: 40px;
+       font-weight: bold;
+       transition: 0.3s;
+       cursor: pointer;
+     }
+ 
+     .close-modal:hover, .close-modal:focus {
+       color: #bbb;
+       text-decoration: none;
+     }
+ 
+     .options {
+       list-style: none;
+       margin-top: 20px;
+     }
+ 
+     .options li {
+       margin-bottom: 15px;
+     }
+ 
+     .option {
+       background-color: #f1f3f5;
+       padding: 15px 20px;
+       border-radius: 10px;
+       cursor: pointer;
+       transition: all 0.2s ease-in-out;
+       border: 2px solid transparent;
+       display: flex;
+       align-items: baseline;
+     }
+ 
+     .option-letter {
+       font-weight: 700;
+       margin-right: 10px;
+       color: var(--primary);
+     }
+ 
+     .option:hover {
+       background-color: #e9ecef;
+       border-color: var(--primary);
+       transform: translateX(5px);
+     }
+ 
+     .option.selected {
+       border-color: var(--primary-dark);
+       background-color: #d1e3ff;
+     }
+ 
+     .option.correct {
+       border-color: var(--accent) !important;
+       background-color: var(--accent-light) !important;
+       color: #1b5e20;
+       font-weight: 600;
+     }
+ 
+     .option.correct .option-letter {
+       color: var(--accent);
+     }
+ 
+     .option.incorrect {
+       border-color: var(--danger) !important;
+       background-color: var(--danger-light) !important;
+       color: #c62828;
+       font-weight: 600;
+     }
+ 
+     .option.incorrect .option-letter {
+       color: var(--danger);
+     }
+ 
+     .options.disabled .option {
+       pointer-events: none;
+       opacity: 0.8;
+     }
+ 
+     .options.disabled .option:not(.selected):not(.correct) {
+       background-color: #f8f9fa;
+       opacity: 0.7;
+     }
+ 
+     .button-container {
+       text-align: right;
+       margin-top: 30px;
+     }
+ 
+     .button {
+       background-color: var(--primary);
+       color: white;
+       padding: 12px 30px;
+       border: none;
+       border-radius: 8px;
+       cursor: pointer;
+       font-weight: 600;
+       font-size: 1rem;
+       transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+       box-shadow: 0 4px 10px rgba(41, 121, 255, 0.3);
+     }
+ 
+     .button:hover {
+       background-color: var(--primary-dark);
+       transform: translateY(-2px);
+       box-shadow: 0 6px 15px rgba(41, 121, 255, 0.4);
+     }
+ 
+     .button:active {
+       transform: translateY(0);
+       box-shadow: 0 4px 10px rgba(41, 121, 255, 0.3);
+     }
+ 
+     .button:disabled {
+       background-color: var(--disabled-bg);
+       color: var(--disabled-text);
+       cursor: not-allowed;
+       box-shadow: none;
+       transform: none;
+     }
+ 
+     .results-card h2 {
+       color: var(--primary);
+       margin-bottom: 15px;
+       text-align: center;
+       font-size: 1.8rem;
+     }
+ 
+     .results-card p {
+       text-align: center;
+       font-size: 1.1rem;
+       margin-bottom: 30px;
+       color: var(--text-light);
+     }
+ 
+     .chart-container {
+       width: 100%;
+       max-width: 400px;
+       margin: 0 auto 30px auto;
+     }
+ 
+     .congrats-popup {
+       position: fixed;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100%;
+       background-color: rgba(0,0,0,0.8);
+       display: flex;
+       flex-direction: column;
+       justify-content: center;
+       align-items: center;
+       z-index: 2000;
+       animation: fadeIn 0.5s;
+     }
+ 
+     .congrats-content {
+       background-color: white;
+       padding: 30px;
+       border-radius: 15px;
+       max-width: 90%;
+       text-align: center;
+       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+     }
+ 
+     .congrats-message {
+       font-size: 1.5rem;
+       margin-bottom: 20px;
+       color: var(--primary);
+       font-weight: bold;
+     }
+ 
+     .close-popup {
+       margin-top: 20px;
+       padding: 10px 20px;
+       background-color: var(--primary);
+       color: white;
+       border: none;
+       border-radius: 8px;
+       cursor: pointer;
+       font-weight: 600;
+     }
+ 
+     @keyframes slideUpFadeIn {
+       from {
+         opacity: 0;
+         transform: translateY(40px);
+       }
+       to {
+         opacity: 1;
+         transform: translateY(0);
+       }
+     }
+ 
+     @keyframes fadeInModal {
+       from { opacity: 0; }
+       to { opacity: 1; }
+     }
+ 
+     @keyframes zoomInModal {
+       from { transform: scale(0.7); }
+       to { transform: scale(1); }
+     }
+ 
+     @keyframes fadeIn {
+       from { opacity: 0; }
+       to { opacity: 1; }
+     }
+ 
+     @media (max-width: 600px) {
+       body { padding: 20px 10px; }
+       .quiz-card, .results-card { padding: 20px; }
+       .quiz-title { font-size: 1.4rem; }
+       #question-text { font-size: 1.05rem; }
+       .option { padding: 12px 15px; }
+       .button { padding: 10px 20px; font-size: 0.95rem;}
+       .results-card h2 { font-size: 1.5rem; }
+       .results-card p { font-size: 1rem; }
+     }
+   </style>
+ </head>
+ <body>
+   <div class="main-container">
+     <div id="quiz-container"></div>
+     <div id="results-container" style="display: none;"></div>
+   </div>
+ 
+   <div id="imageModal" class="image-modal">
+     <span class="close-modal" id="closeModalBtn">&times;</span>
+     <img class="modal-content" id="modalImageContent">
+   </div>
+ 
+   <script>
+     // =============================================
+     // BANCO DE QUESTÕES
+     // =============================================
+     const sampleQuestions = [
+  {
+    "enunciado": "Quando a carga alostática é mantida por períodos longos ou indefinidamente, ou a resposta adaptativa que encerraria o ciclo não ocorre, temos um aumento dramático na carga alostática, com atuação perene de mediadores metabólicos e consequente dano à saúde. Como são denominados esses aumentos?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Sobrecarga alostática",
+      "b": "Equilíbrio alostático.",
+      "c": "Sobrecarga funcional.",
+      "d": "Equilibrio homeostático."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "\"Na desidratação, o suor ocorre como apenas uma pequena parte do processo em que muitos outros sistemas também vão adaptar o seu funcionamento, tanto para reduzir o uso de água como para apoiar a variedade de outros sistemas que se alteram para ajudar. Neste caso, os rins podem reduzir a produção de urina, a membrana mucosa da boca, nariz e os olhos podem secar; urina e suor irão diminuir; o lançamento de vasopressina irá aumentar; e veias e artérias vão contrair-se para manter a pressão arterial com um menor volume de sangue. Os mecanismos adaptativos descritos no trecho acima referem-se à qual conceito?\"",
+    "imagem": null,
+    "alternativas": {
+      "a": "Alostase",
+      "b": "Homeostase",
+      "c": "Carga alostática.",
+      "d": "Sobrecarga alostática."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Doença é uma ruptura da homeostase. Não podemos dizer que uma temperatura de 37.5°C é uma doença, pois o sistema, apesar de fora do seu nível padrão de temperatura, ainda consegue manter tranquilamente a homeostase com temperaturas que chegam até 38°C. Valores entre 36 e 42°C já exigem do organismo maiores esforços (sobrecarga alostática) para manter sua estabilidade. Mediante o exposto pode-se afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A temperatura entre 36 e 42°C é o excesso de energia utilizado para tentar, a todo custo, manter a homeostase.",
+      "b": "A temperatura de 37.5°C é uma situação de estabilidade dos parâmetros necessários à vida de um organismo.",
+      "c": "A temperatura entre 36 e 42°C é uma situação de estabilidade dos parâmetros necessários à vida de um organismo.",
+      "d": "A temperatura de 37.5°C é o excesso de energia utilizado para tentar, a todo custo, manter a homeostase."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "O organismo capaz de manter o equilíbrio do meio interno quase constante. Para garantir esse equilíbrio, denominado de homeostase, o corpo conta com dois sistemas principais:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Sistema endócrino e sistema cardiovascular.",
+      "b": "Sistema nervoso e sistema cardiovascular.",
+      "c": "Sistema endócrino e sistema nervoso.",
+      "d": "Sistema urinário e sistema cardiovascular."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "O pâncreas localiza-se atrás do estômago, entre o duodeno e o baço. Esse órgão atua tanto como uma glândula exócrina, secretando suco pancreático, como endócrino, formada pelas ilhotas de Langerhans que possuem dois tipos de células, a alfa e a beta que produzem os hormônios glucagon e insulina, respectivamente. Ao ingerir uma refeição, o nível de glicose no sangue aumenta, fazendo com que o pâncreas secrete a insulina responsável por captar a glicose do sangue e levá-la para dentro das células. No trecho acima, qual é um exemplo de homeostase?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Regulação dos níveis séricos de glicose.",
+      "b": "Formação do pâncreas endócrino.",
+      "c": "Liberação de insulina pelas células beta pancreáticas.",
+      "d": "Liberação de glucagon pelas células alfa pancreáticas."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Considerando o pensamento de FOUCAULT 2006, assinale a alternativa correta para o cuidado de si :",
+    "imagem": null,
+    "alternativas": {
+      "a": "O cuidado de si não traz autonomia para o sujeito em suas ações e no modo de agir.",
+      "b": "Não se deve fazer passar o cuidado dos outros na frente do cuidado de si.",
+      "c": "O cuidado dos outros deve vir primeiro que o cuidado de si.",
+      "d": "O conceito não está relacionado ao imperativo Socrático "
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Ainda sobre o tema do cuidado de si, assinale a alternativa correta:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A forma de cuidado de si envolve-se nas relações com os outros, na maneira de cuidar de si mesmo e na forma de cuidar dos outros.",
+      "b": "A revolução sexual foi uma mudança no cuidado de si que livrou os corpos da moral e da mercantilização.",
+      "c": "Apesar de algumas mudanças, o autocuidado sempre privilegiou o corpo, culminando hoje com o autocuidado das condições crônicas de saúde.",
+      "d": "A Medicina é a fonte de informações mais confiáveis sobre autocuidado e cuidado de si, apesar da busca crescente por outras fontes sobre saúde e bem-estar."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Conceitualmente, \"o cuidado de si\" é uma forma de preocupação com a saúde. Qual a contribuição desse conceito para a medicina contemporânea?",
+    "imagem": null,
+    "alternativas": {
+      "a": "O cuidado de si enfatiza a solução das necessidades imediatas com emprego de tecnologias que possibilitem essa finalidade.",
+      "b": "O cuidado de si visa a longevidade, ou seja, é um meio para o alcance desse objetivo e deve envolver o paciente e sua família.",
+      "c": "O cuidado de si carreia em si a própria finalidade, que é a autonomia do sujeito na sua relação com a doença e a saúde.",
+      "d": "O cuidado de si abarca um momento na história do sujeito: a pré-doença, sendo um meio de evitar a doença."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Você acompanhou a atividade com grupo de pacientes com diabetes mellitus na UBS, em que a equipe propôs a leitura do trecho do poema de Willian Shakespeare, abaixo: Plante seu jardim e decore sua alma, ao invés de esperar que alguém lhe traga flores. E você aprende que realmente pode suportar... que realmente é forte, e que pode ir muito mais longe depois de pensar que não se pode mais. A equipe utilizou este trecho de poema com a finalidade de fazer um paralelo com os cuidados necessários com o DM com o objetivo de:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Estimular a autonomia dos pacientes no cuidado de si, do seu DM para aderirem ao tratamento e manterem, por fim, o controle da glicemia.",
+      "b": "Estimular os pacientes a procurarem ajuda, pois não é fácil lidar com o DM e os pacientes precisam encontrar alguém para lhes ajudar nos seus cuidados.",
+      "c": "Estimular os pacientes a perceberem a importância das atividades de lazer no seu dia a dia, com o objetivo da integralidade no cuidado de si.",
+      "d": "Estimular os pacientes a terem uma horta em casa e a utilizarem estes alimentos saudáveis, como forma de cuidarem de si, por mais difícil que isso seja."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "\"Ocupar-se consigo não é, pois, uma simples preparação momentânea para a vida; é uma forma de vida (Foucault, Hermenêutica do Sujeito, p. 446). Assinale a alternativa correta sobre cuidar de si:\"",
+    "imagem": null,
+    "alternativas": {
+      "a": "Cuidar de si é dar conta de sua própria conduta para consigo e com os outros.",
+      "b": "O objetivo final é melhorar a vida em sociedade.",
+      "c": "Cuidar de si é um pensamento do homem egoísta, fechado em si mesmo.",
+      "d": "É uma forma do sujeito pensar em sua própria capacidade de variação dentro de um campo objetivo."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Dentre os agentes antidiabéticos, escolha a alternativa que contenha corretamente os representantes dos agentes que não aumentam a secreção de insulina:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Metformina, acarbose e pioglitazona.",
+      "b": "Gliptina, sulfonilureia e metformina.",
+      "c": "Sulfonilureia, glinida e acarbose.",
+      "d": "Acarbose, gliptina e pioglitazona."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Você é estudante de medicina e recentemente recebeu o diagnóstico de DM2. Habitualmente, no intervalo das aulas, costuma tomar café adoçado e comer um pão de queijo na cantina. Após ter consciência do seu estado de saúde, você começa a pensar algumas estratégias para mudança de hábitos, como por exemplo tomar café sem açúcar e substituir o pão de queijo por frutas ou algumas fatias de queijo minas. Em que estágio da mudança de comportamento você se enquadra?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Preparação.",
+      "b": "Ação.",
+      "c": "Pré-contemplação.",
+      "d": "Manutenção."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Considerando a importância da educação em diabetes, com a incorporação de ferramentas para atingir as metas estabelecidas para o tratamento, identifique as principais diretrizes:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O educador deve impor rotinas ao paciente e familiares.",
+      "b": "Deve ser centrado na doença e suas complicações.",
+      "c": "Deve capacitar o individuo para o auto cuidado.",
+      "d": "O atendimento individual é mais vantajoso que em grupo."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Qual alternativa elenca uma medicação que NÃO é opção de tratamento para diabetes mellitus tipo 1?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Sulfoniluréia.",
+      "b": "Glargina.",
+      "c": "NPH.",
+      "d": "Metformina."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Qual alternativa apresenta uma situação que cumpre critério diagnóstico de DM2 e, portanto, indica tratamento imediato?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Glicemia ocasional maior que 200mg/dL em paciente sintomático",
+      "b": "Hemoglobina glicada maior que 5,7% em paciente assintomático.",
+      "c": "Glicemia de jejum maior que 126mg/dL em paciente sintomático",
+      "d": "Hemoglobina glicada menor que 6,5% em paciente assintomático."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "A prescrição de metformina a um homem de 58 anos de idade, que acaba de ser diagnosticado com diabetes mellitus tipo 2, pode provocar, como principal efeito:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Hiperglicemia.",
+      "b": "Aumento de colesterol HDL.",
+      "c": "Aumento da captação periférica de glicose.",
+      "d": "Diminuição do colesterol HDL."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Assinale a alternativa que contém um grau de recomendação A para DM2:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Com os anos de evolução do DM2, ocorre redução da secreção de insulina com falha na monoterapia e/ou na combinação de agentes orais com mecanismos de ação diferentes.",
+      "b": "Quando a glicemia for inferior a 200mg/dL, estão indicados os medicamentos que não promovam aumento da secreção de insulina (principalmente no obeso).",
+      "c": "Para obesos que não perdem peso ou não respondem à monoterapia ou à combinação oral, a associação de outro medicamento pode ajudar na perda de peso.",
+      "d": "Quando houver a necessidade de combinação terapêutica, a insulina basal noturna é uma opção a um ou mais agentes orais."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "O diagnóstico de diabetes mellitus, de acordo com os critérios da Sociedade Brasileira de Diabetes, é confirmado quando a glicemia de jejum e/ou a glicemia pós-prandial apresentam-se, respectivamente:",
+    "imagem": null,
+    "alternativas": {
+      "a": "≥ a 126 mg/dl e ≥ a 200 mg/dl.",
+      "b": "≥ a 110mg/dl e ≥ a 180mg/dl.",
+      "c": "≥ a 100 mg/dl e ≥ a 200 mg/dl.",
+      "d": "> que 120 mg/dl e > que 200 mg/dl."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "É mandatório, para indivíduos com sinais e sintomas sugestivos, a coleta de exames para confirmação diagnóstica de DM2. Ainda que assintomáticos, a presença de fatores de risco já impõe rastreamento para diagnóstico precoce. Entre adultos sintomáticos menores de 45 anos, sugere-se rastreamento de DM2 naqueles com sobrepeso ou obesidade associado a qual dos seguintes fatores de risco?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Síndrome de ovários policisticos.",
+      "b": "Tabagismo",
+      "c": "Multiparidade",
+      "d": "HDL-c > 45 mg/dL"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Assinale a primeira opção de tratamento medicamentoso do diabetes melitos tipo 1 e tipo 2, respectivamente:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Insulina e biguanida (preferencialmente metformina).",
+      "b": "Biguanida (preferencialmente metformina) e insulina.",
+      "c": "Insulina e sulfonilureia (p.ex., gibenclamida).",
+      "d": "Sulfonilureia (p.ex., gibenclamida) e insulina."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Considerando os medicamentos para diabetes, identifique algum aspecto que deve ser avaliado para a sua escolha correta:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Os antecedentes pessoais do paciente.",
+      "b": "Os antecedentes familiares do paciente.",
+      "c": "Os mecanismos de resistência à insulina (RI) do paciente.",
+      "d": "O estilo de vida do paciente."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Sr. Augusto, 50 anos relata ao seu médico de família da UBS Fátima estar apresentando os seguintes sintomas: poliúria, polidipsia, polifagia e emagrecimento. O médico, na sequência, solicitou dosagem de glicemia ao acaso e foi verificado o valor de ≥220 mg/dL. Diante desse quadro, assinale a alternativa correta para a conduta do médico:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Informar o diagnóstico de diabetes e prescrever metformina.",
+      "b": "Solicitar glicemia de jejum para confirmar a diabetes.",
+      "c": "Solicitar hemoglobina glicada para confirmar o diagnóstico de diabetes.",
+      "d": "Informar o diagnóstico de diabetes e prescrever insulina NPH."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Dona Creusa, 57 anos, portadora de hipertensão arterial e diabetes mellitus tipo II em uso de insulina, procura constantemente a Unidade Básica de Saúde apresentando hiperglicemia. Ao ser questionada sobre tomada da medicação, refere que não tem coragem de fazer aplicação da insulina e por isso fica aguardando a filha para que faça a administração de insulina nela. Em relação a alimentação, relata hábito alimentar a base de verduras, legumes e carnes magras. Nega comer carboidrato ou doces. Ao realizar visita domiciliar, o ACS identifica grande quantidade de caixas de bolos, doces e gelatinas (prontas e armazenadas), além da filha que diz que só administra a insulina quando a mãe deixa. Em conversa, Dona Creusa relata saber da gravidade de sua doença, mas que não gosta de ser picada 3 vezes por dia e tampouco deixar de comer o que tanto ama, os doces e que neste momento, sente-se bem e continuará como está. Em relação aos estágios de mudança de comportamento, é correto afirmar no caso de Dona Creusa.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Dona Creusa sabe da sua doença e de seus males, mas ainda não se sente apta para a mudança, característica do estágio de pré-contemplação.",
+      "b": "Dona Creusa tem consciência, mas não dá importância suficiente para seu problema e não se dispõe a mudar, característica do estágio de pré-contemplação.",
+      "c": "Dona Creusa não tem consciência do seu problema, mas se dispõe à se preparar para mudanças, característica do estágio de contemplação.",
+      "d": "Dona Creusa, mesmo sentindo-se mal diversas vezes não identifica a gravidade do seu problema, característica do estágio de contemplação."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "De acordo com a etiologia, a Diabetes mellitus pode ser classificada em:",
+    "imagem": null,
+    "alternativas": {
+      "a": "DM tipo 1B, deficiência de insulina por destruição autoimune das células β comprovada por exames laboratoriais",
+      "b": "DM tipo 2, etiologia multifatorial, envolvendo componentes genéticos e ambientais.",
+      "c": "DM gestacional, acomete gestantes e implica diretamente na hiperglicemia de recém nascidos.",
+      "d": "DM tipo 1A, caracterizada pela deficiência de insulina de natureza idiopática e de estilo de vida."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Na UBS, você acompanhou a consulta de retorno de Inês, 6 anos, que tem diabetes mellitus tipo 1, controlada com dieta e insulina. Sua mãe traz o resultado dos exames solicitados, com hemoglobina glicada apresentando o valor de 5%. Relatam que Inês tem mantido dieta, atividade física e o uso de insulina, conforme as orientações fornecidas pela equipe de saúde. A menina diz que se sente bem, sem queixas. Conforme os dados obtidos da consulta, e utilizando seus conhecimentos acerca do Modelo Transteórico de Mudança de Comportamento, proposto por Prochaska et al., é possível afirmar corretamente que Inês se encontra no estágio de:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Pré-contemplação.",
+      "b": "Manutenção.",
+      "c": "Preparação.",
+      "d": "Contemplação."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "\"Você está acompanhando as consultas de um médico de família durante o internato na UBS. Vera, 49 anos, vem à consulta médica queixando-se de perda de peso, nos últimos meses, sem fazer dieta; ressecamento vaginal; dores na articulação do polegar direito; e aumento da fome e da sede, bem como da frequência urinária. Além disso, acorda no meio da madrugada e está com dificuldade para voltar a dormir. Como você está estudando diabetes mellitus na disciplina de APS Interdisciplinar, suspeita que Vera esteja com a doença devido aos seguintes sintomas:\"",
+    "imagem": null,
+    "alternativas": {
+      "a": "Poliúria, emagrecimento, polifagia e polidipsia.",
+      "b": "Poliúria, emagrecimento, insônia, e dor articular.",
+      "c": "Emagrecimento, polifagia, polidispsia e ressecamento vaginal.",
+      "d": "Emagrecimento, poliúria, ressecamento vaginal e insônia."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Paciente do sexo feminino, 52 anos, com diabetes mellitus tipo 1 (DM1), apresenta seu controle glicêmico controlado. Pela recomendação da Associação Americana de Diabetes, as metas glicêmicas correspondentes da glicemia de jejum/pré-prandial e da pós-prandial devem ser, respectivamente:",
+    "imagem": null,
+    "alternativas": {
+      "a": "entre 70-130 mg/dl e abaixo de 180 mg/dl.",
+      "b": "entre 50-90 mg/dl e abaixo de 150 mg/dl.",
+      "c": "entre 100-180 mg/dl e abaixo de 250 mg/dl.",
+      "d": "entre 80-100 mg/dl e abaixo de 100 mg/dl."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "A monitorização da glicemia capilar diariamente por indivíduos com DM1 de qualquer faixa etária traz grandes benefícios, por diminuir o risco de complicações agudas, tais como cetoacidose e hipoglicemia, e por permitir que o paciente entenda os determinantes de sua glicemia ao correlacionar os resultados glicêmicos em tempo real com a ingestão de alimentos ou com a pratica de atividade física. Para tanto a ADA estabelece que para o individuo adulto com Diabetes Mellitus, as metas glicêmicas em distintos períodos do dia deva ser:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Pós-prandial <180 mg/dL",
+      "b": "Em jejum >70 mg/dl e < 130 mg/dL.",
+      "c": "Pós- prandial > 180 mg/dL e < 220 mg/dL",
+      "d": "Em jejum <70 mg/dL."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Mario Cesar, 65 anos, apresenta diabetes mellitus desde os 52 anos de idade, e estava em uso de metformina 850mg, 1 comprimido ao dia. Na última consulta, o médico da UBS Eufrásio optou por aumentar a dose para 2 comprimidos por dia. Assinale a alternativa correta para o monitoramento desse paciente:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A dosagem da hemoglobina glicada deve ser feita em 90 dias.",
+      "b": "A dosagem da hemoglobina glicada deve ser realizada em 60 dias.",
+      "c": "A dosagem de glicemia automonitorada deve ser feita semanalmente na UBS.",
+      "d": "A dosagem de glicemia de jejum deve ser feita quinzenalmente após o ajuste da dose."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Pela recomendação da Sociedade Brasileira de Diabetes (SBD), as metas glicêmicas correspondentes da glicemia de jejum, pós-prandial e HbA1c de um adulto portador de DM devem ser, respectivamente:",
+    "imagem": null,
+    "alternativas": {
+      "a": "<110 mg/dL; <140 mg/dL e <6,5%",
+      "b": "<130 mg/dL; <180 mg/dL e <7,5%",
+      "c": "<115 mg/dL; <170 mg/dL e <6.0%.",
+      "d": "<100 mg/dL; <160 mg/dL e <7,0%"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Doutor, posso tirar uma dúvida? Tenho uns cinco minutos. O que foi Episteme. Doutor, emagreci muito nos últimos meses. Não sei se foi por causa da preocupação com minha esposa, bebê, irmão, mãe, trabalho etc. A vida não é fácil. Mas perdi 7 kg em dois meses e estou preocupado. Não estou fazendo dieta nem nada. E teu apetite? Como muito, estou sempre com fome, isso não é problema. Bebe muita água? No trabalho nem tanto. Como trabalho o tempo todo, não percebi diferença. Em dias quentes a gente bebe muito mesmo, não é doutor? Você acorda à noite para urinar? Isso sim doutor, acordo umas três vezes. Faça o seguinte Episteme. Que horas você tomou café? Há umas duas horas, voltando do hospital. Hoje mal dormi. Ok, de qualquer modo, faça o seguinte. Peça, na sala de procedimentos, para realizarem este teste. É um teste de diabetes, tudo bem? Será doutor? Não sou tão velhinho quanto meu sogro e minha sogra. Epísteme, sem nenhum julgamento, caminhando na direção do problema que você referiu, faz parte pedir esse teste. O bom é que já vemos o resultado. E volto aqui depois? Sim, aguarde um pouco em frente ao consultório que já te chamo. Tenho alguns pacientes marcados. Obrigado doutor. Desculpa tanta amolação da gente. Parece que as coisas vieram todas de uma vez. Até já Epísteme. Epísteme. Por favor, venha. Vamos ver o que deu. Tudo certo? Nada certo doutor. Estou assustado. É possível isso? O teste não está errado. 350! 350! Eu tenho diabetes doutor! Meu Deus, e agora? E agora temos que lidar com isso e te apoiar para tua saúde melhorar. Eu sei que você consegue. Que bom que você está aquí. É um começo, concorda? Epísteme queria acreditar que sim. O diálogo acima é de uma consulta do médico com um paciente, retirado do livro \"Saúde na Comunidade\". Sabendo que Epísteme tem 22 anos, assinale a alternativa correta em relação ao caso.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Epísteme já tem um Diabetes estabelecido.",
+      "b": "É necessário confirmação da glicose em jejum para definir o diagnóstico.",
+      "c": "Pela idade de Episteme ele será classificado como pré-diabético.",
+      "d": "O médico precisa avaliar a alimentação de Epísteme para entender melhor a situação e dar prosseguimento ao caso."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Você é o Médico de Família e Comunidade da UBS Portal das Garças e a ACS passou o caso de uma paciente. A Dona Arminda, 71 anos, mora sozinha. Ela é viúva, tem 2 filhos (que não a visitam) e vive com o dinheiro da aposentadoria e da pensão do marido. Ela diz que ultimamente não está conseguindo costurar, pois tem dificuldade de passar a linha na agulha. Na visita você percebe que a casa está organizada e ela diz que não toma nenhuma medicação. Diz ter orgulho de ter chegado aos 70 sem nenhum remédio. Ela conta que urina duas vezes durante a noite, mas desde que se casou tem esse hábito. No seu exame físico, a PA: 150x80mmHg e a ausculta tem RCR com bulhas normofonéticas a 2 tempos, sem sopros. Ela tem dificuldade de enxergar à curtas distâncias (<1m). O demais item do exame físico não apresentam alterações dignas de nota. Ela te traz o resultado de um exame de 03 meses atrás e a glicemia de jejum era de 138mg/dl, que ela ainda não mostrou para ninguém. Com relação à possibilidade de DM, assinale a alternativa correta:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Solicitar uma nova glicemia de jejum e, se o resultado for acima de 126 mg/dl, pode-se considerar DM e indicar o tratamento.",
+      "b": "Solicitar uma nova glicemia de jejum e, se o resultado for maior que 200mg/dl, um novo exame confirmatório deve ser solicitado em até 03 meses.",
+      "c": "Solicitar Teste de Tolerância Oral à Glicose (TOTG) com sobrecarga de 75g de glicose e, se o resultado for entre 140 e 199 mg/dl, deve-se considerar apenas a consulta com enfermagem para Orientação de Melhoria de Estilo de Vida e reavaliação em 01 ano, por se tratar de pré-diabetes.",
+      "d": "Realizar, no momento da consulta, a glicemia capilar e, se o resultado for menor que 100mg/dl, não é necessário realizar nenhum outro exame e considerar a consulta médica para Orientação de Melhora de Estilo de Vida com reavaliação em 06 meses."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Doutor, emagreci muito nos últimos meses. Não sei se foi por causa da preocupação com minha esposa, bebê, irmão, mãe, trabalho etc. A vida não é fácil. Mas perdi 7 kg em dois meses e estou preocupado. Não estou fazendo dieta nem nada. E teu apetite? Como muito, estou sempre com fome, isso não é problema. Bebe muita água? No trabalho nem tanto. Como trabalho o tempo todo, não percebi diferença. Em dias quentes a gente bebe muito mesmo, não é doutor? Você acorda à noite para urinar? Isso sim doutor, acordo umas três vezes. Com base nas informações contidas no diálogo acima, entre Epísteme e Dr. Hérmes, escolha a alternativa correta:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Episteme provavelmente está com diabetes mellitus, que será confirmado pelo exame de glicemia de jejum.",
+      "b": "A clínica apresentada por Epísteme é suficiente para estabelecer o diagnóstico de diabetes mellitus.",
+      "c": "Epísteme está com diabetes mellitus e deverá iniciar dieta para diabetes e hipoglicemiante oral.",
+      "d": "A clínica apresentada por Epísteme é sugestiva de diabetes mellitus, que será confirmado com TOTG."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "A Educação em diabetes evoluiu nos últimos anos. As técnicas atuais de estímulo e treinamento para o autocuidado focado no paciente. Para compreender melhor o momento do educando, sugere-se que o educador conheça o modelo Transteórico de mudança proposto por Prochaska e DiClemente. Assinale a resposta correta que identifique adequadamente a fase de mudança de comportamento:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Na ação, a decisão de mudar pode ser observada por atitudes concretas",
+      "b": "Na manutenção, a decisão de mudar em geral não é bem sucedida.",
+      "c": "Na preparação, o indivíduo está consciente para iniciar a mudança imediatamente.",
+      "d": "Na contemplação, o indivíduo não tem consciência do problema para iniciar a mudança."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Os fatores causais dos principais tipos de diabetes mellitus (DM) são genéticos causais e ambientais e ainda não são completamente conhecidos. Assinale a alternativa correta para a classificação etiológica do DM:",
+    "imagem": null,
+    "alternativas": {
+      "a": "No tipo 2 há perda progressiva de secreção de insulina e aumento da resistência à insulina.",
+      "b": "No tipo 1, a deficiência de insulina tem natureza idiopática.",
+      "c": "No tipo 1B, a deficiência de insulina é por destruição de células beta.",
+      "d": "No tipo MODY, a disfunção da célula beta é por herança autossômica recessiva."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Na UBS, você presenciou uma reunião de equipe de ESF. A ACS Isa informou que Inês, 6 anos, teve alta hospitalar de internação em que foi diagnosticado diabetes mellitus autoimune, necessitando o uso de insulina como terapia, além de dieta. A equipe toda ficou muito incomodada com a notícia, e Isa questionou como não foi feito o diagnóstico e iniciado o tratamento antes de precisar internar, se Inês é acompanhada pela equipe e passa em consultas com a médica de família e comunidade Ana Carenina desde que nasceu. A médica respondeu corretamente para Isa e equipe, a assertiva contida na alternativa:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Realmente, houve falha minha, estou arrasada, pois eu deveria ter solicitado a dosagem de autoanticorpos precocemente como forma de rastreamento de diabetes mellitus tipo 1.",
+      "b": "Juntamente com os exames complementares de rotina da infância, eu deveria ter incluído a hemoglobina glicada para saber antecipadamente que Inês estava desenvolvendo autoimunidade para o diabetes.",
+      "c": "Não se recomenda a realização rotineira de autoanticorpos para diagnosticar diabetes mellitus autoimune, Inês estava saudável até então, e a dosagem é solicitada mediante suspeita clínica.",
+      "d": "Este diagnóstico poderia ter sido realizado precocemente, se a dosagem de autoanticorpos para diagnóstico de diabetes mellitus tipo 1B fizesse parte dos exames contidos no teste do pezinho."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "O profissional da área da saúde aprende seu papel pelo processo de educação de sua profissão. No trabalho em equipe, como o realizado pela Estratégia de Saúde da Família, algumas condições são necessárias para que o trabalho ocorra com menos conflitos. Considerando esta assertiva, assinale a alternativa mais adequada:",
+    "imagem": null,
+    "alternativas": {
+      "a": "É importante e necessário a compreensão do papel de outras pessoas, dominar competências e compartilhar responsabilidades.",
+      "b": "O conflito desestimula a inovação e a solução de problemas, diminuindo a confiança entre os membros da equipe.",
+      "c": "O médico vai sempre estar na liderança de uma equipe por ter concluído um curso superior mais longo e complexo.",
+      "d": "Os problemas surgem quando não há super utilização de expertise dos profissionais."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Para termos uma equipe de alto desempenho, alguns recursos são necessários. Assinale a alternativa que identifica esses recursos:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Respeito, confiança e compromissos com a organização",
+      "b": "Liderança centralizadora, objetivos claros e compromisso.",
+      "c": "Ideias convergentes, respeito e estilos diferentes",
+      "d": "Liderança rotativa, problemas pessoais entre membros e ideias divergentes."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Considerando o artigo de PINHO 2006, sobre trabalho em equipe realizado em hospital publico do Rio de Janeiro entre os resultados observou-se que:",
+    "imagem": null,
+    "alternativas": {
+      "a": "No ambulatório havia um trabalho de equipe multiprofissional.",
+      "b": "Havia uma responsabilização coletiva dos profissionais.",
+      "c": "Não estava presente a hierarquização de poderes entre os profissionais.",
+      "d": "Nas enfermarias havia um trabalho de equipe multiprofissional."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "No artigo de Pinho (2006), foi possível observar evidências para a consolidação do trabalho em equipe. Assinale a alternativa correta para as dificuldades apontadas no artigo para o trabalho em equipe:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A vida organizacional de uma Unidade de Saúde pouco harmoniosa, por fatores técnicos e comportamentais produzindo fragmentações que dificultam a eficácia.",
+      "b": "O modelo biomédico tem mostrado potencialidades para o trabalho em equipe apesar de muitas controvérsias.",
+      "c": "No ambulatório em geral observa-se um trabalho interprofissional, mas com hierarquização de saberes em especial da classe médica.",
+      "d": "Na enfermaria foi observado um perfil consolidado interprofissional, com discussão de casos na enfermaria com um Projeto Terapêutico Singular."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "O modelo do sistema de trabalho em equipe proposto por Drinka (2000) fornece um desenvolvimento suplementar do conceito de prática em equipe colaborativa. Utiliza-se de diversos métodos identificados na prática. A necessidade de uma interdependência progressiva e colaboração são o gancho para determinar que método de prática de equipe deve ser utilizado e o modo correto para dirigir-se a um problema particular encontrado. Tomando como exemplo um caso que envolve paciente com sequelas de AVC, demência, necessidade de cuidados continuados pela equipe de ESF, e, ainda, cuidados de saúde mental e fisioterapia, o melhor método de trabalho a ser escolhido pela equipe deve ser:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O quinto método, que consiste em equipe interdisciplinar interativa, com o cuidado integrado, o compartilhar de responsabilidade pela liderança da equipe, soluções direcionadas para problemas complexos.",
+      "b": "O segundo método, que consiste em um grupo de trabalho formal unidisciplinar, cujos componentes são médicos de diversas especialidades.",
+      "c": "O primeiro método, que consiste em um grupo de tarefa escolhido ou formado por um lider onde as regras são colocadas pelo grupo para resolver o problema e dispensá-lo.",
+      "d": "O terceiro método, que consiste em um grupo de trabalho multidisciplinar composto por médicos, enfermeiros, assistentes sociais e etc., em que as decisões finais são tomadas por um líder."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "O trabalho em equipe não é simplesmente a junção de pessoas ou passar a informação de um para outro. É necessária a disseminação de uma cultura colaborativa para a cooperação entre os membros e a criação de equipes. Sobre a criação de equipes é correto afirmar.",
+    "imagem": null,
+    "alternativas": {
+      "a": "A delimitação do trabalho de cada um e a promoção de reuniões entre os membros da chefia constituem passos para a criação de equipes.",
+      "b": "O estabelecimento de confiança e o empowering (empoderamento) dos membros da equipe constituem passos para a criação de equipes.",
+      "c": "O desenvolvimento de crenças e atitudes incomuns entre os membros e a realização de reunião constituem passos para a criação de equipes.",
+      "d": "A promoção de feedback sobre os funcionários da equipe para a chefia imediata e a definição de metas de trabalho constituem passos para a criação de equipes."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "\"Verifica-se o problema compreensão parte-todo e da redução que o extenso processo de especialização provocou. As especialidades clínicas foram se desenvolvendo para dar conta de aspectos cada vez mais aprofundados dos fatos complexos. Ocorre, no entanto, que ao se especializar, muitas vezes, o profissional perde a noção da totalidade\". Depoimento da médica 1. Diante desse depoimento, o que pode ficar mais prejudicado no cuidados às pessoas, por esse método de prática:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Foco único em um problema.",
+      "b": "Condução rápida do problema.",
+      "c": "Integralidade do cuidado.",
+      "d": "Necessidade de um tempo menor para decisões."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "No artigo de Pinho (2006), foi possível observar evidências para a consolidação do trabalho em equipe. Assinale a alternativa correta para as dificuldades apontadas no artigo para o trabalho em equipe:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A vida organizacional de uma Unidade de Saúde pouco harmoniosa, por fatores técnicos e comportamentais produzindo fragmentações que dificultam a eficácia.",
+      "b": "O modelo biomédico tem mostrado potencialidades para o trabalho em equipe apesar de muitas controvérsias.",
+      "c": "No ambulatório em geral observa-se um trabalho interprofissional, mas com hierarquização de saberes em especial da classe médica.",
+      "d": "Na enfermaria foi observado um perfil consolidado interprofissional, com discussão de casos na enfermaria com um Projeto Terapêutico Singular."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Considerando seus conhecimentos sobre homeostase, alostase, carga alostática e sobrecarga alostática, diz-se que ocorre a doença quando:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Há alterações repetidas e mantidas da sobrecarga alostática em valores que organismo não consegue compensar.",
+      "b": "Há alterações repetidas e mantidas da alostase em valores próximos aos de manutenção da homeostase.",
+      "c": "Há alterações repetidas e mantidas da carga alostática em valores próximos aos de manutenção da alostase.",
+      "d": "Há alterações repetidas e mantidas da alostase em valores que o organismo não consegue igualar aos da homeostase."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "O organismo é capaz de manter o equilíbrio do meio interno quase constante. Para garantir esse equilíbrio, denominado de homeostase, o corpo conta com dois sistemas principais, cujos corretos encontram-se na alternativa:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Sistema urinário e sistema cardiovascular.",
+      "b": "Sistema endócrino e sistema nervoso.",
+      "c": "Sistema nervoso e sistema cardiovascular.",
+      "d": "Sistema endócrino e sistema cardiovascular."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "\"A jornada de trabalho do anestesiologista é marcada pelo excesso de horas trabalhadas por dia/semana, no período diurno e noturno, horas extras, jornada prolongada, plantões noturnos seguidos por trabalho durante todo o dia, levando a intensa sobrecarga de trabalho, sem ambientes adequados para descanso médico. Efeitos de horários de trabalho inadequados podem desencadear distúrbios do ritmo circadiano, distúrbios do sono, fadiga, alterações cardiovasculares, digestivas e interferir na vida familiar; portanto, podem causar impactos, principalmente, sobre a saúde do profissional, fato que mais tarde se refletirá em seu desempenho e na segurança ocupacional e do paciente (GASTÃO, 2013). O texto acima aborda o conceito e as implicações da:\"",
+    "imagem": null,
+    "alternativas": {
+      "a": "Carga alostática, que designa a soma dos desgastes que o estresse prolongado provoca nos organismos.",
+      "b": "Homeostase, termo que define a estabilidade do sistema fisiológico que mantém a vida.",
+      "c": "Alostase, termo que define a estabilidade do sistema fisiológico que mantém a vida.",
+      "d": "Carga alostática, termo que define a estabilidade do sistema fisiológico que mantém a vida."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "De acordo com o conceito de alostase, obesidade, hipertensão e diabetes seriam desfechos de saúde que ocorrem por:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Mediadores interativos do sistema neuroendocrino.",
+      "b": "Mediadores interativos do sistema imune.",
+      "c": "Mediadores interativos do sistema neural.",
+      "d": "Mediadores interativos do sistema cardiovascular."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Os sistemas de resposta ao estresse geram mediadores que irão atuar nos órgãos e tecidos do indivíduo. Assinale a alternativa correta para esses mediadores:",
+    "imagem": null,
+    "alternativas": {
+      "a": "deidroepiandrosterona, catecolaminas, citocinas.",
+      "b": "citocinas, progesterona, catecolaminas.",
+      "c": "androsterona, glicocorticóides, epinefrina.",
+      "d": "enzimas gástricas, glicocorticóides, catecolaminas."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "José Antônio é um paciente assintomático para diabetes. Assinale a alternativa que confirmaria um diagnóstico de diabete segundo a ADA:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Duas glicemias de jejum maiores ou iguais a 126 mg/dL",
+      "b": "Uma medida de hemoglobina glicada menor ou igual a 6%.",
+      "c": "Uma medida de glicemia casual maior ou igual a 200 mg/dL.",
+      "d": "Duas glicemias 2 horas após 75g de dextrosol menores ou iguais 126 mg/dL."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Paciente do sexo feminino, 52 anos, com diabetes mellitus tipo 1 (DM1), apresenta seu controle glicêmico controlado. Pela recomendação da Associação Americana de Diabetes, as metas glicêmicas correspondentes da glicemia de jejum/pré-prandial e da pós-prandial devem ser, respectivamente:",
+    "imagem": null,
+    "alternativas": {
+      "a": "entre 70-130 mg/dl e abaixo de 180 mg/dl.",
+      "b": "entre 50-90 mg/dl e abaixo de 150 mg/dl.",
+      "c": "entre 100-180 mg/dl e abaixo de 250 mg/dl.",
+      "d": "entre 80-100 mg/dl e abaixo de 100 mg/dl."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Dona Creusa, 57 anos, portadora de hipertensão arterial e diabetes mellitus tipo II em uso de insulina, procura constantemente a Unidade Básica de Saúde apresentando hiperglicemia. Ao ser questionada sobre tomada da medicação, refere que não tem coragem de fazer aplicação da insulina e por isso fica aguardando a filha para que faça a administração de insulina nela. Em relação a alimentação, relata hábito alimentar a base de verduras, legumes e carnes magras. Nega comer carboidrato ou doces. Ao realizar visita domiciliar, o ACS identifica grande quantidade de caixas de bolos, doces e gelatinas (prontas e armazenadas), além da filha que diz que só administra a insulina quando a mãe deixa. Em conversa, Dona Creusa relata saber da gravidade de sua doença, mas que não gosta de ser picada 3 vezes por dia e tampouco deixar de comer o que tanto ama, os doces e que neste momento, sente-se bem e continuará como está. Em relação aos estágios de mudança de comportamento, é correto afirmar no caso de Dona Creusa.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Dona Creusa não tem consciência do seu problema, mas se dispõe à se preparar para mudanças, característica do estágio de contemplação.",
+      "b": "Dona Creusa tem consciência, mas não dá importância suficiente para seu problema e não se dispõe a mudar, característica do estágio de pré-contemplação.",
+      "c": "Dona Creusa, mesmo sentindo-se mal diversas vezes não identifica a gravidade do seu problema, característica do estágio de contemplação.",
+      "d": "Dona Creusa sabe da sua doença e de seus males, mas ainda não se sente apta para a mudança, característica do estágio de pré-contemplação."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Qual alternativa elenca corretamente os sete comportamentos do autocuidado proposto pela American Association of Diabetes Educator, com o objetivo de identificar a qualidade dos resultados obtidos com um programa de educação efetivo:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Vigiar as taxas, tomar as medicações, adaptar-se saudavelmente, resolver problemas, elevar os riscos, comer saudavelmente, praticar atividade física.",
+      "b": "Vigiar as taxas, tomar as medicações, adaptar-se saudavelmente, resolver problemas, reduzir riscos, focar na dieta mediterrânea, praticar atividade física.",
+      "c": "Vigiar as taxas, tomar as medicações, adaptar-se saudavelmente, resolver problemas, reduzir riscos, comer saudavelmente, praticar atividade física.",
+      "d": "Vigiar as taxas, tomar as medicações, adaptar-se saudavelmente, criar problemas, reduzir riscos, comer saudavelmente, praticar atividade física."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Você está acompanhando as consultas médicas na UBS quando Joana vem consultar. Ela tem de 67 anos é paciente da médica há uns 7 anos, com quem trata diabetes mellitus (DM), dentre outras coisas. Nesta consulta ela traz o resultado da hemoglobina glicosilada (HbA1C) de 8,0. Não tem queixas, não houve grandes mudanças em seu peso (68kg em 165 cm de estatura) nem no padrão alimentar. Como você está estudando DM na APS Interdisciplinar, não foi difícil constatar que:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O DM de Joana está descompensado, nos últimos 4 meses, pois o valor da HbA1C está elevado.",
+      "b": "O DM de Joana está bem controlado, pois a HbA1C está com valor normal e ela está mantendo a dieta.",
+      "c": "Joana precisará realizar exame de glicemia de jejum para controle do DM, visto a HbA1C ser inconclusiva.",
+      "d": "Joana precisará realizar exame de insulina e jejum, pois o valor da HbA1C sugere descontrole do DM."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta em relação ao diagnóstico de Diabetes Mellitus:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Pacientes com sintomas clássicos de hiperglicemia, devem ser submetidos a dosagem de glicemia ao acaso e se encontrado o valor ≥200 mg/dL não há necessidade de confirmação por outra dosagem.",
+      "b": "A confirmação do diagnostico de DM não requer repetição dos exames alterados, na ausência de sintomas inequívocos de hiperglicemia",
+      "c": "A confirmação do diagnostico de DM requer repetição dos exames alterados, idealmente o mesmo exame alterado em segunda amostra de sangue mesmo com sintomas de hiperglicemia.",
+      "d": "Para o paciente diabético a glicemia de jejum deve estar entre 100 e 126 mg/dl, e a hemoglobina glicada entre 5,7 e 6,5 mg/dL."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Lúcia, 53 anos, procurou Alana, sua MFC, preocupada por estar emagrecendo muito e rapidamente, nos últimos tempos. Perdeu 10 Kg em dois meses, sem fazer dieta. Pelo contrário, Lúcia informou estar com o apetite aumentado, a toda hora tem fome e come muito. Disse que tinha tomado café da manhã bem reforçado às 08:00, não comeu nada depois. Eram 11:00 e estava faminta. Lembrou, também, que aumentou a frequência de idas ao banheiro para urinar, mas acha que é porque está comendo mais, e as comidas têm muito sal. Uma coisa que não era comum e está acontecendo todas as noites é acordar para fazer xixi. Alana conversou com Lúcia e informou que os sintomas sugeriam diabetes mellitus. Solicitou que Lúcia fizesse o exame de glicemia capilar com a enfermagem e que retornasse com o resultado. O HGT de Lúcia, naquele momento, foi de 363 mg/dl. Alana lhe explicou o que significava o resultado do teste, a doença e iniciou a conversa com foco no tratamento e medidas de autocuidado. Porém, Lúcia não estava muito preocupada com aquilo tudo, pois seu medo era de estar com câncer. Com base na história de Lúcia, é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Lúcia está com DM, pois apresenta sintomas sugestivos e a glicemia capilar está alterada.",
+      "b": "Os dados apresentados são insuficientes para diagnosticar DM, pois são necessários exames confirmatórios para isso.",
+      "c": "Lúcia tem uma rotina muito extenuante que está lhe causando sintomas relacionados ao estresse crônico.",
+      "d": "Alana precisa solicitar exames para investigar doenças que apresentam emagrecimento"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Você é o Médico de Família e Comunidade da UBS Portal das Garças e a ACS passou o caso de uma paciente. A Dona Arminda, 71 anos, mora sozinha. Ela é viúva, tem 2 filhos (que não a visitam) e vive com o dinheiro da aposentadoria e da pensão do marido. Ela diz que ultimamente não está conseguindo costurar, pois tem dificuldade de passar a linha na agulha. Na visita você percebe que a casa está organizada e ela diz que não toma nenhuma medicação. Diz ter orgulho de ter chegado aos 70 sem nenhum remédio. Ela conta que urina duas vezes durante a noite, mas desde que se casou tem esse hábito. No seu exame físico, a PA: 150x80mmHg e a ausculta tem RCR com bulhas normofonéticas a 2 tempos, sem sopros. Ela tem dificuldade de enxergar à curtas distâncias (<1m). O demais item do exame físico não apresentam alterações dignas de nota. Ela te traz o resultado de um exame de 03 meses atrás e a glicemia de jejum era de 138mg/dl, que ela ainda não mostrou para ninguém. Com relação à possibilidade de DM, assinale a alternativa correta:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Solicitar uma nova glicemia de jejum e, se o resultado for acima de 126 mg/dl, pode-se considerar DM e indicar o tratamento.",
+      "b": "Solicitar uma nova glicemia de jejum e, se o resultado for maior que 200mg/dl, um novo exame confirmatório deve ser solicitado em até 03 meses.",
+      "c": "Solicitar Teste de Tolerância Oral à Glicose (TOTG) com sobrecarga de 75g de glicose e, se o resultado for entre 140 e 199 mg/dl, deve-se considerar apenas a consulta com enfermagem para Orientação de Melhoria de Estilo de Vida e reavaliação em 01 ano, por se tratar de pré-diabetes",
+      "d": "Realizar, no momento da consulta, a glicemia capilar e, se o resultado for menor que 100mg/dl, não é necessário realizar nenhum outro exame e considerar a consulta médica para Orientação de Melhora de Estilo de Vida com reavaliação em 06 meses."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Assinale a alternativa que contém um grau de recomendação B para tratamento de DM2:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Quando houver a necessidade de combinação terapêutica, a insulina basal noturna é uma opção a um ou mais agentes orais.",
+      "b": "Quando a glicemia for inferior a 200mg/dL estão indicados os medicamentos que não promovam aumento da secreção de insulina (principalmente no obeso).",
+      "c": "Os obesos que não perdem peso ou não respondem à monoterapia ou à combinação oral, a associação de outro medicamento pode ajudar na perda de peso.",
+      "d": "Com os anos de evolução do DM2, ocorre redução da secreção de insulina com falha na monoterapia e/ou na combinação de agentes orais com mecanismos de ação diferentes."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Escolha qual alternativa traz corretamente uma opção de classe de medicamento para tratamento de diabetes mellitus tipo 2?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Secretagogos.",
+      "b": "Glicocorticoides.",
+      "c": "Inibidores de canal de cálcio.",
+      "d": "Inibidores de recaptação da serotonina."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Doutor, posso tirar uma dúvida? Tenho uns cinco minutos. O que foi Episteme. Doutor, emagreci muito nos últimos meses. Não sei se foi por causa da preocupação com minha esposa, bebê, irmão, mãe, trabalho etc. A vida não é fácil. Mas perdi 7 kg em dois meses e estou preocupado. Não estou fazendo dieta nem nada. E teu apetite? Como muito, estou sempre com fome, isso não é problema. Bebe muita água? No trabalho nem tanto. Como trabalho o tempo todo, não percebi diferença. Em dias quentes a gente bebe muito mesmo, não é doutor? Você acorda à noite para urinar? Isso sim doutor, acordo umas três vezes. Faça o seguinte Epísteme. Que horas você tomou café? Há umas duas horas, voltando do hospital. Hoje mal dormi. Ok, de qualquer modo, faça o seguinte. Peça, na sala de procedimentos, para realizarem este teste. É um teste de diabetes, tudo bem? Será doutor? Não sou tão velhinho quanto meu sogro e minha sogra. Episteme, sem nenhum julgamento, caminhando na direção do problema que você referiu, faz parte pedir esse teste. O bom é que já vemos o resultado. E volto aqui depois? Sim, aguarde um pouco em frente ao consultório que já te chamo. Tenho alguns pacientes marcados. Obrigado doutor. Desculpa tanta amolação da gente. Parece que as coisas vieram todas de uma vez. Até já Epísteme. Episteme. Por favor, venha. Vamos ver o que deu. Tudo certo? Nada certo doutor. Estou assustado. É possível isso? O teste não está errado. 350! 350! Eu tenho diabetes doutor! Meu Deus, e agora? E agora temos que lidar com isso e te apoiar para tua saúde melhorar. Eu sei que você consegue. Que bom que você está aqui. É um começo, concorda? Epísteme queria acreditar que sim. O diálogo acima é de uma consulta do médico com um paciente, retirado do livro \"Saúde na Comunidade\". Sabendo que Epísteme tem 22 anos, assinale a alternativa correta em relação ao caso.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Epísteme já tem um Diabetes estabelecido.",
+      "b": "Pela idade de Epísteme ele será classificado como pré-diabético.",
+      "c": "O médico precisa avaliar a alimentação de Epísteme para entender melhor a situação e dar prosseguimento ao caso.",
+      "d": "É necessário confirmação da glicose em jejum para definir o diagnóstico."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Após vários meses sem procurar a UBS, Clara, de 59 anos de idade, vem à consulta dizendo que gostaria de fazer exames para verificar como está o controle do diabetes. Ela tem diabetes tipo 2 e vinha mantendo bom controle glicêmico utilizando metformina em duas doses diárias. Qual a conduta correta?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Solicitar dosagem de hemoglobina glicosilada para verificar o controle glicêmico nos últimos 4 meses.",
+      "b": "Solicitar a dosagem semestral dos níveis de insulina basal para determinar o momento apropriado para a iniciar insulina.",
+      "c": "Solicitar dosagem de glicemia e de insulina de jejum para verificar a necessidade de modificar a prescrição medicamentosa.",
+      "d": "Solicitar dosagem de microalbuminúria, que deve ser realizada semestralmente a partir do momento de diagnóstico do diabetes."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "O diabetes mellitus (DM) consiste em um distúrbio metabólico caracterizado por hiperglicemia persistente, decorrente da deficiência na produção de insulina ou na sua ação, ou em ambos os mecanismos, ocasionando complicações em longo prazo. De acordo com a Sociedade Brasileira de Diabetes, considera-se como meta de controle metabólico o valor de glicemia em jejum:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Menor que 160.",
+      "b": "Menor que 100.",
+      "c": "Entre 100 e 126.",
+      "d": "Entre 100 e 140."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Em relação ao diagnóstico de diabetes mellitus gestacional (DGM), assinale a alternativa correta:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Sugere-se investigar DM preexistente a partir do segundo trimestre gestacional por meio de exames habituais.",
+      "b": "Valores entre 92 e 126 mg/dL em qualquer fase da gestação são considerados diagnósticos de DGM.",
+      "c": "Apenas mulheres com suspeita de DGM devem ser submetidas a TOTG com 75 g de glicose após jejum de 8 horas, entre 24 e 28 semanas.",
+      "d": "Idade materna avançada, sobrepeso e/ou obesidade, crescimento fetal excessivo e hipertensão já caracterizam o diagnóstico de DGM."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "A prescrição de metformina a um homem de 58 anos de idade, que acaba de ser diagnosticado com diabetes mellitus tipo 2, pode provocar, como principal efeito:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Diminuição do colesterol HDL.",
+      "b": "Hiperglicemia.",
+      "c": "Aumento de colesterol HDL.",
+      "d": "Aumento da captação periférica de glicose."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Os tipos de diabetes mais frequentes são: I. O diabetes tipo 1, anteriormente conhecido como diabetes do adulto, que compreende cerca de 90% do total de casos. II. O diabetes tipo 2, anteriormente conhecido como diabetes juvenil, que compreende cerca de 10% do total de casos. III. Outro tipo de diabetes encontrado com maior frequência e cuja etiologia ainda não está esclarecida é o diabetes gestacional, detectado no rastreamento pré-natal. Está CORRETO o contido em:",
+    "imagem": null,
+    "alternativas": {
+      "a": "I, apenas",
+      "b": "II, apenas.",
+      "c": "I, II e III.",
+      "d": "III, apenas."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Mario Cesar, 65 anos, apresenta diabetes mellitus desde os 52 anos de idade, e estava em uso de metformina 850mg, 1 comprimido ao dia. Na última consulta, o médico da UBS Eufrásio optou por aumentar a dose para 2 comprimidos por dia. Assinale a alternativa correta para o monitoramento desse paciente:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A dosagem da hemoglobina glicada deve ser feita em 90 dias.",
+      "b": "A dosagem da hemoglobina glicada deve ser realizada em 60 dias.",
+      "c": "A dosagem de glicemia automonitorada deve ser feita semanalmente na UBS.",
+      "d": "A dosagem de glicemia de jejum deve ser feita quinzenalmente após o ajuste da dose."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Você está na UBS, acompanhando a consulta de Roberto, 52 anos, com diabetes mellitus (DM), diagnosticado há cerca de 9 meses, quando inicialmente foi orientado a controlar a doença com dieta e, uns meses depois, foi prescrita metformina. Roberto tem apresentado controle glicêmico inadequado continuamente. A equipe está percebendo que ele está com dificuldades para lidar com o DM e desconfia que ele não está se tratando adequadamente. Ele relata que ainda não está na idade para ter DM e que não se sente doente para usar remédios e fazer dieta tão restritiva. Frente ao exposto, você percebe que a equipe precisará adotar medidas de educação para o autocuidado e autocontrole do DM de Roberto, cujo comportamento frente à doença encontra-se no estágio de:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Pré-contemplação",
+      "b": "Ação",
+      "c": "Manutenção",
+      "d": "Contemplação"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Na UBS, você acompanhou a consulta de retorno de Inês, 6 anos, que tem diabetes mellitus tipo 1, controlada com dieta e insulina. Sua mãe traz o resultado dos exames solicitados, com hemoglobina glicada apresentando o valor de 5%. Relatam que Inês tem mantido dieta, atividade física e o uso de insulina, conforme as orientações fornecidas pela equipe de saúde. A menina diz que se sente bem, sem queixas. Conforme os dados obtidos da consulta, e utilizando seus conhecimentos acerca do Modelo Transteórico de Mudança de Comportamento, proposto por Prochaska et al., é possível afirmar corretamente que Inês se encontra no estágio de:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Manutenção.",
+      "b": "Preparação.",
+      "c": "Pré-contemplação.",
+      "d": "Contemplação."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Há várias formas de diagnosticar o diabete melito. Assinale a alternativa em que o diagnóstico pode ser feito imediatamente:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Pessoa com perda de peso, poliúria e polidipsia com uma medida eventual de glicose de 220 mg/dL",
+      "b": "Pessoa com uma medida de HbA1c de 6% ao rastreamento oportunistico.",
+      "c": "Pessoa com uma medida de glicemia de jejum de 140 mg/dL ao rastreamento.",
+      "d": "Pessoa obesa e tabagista com uma medida de glicemia de jejum de 190 mg/dL."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Na UBS, você presenciou uma reunião de equipe de ESF. A ACS Isa informou que Inês, 6 anos, teve alta hospitalar de internação em que foi diagnosticado diabetes mellitus autoimune, necessitando o uso de insulina como terapia, além de dieta. A equipe toda ficou muito incomodada com a notícia, e Isa questionou como não foi feito o diagnóstico e iniciado o tratamento antes de precisar internar, se Inês é acompanhada pela equipe e passa em consultas com a médica de família e comunidade Ana Carenina desde que nasceu. A médica respondeu corretamente para Isa e equipe, a assertiva contida na alternativa:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Não se recomenda a realização rotineira de autoanticorpos para diagnosticar diabetes mellitus autoimune, Inês estava saudável até então, e a dosagem é solicitada mediante suspeita clínica.",
+      "b": "Este diagnóstico poderia ter sido realizado precocemente, se a dosagem de autoanticorpos para diagnóstico de diabetes mellitus tipo 1B fizesse parte dos exames contidos no teste do pezinho.",
+      "c": "Juntamente com os exames complementares de rotina da infância, eu deveria ter incluído a hemoglobina glicada para saber antecipadamente que Inês estava desenvolvendo autoimunidade para o diabetes.",
+      "d": "Realmente, houve falha minha, estou arrasada, pois eu deveria ter solicitado a dosagem de autoanticorpos precocemente como forma de rastreamento de diabetes mellitus tipo 1."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Dentre os agentes antidiabéticos, escolha a alternativa que contenha corretamente os representantes dos agentes que não aumentam a secreção de insulina:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Sulfonilureia, glinida e acarbose.",
+      "b": "Metformina, acarbose e pioglitazona.",
+      "c": "Gliptina, sulfonilureia e metformina.",
+      "d": "Acarbose, gliptina e pioglitazona."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Doutor, emagreci muito nos últimos meses. Não sei se foi por causa da preocupação com minha esposa, bebê, irmão, mãe, trabalho etc. A vida não é fácil. Mas perdi 7 kg em dois meses e estou preocupado. Não estou fazendo dieta nem nada. E teu apetite? Como muito, estou sempre com fome, isso não é problema. Bebe muita água? No trabalho nem tanto. Como trabalho o tempo todo, não percebi diferença. Em dias quentes a gente bebe muito mesmo, não é doutor? Você acorda à noite para urinar? Isso sim doutor, acordo umas três vezes. Faça o seguinte Epísteme. Que horas você tomou café? Há umas duas horas, voltando do hospital. Hoje mal dormi. Ok, de qualquer modo, faça o seguinte. Peça, na sala de procedimentos, para realizarem este teste. É um teste de diabetes, tudo bem?. Qual alternativa justifica a conduta médica nesta situação",
+    "imagem": null,
+    "alternativas": {
+      "a": "É fundamental que indivíduos com sinais e sintomas sejam investigados para diagnóstico de DM2.",
+      "b": "É mandatório que pacientes com história de doença cardiovascular sejam investigados para DM2.",
+      "c": "É importante rastrear todos os indivíduos com mais de 45 anos para diagnóstico precoce de DM2.",
+      "d": "É imprescindível que pacientes com parentes de primeiro grau com DM2 sejam diagnosticados."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Sr. Alberto, 46 anos, sedentário, com IMC de 32 kg/m2 e com história familiar de diabete melito, apresentou glicemia de jejum de 136mg/dL em uma ocasião e 142 mg/dL em uma segunda ocasião. Assinale a alternativa que apresenta a abordagem terapêutica adequada, segundo recomendações da Sociedade Brasileira de Diabetes (SBD):",
+    "imagem": null,
+    "alternativas": {
+      "a": "Mudança de estilo de vida e uso de biguanida.",
+      "b": "Mudança de estilo de vida e uso insulina.",
+      "c": "Mudança de estilo de vida e uso de glitazonas.",
+      "d": "Mudança de estilo de vida e uso de sulfonilureia."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Sobre os medicamentos antidiabéticos é correto afirmar.",
+    "imagem": null,
+    "alternativas": {
+      "a": "O uso da Repaglinida reduz a hiperglicemia e a gordura hepática, embora provoque retenção hídrica.",
+      "b": "O uso da Sitagliptina promove a redução dos triglicerídeos e é bem tolerada, embora promova o ganho ponderal.",
+      "c": "O uso da Glibenclamida favorece a redução do peso e dos efeitos cardiovasculares, embora não proteja contra a retinopatia diabética.",
+      "d": "O uso da Metformina melhora o perfil lipidico e previne a Diabetes mellitus tipo II, embora possa causar desconforto abdominal."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "\"(Adaptada do TEMFC 25) João, um homem branco de 55 anos, faz acompanhamento regular com seu médico de família e comunidade com diagnósticos de hipertensão arterial sistêmica e diabete melito. Sua última consulta havia sido em maio, e ele veio em novembro trazer exames de acompanhamento solicitados na última consulta. Ao exame, João está eutrófico, com PA de 144x92, FC de 84 ppm, auscultas cardíaca e pulmonar sem alterações, ausência de edema nos membros inferiores, pulsos pediosos amplos e simétricos e sensibilidade preservada em ambos os pés. Ele faz uso de um comprimido de metformina 850mg e outro de hidroclorotiazida 25mg uma vez ao dia. O médico tem acesso a exames de abril e outubro desse ano, respectivamente: glicemia de jejum (mg/dL) de 122 e 98; HbA1c de 7.5% e 7.3%. Assinale a alternativa com a melhor conduta nesse momento:\"",
+    "imagem": null,
+    "alternativas": {
+      "a": "Aumentar a dose de metformina e incluir outro anti-hipertensivo.",
+      "b": "Repetir os últimos exames, pois seu resultado é incongruente.",
+      "c": "Manter a medicação, reforçar o autocuidado e marcar retorno.",
+      "d": "Reforçar mudanças de estilo de vida e solicitar novos exames em três meses."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "O cuidado com a espiritualidade, em que o acesso à verdade é somente possível pela pureza da alma, pertence a qual momento segundo Foucault.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Momento Romano",
+      "b": "Momento Helenístico",
+      "c": "Momento Ascético-monástico",
+      "d": "Momento Idade de Ouro"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Ultimamente, as Faculdade de Medicina têm percebido a importância de se investir em atividades que promovam o bem estar dos alunos, propondo grupos culturais, de meditação e de mentoria, dentre outros. Imagina-se que os alunos que participem destas atividades obtenham benefícios que resultam em seu bem estar e, de forma mais abrangente, este bem estar traz, consigo, outros resultados para a vida dos estudantes e futuro médicos. Estas atividades justificam-se na importância do cuidado de si, conforme explicitado por Foucault:",
+    "imagem": null,
+    "alternativas": {
+      "a": "para conhecer a si mesmo, pois o cuidado se fundamenta na troca de cuidados com o outro, em que primeiro vem o próprio cuidado e após o cuidado com o outro.",
+      "b": "...de forma egoísta, pois na contemporaneidade a vida requer atitudes competitivas e o aluno precisa se preparar para esta competitividade.",
+      "c": "... com estímulo ao lúdico, pois a Faculdade e Medicina não ensina certas dinâmicas no currículo e elas são importantes para lidar com alguns pacientes.",
+      "d": "... o mundo contemporâneo tem foco na produtividade, o que se reflete na formação médica em que para se conseguir atingir boas notas é preciso um tempo para relaxar e se divertir."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "\"Eu cuido de mim, pois sou o que tenho. Quero e mereço ser feliz.\" \"Sou assim e sou feliz desta forma. Os outros que se adaptem e aprendam a conviver comigo.\" \"Primeiro eu, segundo eu, terceiro eu. Sou feliz quando me cuido acima de tudo.\" \" Importa como eu me sinto e se eu sei me cuidar e me sentir bem comigo mesma. Azar de quem não gostar.\" Analise as afirmativas apresentadas e escolha a alternativa correta sobre o sentido do cuidado de si difundido hoje, que se contradiz ao conceito do cuidar-se de si definido por Foucault:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Cuidar-se de si é um paradoxo: se eu cuido de mim, não me sobra tempo para cuidar dos outros e, afinal, o indivíduo é solitário em sua jornada e precisa aprender a se cuidar.",
+      "b": "Cuidar-se de si requer dedicação de tempo, independentemente das demandas do mundo externo, que realmente não importa.",
+      "c": "Cuidar-se de si, em nossa sociedade, passou a se manifestar como uma forma de egoísmo, em contradição com o interesse necessário de se ter em relação aos outros.",
+      "d": "Cuidar-se de si é importante para estar bem e, assim, poder se relacionar com os demais e obter, deles, os cuidados de que precisa."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Conforme o pensamento de Foucault, o cuidado de si:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Envolve o corpo em uma unidade corpo-alma, que precisa ser compreendido de um modo integral, pois um elemento está inteiramente conectado com o outro.",
+      "b": "Envolve o cuidado de si mesmo pelo viés do ocupar-se consigo mesmo, preocupar-se consigo próprio, em sua individualidade.",
+      "c": "Caracteriza-se como um princípio de formação do sujeito, durante a juventude para preparar-se para a vida e na velhice para rejuvenescer",
+      "d": "Envolve o momento em que o cuidado de si aparece como sendo o cuidado com a espiritualidade, em que o acesso à verdade somente é possível pela pureza da alma."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "De acordo com as reflexões de Foucault (1985), assinale a alternativa que contém características e dimensões do conceito de cuidado de si:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O cuidado de si é colocado em evidência pois todos os indivíduos têm capacidade de cuidar-se sozinho.",
+      "b": "O cuidado de si exige prática constante e tempo para praticá-lo, envolvendo o viés de ocupar-se consigo mesmo.",
+      "c": "Em relação as trocas do cuidado, primeiro vem o cuidado com o outro a após o cuidado consigo mesmo.",
+      "d": "Ocupar-se de si nunca foi considerado uma forma de egoísmo ou de interesse individual, mas sim um sacrifício de si mesmo."
+    },
+    "correta": "b"
+  }
+];
+ 
+     // =============================================
+     // LÓGICA DO QUIZ
+     // =============================================
+     let shuffledQuestions = [];
+     let currentQuestionIndex = 0;
+     let questionsInBatch = 0;
+     let scoreBatch = 0;
+     let resultsHistory = [];
+     let currentChart = null;
+
+
+    const allIframes = [
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lista-mais-g-y-do-planeta-terra-2-0-1308/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eu-quero-comer-voce-99397/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/rat-dance-music-93451/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/pou-estourado-48183/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/sua-mae-sabe-que-voce-gosta-de-rapazes-80078/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/toma-milk-shake-de-morango-59364/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/rojao-super-estourado-44057/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-da-minha-foia-19424/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vai-tomar-no-c-pir4nh444-34654/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-e-neymar-47-40647/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/e-agora-vai-entra-o-grosso-75362/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/caramba-que-p1nto-enorme-42382/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/o-homem-uma-maquina-uma-besta-enjaulada-66045/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/manda-foto-pivete-4508/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/som-do-zap-zap-estourado-15594/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-empurra-mole-59742/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/foi-quando-gyro-finalmente-entendeu-41342/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/uicideboy-intro-gmi2-36329/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/abc-da-amazonia-61531/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/corinthians-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cruzeiro-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eae-mane-cade-o-pix-mwahahaha-8598/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/posso-te-ligar-agora-ou-tua-mulher-54107/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/para-de-mandar-audio-to-na-ucrania-47141/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ponte-preta-radio-globo-91750/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/coritiba-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/dolly-estourado-50496/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/imbroxavel-44092/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-ze-gotinha-26753/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/hino-da-urss-53471/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lobo-pidao-50489/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/voce-vem-almocar-23752/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vinheta-ifood/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/spongebob-fail-11236/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/botao-do-whatsapp-97196/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/1-2-3-4-flamengo-18569/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ai-chavinho-25347/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/tralalero-funk-20181/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/indian-song-7sek-58379/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/hello-moto-estourado-73372/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/plantao-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/aw-shit-here-go-again-cj-from-gta-sa-97151/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cala-a-boca-e-escuta-o-som-da-minha-kombi-ai-2767/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/qui-fase-que-ta-o-curintia-43357/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/musica-triste-meme-41946/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/pare/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-ferrei-amigos-estevao-31478/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ele-ta-pedindo-pra-ser-empurrado-4066/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/papu-papu-papu-58837/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/biometria-13888/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/brasil-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/agostinho-carrara-autonomo-28476/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/freddie/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bem-te-vi-passaro-58874/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/grito-do-tom-35478/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/what-bottom-text-meme-sanctuary-guardian-s-24591/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/acorda-monark-17462/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-mata-de-uma-vez-trio-parada-dura-572/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-mata-de-uma-vez-31687/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/aumenta-o-som-marcelo-dig-dig-dig-74686/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vinheta-jornal-nacional/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cr7-bom-dia-34785/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bad-to-the-bone-meme-22189/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ai-programa-hora-do-faro-melhor-qualidade-5308/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/donald-trump-build-a-wall/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/quien-estaba-hablando-contigo-73597/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bom-dia-sao-10h-silvio-santos/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-de-xampu-de-mulher/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/avocados-fron-mexico-5538/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-globo-1-621/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-globo-2-83971/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/e-o-pintinho-piu-26037/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bilu-o-et-brasileiro/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/som-motor-f1-51289/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/buzina-de-caminhao-byrm-17163/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/caminhao-de-gas/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/re-caminhao-67082/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/o-moco-o-caminhao-tombou-35530/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/toque-do-motorola-28486/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/encara-messi-23845/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cr7-vou-ao-u-ao-messi-36080/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/linkin-park-in-the-end-versao-forro-brazil-79061/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vx-without-me-forro-estourado-27992/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/minha-pomba-forro-21153/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/champions-league-forro-42023/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/tu-conhece-a-paola-63959/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-feijao-puro-34490/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/chora-viola/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/sinonimos-chitaozinho-xororo-brasil-27832/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eu-to-maluco-to-doente-to-doidao-14644/embed/" frameborder="0" scrolling="no"></iframe>'
+];
+let availableIframes = []; // Começa vazia, será preenchida na primeira chamada
+// --- FIM DAS NOVAS VARIÁVEIS ---
+
+// ... resto das suas variáveis globais ...
+     const quizContainer = document.getElementById('quiz-container');
+     const resultsContainer = document.getElementById('results-container');
+     const imageModal = document.getElementById('imageModal');
+     const modalImageContent = document.getElementById('modalImageContent');
+     const closeModalBtn = document.getElementById('closeModalBtn');
+    
+ 
+     // Funções auxiliares
+     function shuffleArray(array) {
+       for (let i = array.length - 1; i > 0; i--) {
+         const j = Math.floor(Math.random() * (i + 1));
+         [array[i], array[j]] = [array[j], array[i]];
+       }
+       return array;
+     }
+ 
+     function playSound(id) {
+       const sound = document.getElementById(id);
+       if (sound) {
+         sound.currentTime = 0;
+         sound.play().catch(e => console.log("Audio play failed:", e));
+       }
+     }
+ 
+     // Funções do modal de imagem
+     function openImageModal(src) {
+       if (!src) return;
+       modalImageContent.src = src;
+       imageModal.style.display = "block";
+     }
+ 
+     function closeImageModal() {
+       imageModal.style.display = "none";
+       modalImageContent.src = "";
+     }
+ 
+     // Lógica principal
+     function startQuiz() {
+       shuffledQuestions = shuffleArray([...sampleQuestions]);
+       currentQuestionIndex = 0;
+       questionsInBatch = 0;
+       scoreBatch = 0;
+       resultsHistory = [];
+       resultsContainer.style.display = 'none';
+       quizContainer.style.display = 'block';
+       renderQuestion(currentQuestionIndex);
+     }
+ 
+     function renderQuestion(index) {
+       if (index >= shuffledQuestions.length) {
+         showFinalResults();
+         return;
+       }
+ 
+       const question = shuffledQuestions[index];
+       const totalQuestions = shuffledQuestions.length;
+ 
+       quizContainer.innerHTML = `
+         <div class="quiz-card">
+           <div class="quiz-header">
+             <span class="quiz-title">Questão ${index + 1}</span>
+             <span class="question-counter">${index + 1} / ${totalQuestions}</span>
+           </div>
+           <p id="question-text">${question.enunciado}</p>
+           ${question.imagem ? `
+             <div class="image-container">
+               <img src="${question.imagem}" alt="Imagem da questão" onclick="openImageModal('${question.imagem}')">
+             </div>
+           ` : ''}
+           <ul class="options">
+             ${Object.entries(question.alternativas).map(([key, value]) => `
+               <li>
+                 <div class="option" data-option="${key}">
+                   <span class="option-letter">${key.toUpperCase()})</span> ${value}
+                 </div>
+               </li>
+             `).join('')}
+           </ul>
+           <div class="button-container">
+             <button class="button" id="next-btn" onclick="handleNext()" disabled>Próxima</button>
+           </div>
+         </div>
+       `;
+ 
+       document.querySelectorAll('.option').forEach(el => {
+         el.addEventListener('click', handleAnswerSelection);
+       });
+     }
+ 
+     function handleAnswerSelection(event) {
+       const selectedOptionElement = event.currentTarget;
+       const optionsContainer = selectedOptionElement.closest('.options');
+ 
+       if (optionsContainer.classList.contains('disabled')) return;
+ 
+       optionsContainer.classList.add('disabled');
+ 
+       const userAnswer = selectedOptionElement.getAttribute('data-option');
+       const currentQuestion = shuffledQuestions[currentQuestionIndex];
+       const correctAnswer = currentQuestion.correta;
+ 
+       selectedOptionElement.classList.add('selected');
+       if (userAnswer === correctAnswer) {
+         selectedOptionElement.classList.add('correct');
+         scoreBatch++;
+         playSound('correctSound');
+       } else {
+         selectedOptionElement.classList.add('incorrect');
+         playSound('wrongSound');
+         const correctOptionElement = optionsContainer.querySelector(`.option[data-option="${correctAnswer}"]`);
+         if (correctOptionElement) {
+           correctOptionElement.classList.add('correct');
+         }
+       }
+ 
+       questionsInBatch++;
+       document.getElementById('next-btn').disabled = false;
+     }
+ 
+     function handleNext() {
+       currentQuestionIndex++;
+       const isEndOfBatch = (questionsInBatch === 10) || (currentQuestionIndex >= shuffledQuestions.length);
+ 
+       if (isEndOfBatch) {
+         showBatchResults();
+       } else {
+         renderQuestion(currentQuestionIndex);
+       }
+     }
+ 
+function showBatchResults() {
+    quizContainer.style.display = 'none';
+    resultsContainer.style.display = 'block';
+
+    const batchNumber = resultsHistory.length + 1;
+    const totalInBatch = questionsInBatch; // Quantas questões foram respondidas neste bloco
+    const percentage = totalInBatch > 0 ? Math.round((scoreBatch / totalInBatch) * 100) : 0;
+    const scoreThreshold = 0.7; // 70% - Limite definido
+
+    resultsHistory.push({ batch: batchNumber, score: scoreBatch, total: totalInBatch });
+
+    resultsContainer.innerHTML = `
+        <div class="results-card">
+            <h2>Resultado - Bloco ${batchNumber}</h2>
+            <p>Você acertou ${scoreBatch} de ${totalInBatch} questões (${percentage}%).</p>
+            <div class="chart-container">
+                <canvas id="resultsChart"></canvas>
+            </div>
+            <div class="button-container">
+                ${currentQuestionIndex < shuffledQuestions.length ?
+                '<button class="button" onclick="continueQuiz()">Continuar</button>' :
+                '<button class="button" onclick="showFinalResults()">Ver Resultado Final</button>'
+                }
+            </div>
+        </div>
+    `;
+
+    renderChart(scoreBatch, totalInBatch - scoreBatch);
+
+    // --- MODIFICAÇÃO ADICIONADA ---
+    // Verifica se o desempenho no bloco atual foi >= 70%
+    if (totalInBatch > 0 && (scoreBatch / totalInBatch) >= scoreThreshold) {
+        // Mostra o popup de parabéns com iframe aleatório
+        // Usamos setTimeout para dar um pequeno tempo para o usuário ver o resultado do bloco antes do popup
+        setTimeout(showRandomCongratsPopup, 500); // Atraso de 0.5 segundos (opcional)
+    }
+    // --- FIM DA MODIFICAÇÃO ---
+
+
+    // Reseta os contadores para o próximo bloco (movido para depois da verificação)
+    scoreBatch = 0;
+    questionsInBatch = 0;
+}
+ 
+     function renderChart(correct, incorrect) {
+       const ctx = document.getElementById('resultsChart').getContext('2d');
+ 
+       if (currentChart) {
+         currentChart.destroy();
+       }
+ 
+       currentChart = new Chart(ctx, {
+         type: 'doughnut',
+         data: {
+           labels: ['Corretas', 'Incorretas'],
+           datasets: [{
+             label: 'Desempenho',
+             data: [correct, incorrect],
+             backgroundColor: [
+               'rgba(75, 192, 192, 0.7)',
+               'rgba(255, 99, 132, 0.7)'
+             ],
+             borderColor: [
+               'rgba(75, 192, 192, 1)',
+               'rgba(255, 99, 132, 1)'
+             ],
+             borderWidth: 1
+           }]
+         },
+         options: {
+           responsive: true,
+           maintainAspectRatio: true,
+           plugins: {
+             legend: {
+               position: 'top',
+             },
+             tooltip: {
+               callbacks: {
+                 label: function(context) {
+                   return `${context.label}: ${context.parsed}`;
+                 }
+               }
+             }
+           }
+         }
+       });
+     }
+ 
+     function continueQuiz() {
+       resultsContainer.style.display = 'none';
+       quizContainer.style.display = 'block';
+       renderQuestion(currentQuestionIndex);
+     }
+ 
+     function showRandomCongratsPopup() {
+       const iframes = [
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lista-mais-g-y-do-planeta-terra-2-0-1308/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eu-quero-comer-voce-99397/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/rat-dance-music-93451/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/pou-estourado-48183/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/sua-mae-sabe-que-voce-gosta-de-rapazes-80078/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/toma-milk-shake-de-morango-59364/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/rojao-super-estourado-44057/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-da-minha-foia-19424/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vai-tomar-no-c-pir4nh444-34654/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-e-neymar-47-40647/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/e-agora-vai-entra-o-grosso-75362/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/caramba-que-p1nto-enorme-42382/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/o-homem-uma-maquina-uma-besta-enjaulada-66045/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/manda-foto-pivete-4508/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/som-do-zap-zap-estourado-15594/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-empurra-mole-59742/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/foi-quando-gyro-finalmente-entendeu-41342/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/uicideboy-intro-gmi2-36329/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/abc-da-amazonia-61531/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/corinthians-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cruzeiro-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eae-mane-cade-o-pix-mwahahaha-8598/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/posso-te-ligar-agora-ou-tua-mulher-54107/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/para-de-mandar-audio-to-na-ucrania-47141/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ponte-preta-radio-globo-91750/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/coritiba-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/dolly-estourado-50496/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/imbroxavel-44092/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-ze-gotinha-26753/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/hino-da-urss-53471/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lobo-pidao-50489/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/voce-vem-almocar-23752/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vinheta-ifood/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/spongebob-fail-11236/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/botao-do-whatsapp-97196/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/1-2-3-4-flamengo-18569/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ai-chavinho-25347/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/tralalero-funk-20181/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/indian-song-7sek-58379/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/hello-moto-estourado-73372/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/plantao-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/aw-shit-here-go-again-cj-from-gta-sa-97151/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cala-a-boca-e-escuta-o-som-da-minha-kombi-ai-2767/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/qui-fase-que-ta-o-curintia-43357/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/musica-triste-meme-41946/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/pare/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-ferrei-amigos-estevao-31478/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ele-ta-pedindo-pra-ser-empurrado-4066/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/papu-papu-papu-58837/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/biometria-13888/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/brasil-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/agostinho-carrara-autonomo-28476/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/freddie/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bem-te-vi-passaro-58874/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/grito-do-tom-35478/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/what-bottom-text-meme-sanctuary-guardian-s-24591/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/acorda-monark-17462/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-mata-de-uma-vez-trio-parada-dura-572/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-mata-de-uma-vez-31687/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/aumenta-o-som-marcelo-dig-dig-dig-74686/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vinheta-jornal-nacional/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cr7-bom-dia-34785/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bad-to-the-bone-meme-22189/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ai-programa-hora-do-faro-melhor-qualidade-5308/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/donald-trump-build-a-wall/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/quien-estaba-hablando-contigo-73597/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bom-dia-sao-10h-silvio-santos/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-de-xampu-de-mulher/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/avocados-fron-mexico-5538/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-globo-1-621/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-globo-2-83971/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/e-o-pintinho-piu-26037/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bilu-o-et-brasileiro/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/som-motor-f1-51289/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/buzina-de-caminhao-byrm-17163/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/caminhao-de-gas/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/re-caminhao-67082/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/o-moco-o-caminhao-tombou-35530/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/toque-do-motorola-28486/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/encara-messi-23845/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cr7-vou-ao-u-ao-messi-36080/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/linkin-park-in-the-end-versao-forro-brazil-79061/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vx-without-me-forro-estourado-27992/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/minha-pomba-forro-21153/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/champions-league-forro-42023/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/tu-conhece-a-paola-63959/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-feijao-puro-34490/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/chora-viola/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/sinonimos-chitaozinho-xororo-brasil-27832/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eu-to-maluco-to-doente-to-doidao-14644/embed/" frameborder="0" scrolling="no"></iframe>'
+];
+ 
+    const randomIframe = iframes[Math.floor(Math.random() * iframes.length)];
+
+    // --- MODIFICAÇÃO ADICIONADA ---
+    // Remove qualquer popup antigo antes de criar um novo
+    const existingPopup = document.querySelector('.congrats-popup');
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+    // --- FIM DA MODIFICAÇÃO ---
+
+    const popup = document.createElement('div');
+    popup.className = 'congrats-popup';
+    popup.innerHTML = `
+    <div class="congrats-content">
+    {/* --- MODIFICAÇÃO NA MENSAGEM --- */}
+    <p class="congrats-message">Parabéns! Você acertou 70% ou mais neste bloco!</p>
+    <div class="random-iframe">${randomIframe}</div>
+    <button class="button close-popup" onclick="this.closest('.congrats-popup').remove()">Fechar</button>
+    </div>
+    `;
+
+    document.body.appendChild(popup);
+}
+ 
+     function showFinalResults() {
+    quizContainer.style.display = 'none';
+    resultsContainer.style.display = 'block';
+
+    let totalCorrect = 0;
+    let totalAttempted = 0;
+    resultsHistory.forEach(batch => {
+        totalCorrect += batch.score;
+        totalAttempted += batch.total;
+    });
+    const finalPercentage = totalAttempted > 0 ? Math.round((totalCorrect / totalAttempted) * 100) : 0;
+
+    // --- MODIFICAÇÃO AQUI ---
+    // Removemos a chamada ao popup daqui, pois agora ela acontece em showBatchResults
+    /*
+    if ((totalCorrect / totalAttempted) >= 0.7) {
+        setTimeout(showRandomCongratsPopup, 1000); // REMOVIDO/COMENTADO
+    }
+    */
+    // --- FIM DA MODIFICAÇÃO ---
+
+
+    resultsContainer.innerHTML = `
+        <div class="results-card">
+            <h2>Simulado Finalizado!</h2>
+            <p>Seu desempenho geral: ${totalCorrect} de ${totalAttempted} questões corretas (${finalPercentage}%).</p>
+            <div class="chart-container">
+                <canvas id="finalResultsChart"></canvas>
+            </div>
+            <div class="button-container">
+                <button class="button" onclick="startQuiz()">Reiniciar Simulado</button>
+            </div>
+        </div>
+    `;
+    renderFinalChart(resultsHistory);
+}
+ 
+     function renderFinalChart(history) {
+       const ctx = document.getElementById('finalResultsChart').getContext('2d');
+       if (currentChart) {
+         currentChart.destroy();
+       }
+ 
+       const labels = history.map(b => `Bloco ${b.batch}`);
+       const data = history.map(b => b.total > 0 ? (b.score / b.total) * 100 : 0);
+ 
+       currentChart = new Chart(ctx, {
+         type: 'bar',
+         data: {
+           labels: labels,
+           datasets: [{
+             label: '% Acerto por Bloco',
+             data: data,
+             backgroundColor: 'rgba(54, 162, 235, 0.7)',
+             borderColor: 'rgba(54, 162, 235, 1)',
+             borderWidth: 1
+           }]
+         },
+         options: {
+           scales: {
+             y: {
+               beginAtZero: true,
+               max: 100,
+               ticks: {
+                 callback: function(value) {
+                   return value + '%';
+                 }
+               }
+             }
+           },
+           responsive: true,
+           maintainAspectRatio: true,
+           plugins: {
+             legend: { display: false },
+             tooltip: {
+               callbacks: {
+                 label: function(context) {
+                   return `Bloco ${context.label}: ${context.parsed.y.toFixed(1)}%`;
+                 }
+               }
+             }
+           }
+         }
+       });
+     }
+ 
+     // Event listeners
+     closeModalBtn.onclick = closeImageModal;
+     imageModal.onclick = function(event) {
+       if (event.target == imageModal) {
+         closeImageModal();
+       }
+     }
+ 
+     // Torna funções globais
+     window.openImageModal = openImageModal;
+     window.closeImageModal = closeImageModal;
+     window.handleNext = handleNext;
+     window.continueQuiz = continueQuiz;
+     window.startQuiz = startQuiz;
+ 
+     // Inicia o quiz
+     document.addEventListener('DOMContentLoaded', startQuiz);
+   </script>
+ </body>
+ </html>
