@@ -13,7 +13,7 @@
         --primary: #2979ff;
         --primary-dark: #1c54b2;
         --accent: #00c853;
-        --accent-light: #0cd85a;
+        --accent-light: #0cd85a; /* Ajustado para melhor contraste/uso */
         --danger: #f44336;
         --danger-light: #ffebee;
         --text: #263238;
@@ -49,7 +49,7 @@
         width: 100%;
       }
 
-      /* CSS Original Fornecido (Quiz, Results, etc.) */
+      /* CSS Original Fornecido (Quiz, Results, etc.) - Mantido como no original */
       .quiz-card, .results-card {
         background-color: var(--card-bg);
         border-radius: 16px;
@@ -125,7 +125,7 @@
         animation: fadeInModal 0.3s ease;
       }
 
-      .modal-content {
+      .modal-content { /* Este é para o modal da imagem, não confundir com o pin-modal-content */
         margin: auto;
         display: block;
         max-width: 90%;
@@ -188,14 +188,12 @@
 
       .option.correct {
         border-color: var(--accent) !important;
-        background-color: var(--accent-light) !important;
-        color: #1b5e20;
+        background-color: var(--accent-light) !important; /* Usando a variável ajustada */
+        color: #1b5e20; /* Texto mais escuro para contraste */
         font-weight: 600;
       }
+      .option.correct .option-letter { color: #1b5e20; } /* Ajuste para consistência */
 
-      .option.correct .option-letter {
-        color: var(--accent);
-      }
 
       .option.incorrect {
         border-color: var(--danger) !important;
@@ -203,10 +201,8 @@
         color: #c62828;
         font-weight: 600;
       }
+      .option.incorrect .option-letter { color: var(--danger); }
 
-      .option.incorrect .option-letter {
-        color: var(--danger);
-      }
 
       .options.disabled .option {
         pointer-events: none;
@@ -277,28 +273,31 @@
         margin: 0 auto 30px auto;
       }
 
-      .congrats-popup {
+      /* Pop-up de congratulações e Modal de PIN compartilham animações */
+      .congrats-popup { /* Também usado como base para o pin-modal-container */
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
         background-color: rgba(0,0,0,0.8);
-        display: flex;
+        display: flex; /* Modificado para flex para centralizar melhor */
         flex-direction: column;
         justify-content: center;
         align-items: center;
         z-index: 2000;
         animation: fadeIn 0.5s;
+        opacity: 1; /* Garante que começa visível se 'flex' for o display inicial */
       }
 
-      .congrats-content {
+      .congrats-content { /* Também usado como base para o pin-modal-content */
         background-color: white;
         padding: 30px;
         border-radius: 15px;
         max-width: 90%;
         text-align: center;
         box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        animation: slideUpFadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
       }
 
       .congrats-message {
@@ -321,32 +320,23 @@
 
       /* Animações */
       @keyframes slideUpFadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(40px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
       }
-
-      @keyframes fadeInModal {
+      @keyframes fadeInModal { /* Para o modal da imagem */
         from { opacity: 0; }
         to { opacity: 1; }
       }
-
-      @keyframes zoomInModal {
+      @keyframes zoomInModal { /* Para o conteúdo do modal da imagem */
         from { transform: scale(0.7); }
         to { transform: scale(1); }
       }
-
-      @keyframes fadeIn {
+      @keyframes fadeIn { /* Usado pelo popup de congratulações e modal de PIN */
         from { opacity: 0; }
         to { opacity: 1; }
       }
 
-      /* Estilos Adicionais para a Homepage */
+      /* Estilos Adicionais para a Homepage (como fornecido) */
       .homepage-card {
         background-color: var(--card-bg);
         border-radius: 16px;
@@ -355,7 +345,7 @@
         margin-top: 20px;
         margin-bottom: 30px;
         animation: slideUpFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        opacity: 0;
+        opacity: 0; /* Inicia oculto para animação */
         width: 100%;
       }
 
@@ -373,78 +363,158 @@
         height: 80px;
         margin-bottom: 20px;
       }
-
-      .app-icon-placeholder svg {
-        width: 100%;
-        height: 100%;
-      }
-
+      .app-icon-placeholder svg { width: 100%; height: 100%; }
       .app-title {
         font-size: 2.2rem;
         font-weight: 700;
         color: var(--primary-dark);
         text-align: center;
       }
-
-      .app-menu {
-        display: flex;
-        flex-direction: column;
-        gap: 25px;
-      }
-
+      .app-menu { display: flex; flex-direction: column; gap: 25px; }
       .theme-section {
         padding: 25px;
-        background-color: #fdfdff; /* Fundo muito sutil para a seção */
+        background-color: #fdfdff;
         border-radius: 12px;
         border: 1px solid var(--border);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.05); /* Sombra leve para a seção */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
       }
-
       .theme-title {
         font-size: 1.5rem;
         font-weight: 600;
         color: var(--primary);
         margin-bottom: 20px;
         padding-bottom: 10px;
-        border-bottom: 1px solid #e0e0e0; /* Linha divisória sutil */
+        border-bottom: 1px solid #e0e0e0;
         text-align: center;
-        display: flex; /* Para alinhar ícone e texto */
-        align-items: center; /* Alinhar verticalmente */
-        justify-content: center; /* Centralizar o conjunto (ícone + texto) */
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
-
       .section-icon {
-        width: 26px; /* Tamanho do ícone */
+        width: 26px;
         height: 26px;
-        margin-right: 10px; /* Espaço entre o ícone e o título */
-        color: var(--primary); /* Cor padrão para os ícones */
-        flex-shrink: 0; /* Impede que o ícone encolha */
+        margin-right: 10px;
+        color: var(--primary);
+        flex-shrink: 0;
       }
-
-      .theme-section .button, .theme-section a.button { /* Aplica aos botões e links com classe .button */
+      /* Ajuste para que botões e links estilizados como botões se comportem da mesma forma */
+      .theme-section .button, .theme-section a.button {
         display: block;
         width: 100%;
         margin-bottom: 15px;
         text-align: center;
       }
-
       .theme-section .button:last-child, .theme-section a.button:last-child {
         margin-bottom: 0;
       }
 
+      /* Estilos para o Modal de PIN */
+      .pin-modal-container {
+          display: none; /* Começa escondido, será mostrado por JS */
+          position: fixed;
+          z-index: 2000;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          overflow: auto; /* Para permitir rolagem se o conteúdo for muito grande, embora não deva ser */
+          background-color: rgba(0,0,0,0.7);
+          justify-content: center; /* Centraliza horizontalmente */
+          align-items: center; /* Centraliza verticalmente */
+          animation: fadeIn 0.3s ease; /* Usando animação existente */
+      }
+
+      .pin-modal-content {
+          background-color: var(--card-bg);
+          color: var(--text);
+          padding: 30px 35px;
+          border-radius: 12px;
+          box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+          width: 90%;
+          max-width: 400px;
+          text-align: center;
+          /* Animação ao aparecer */
+          animation: slideUpFadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+          opacity: 0; /* Começa invisível para a animação funcionar */
+      }
+
+      .pin-modal-content h2 {
+          color: var(--primary-dark); /* Título mais destacado */
+          margin-bottom: 15px;
+          font-size: 1.7rem; /* Tamanho um pouco maior */
+      }
+
+      .pin-modal-content p {
+          font-size: 1rem;
+          color: var(--text-light);
+          margin-bottom: 25px; /* Mais espaço antes do input */
+      }
+
+      #pinInput {
+          width: calc(100% - 24px); /* Ajuste para padding interno */
+          padding: 14px; /* Mais padding para toque fácil */
+          margin-bottom: 25px; /* Mais espaço antes do botão */
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          font-size: 1.1rem; /* Fonte maior para o PIN */
+          text-align: center;
+          font-family: 'Poppins', sans-serif; /* Garante a fonte */
+          transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      #pinInput:focus {
+          outline: none;
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px rgba(41, 121, 255, 0.25); /* Destaque mais visível */
+      }
+
+      #submitPinButton {
+          background-color: var(--primary);
+          color: white;
+          padding: 14px 30px;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+          font-size: 1rem;
+          transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease;
+          width: 100%;
+      }
+
+      #submitPinButton:hover {
+          background-color: var(--primary-dark);
+          transform: translateY(-1px); /* Efeito sutil ao passar o mouse */
+      }
+
+      #pinErrorMessage {
+          margin-top: 15px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: var(--danger);
+          min-height: 1.2em; /* Reserva espaço para a mensagem, evitando saltos no layout */
+          display: block; /* Mudar para block e controlar visibilidade com opacidade ou conteúdo */
+          visibility: hidden; /* Escondido por padrão, mas ocupando espaço */
+      }
+
+
       /* Media Queries (original + ajustes) */
       @media (max-width: 600px) {
         body { padding: 20px 10px; }
-        .quiz-card, .results-card, .homepage-card { padding: 20px; } /* Inclui homepage-card na regra */
+        .quiz-card, .results-card, .homepage-card { padding: 20px; }
         .quiz-title { font-size: 1.4rem; }
         #question-text { font-size: 1.05rem; }
         .option { padding: 12px 15px; }
         .button { padding: 10px 20px; font-size: 0.95rem;}
         .results-card h2 { font-size: 1.5rem; }
         .results-card p { font-size: 1rem; }
-        .app-title { font-size: 1.8rem; } /* Ajuste para telas menores */
-        .theme-title { font-size: 1.3rem; } /* Ajuste para telas menores */
-        .section-icon { width: 22px; height: 22px; margin-right: 8px;} /* Ícones menores em telas pequenas */
+        .app-title { font-size: 1.8rem; }
+        .theme-title { font-size: 1.3rem; }
+        .section-icon { width: 22px; height: 22px; margin-right: 8px;}
+
+        .pin-modal-content { padding: 25px 20px; }
+        .pin-modal-content h2 { font-size: 1.5rem; }
+        #pinInput { padding: 12px; font-size: 1rem; }
+        #submitPinButton { padding: 12px 25px; }
       }
     </style>
 </head>
@@ -467,7 +537,8 @@
                         <circle cx="50" cy="32.5" r="5" fill="#FFFFFF"/>
                     </svg>
                 </div>
-                <h1 class="app-title">Plataforma de Estudos</h1> </header>
+                <h1 class="app-title">Plataforma de Estudos</h1>
+            </header>
 
             <main class="app-menu">
                 <section class="theme-section">
@@ -482,10 +553,10 @@
                         </svg>
                         Simulados e Provas
                     </h2>
-                    <a href="#" class="button" id="btnProvaMorfo">Prova de Morfofisiologia</a>
-                    <a href="#" class="button" id="btnProvaAPS">Prova de APS</a>
-                    <a href="#" class="button" id="btnProvaFarmaco">Prova de Farmacologia</a>
-                    <a href="#" class="button" id="btnProvaOSCE">Prova OSCE</a>
+                    <button type="button" class="button" data-target-id="btnProvaMorfo">Prova de Morfofisiologia</button>
+                    <button type="button" class="button" data-target-id="btnProvaAPS">Prova de APS</button>
+                    <button type="button" class="button" data-target-id="btnProvaFarmaco">Prova de Farmacologia</button>
+                    <button type="button" class="button" data-target-id="btnProvaOSCE">Prova OSCE</button>
                 </section>
 
                 <section class="theme-section">
@@ -503,11 +574,128 @@
                         </svg>
                         Ferramentas
                     </h2>
-                    <a href="#" class="button" id="btnCalculadora">Calculadora Acadêmica</a>
+                    <button type="button" class="button" data-target-id="btnCalculadora">Calculadora Acadêmica</button>
                 </section>
-
-                </main>
+            </main>
         </div>
     </div>
+
+    <div id="pinModalContainer" class="pin-modal-container">
+        <div class="pin-modal-content">
+            <h2>Acesso Restrito</h2>
+            <p>Por favor, insira seu PIN para continuar:</p>
+            <input type="password" id="pinInput" placeholder="Seu PIN">
+            <button type="button" id="submitPinButton">Acessar</button>
+            <p id="pinErrorMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pinModalContainer = document.getElementById('pinModalContainer');
+            const pinInput = document.getElementById('pinInput');
+            const submitPinButton = document.getElementById('submitPinButton');
+            const pinErrorMessage = document.getElementById('pinErrorMessage');
+            const mainContentButtons = document.querySelectorAll('.app-menu .button');
+
+            const localStorageKeyAccess = 'studyAppAccessGranted_v2'; // Mudei para v2 para invalidar acessos antigos com PINs diferentes, se necessário.
+
+            // Lista de 50 PINs válidos (fornecida por você)
+            const validPins = [
+                "AP7361Q", "ZR2905D", "KX5018P", "VB1172M", "CJ9843G", "HU6709R", "NF4551B", "OW3216T", "QS8823Y", "LM0574A",
+                "FY1980X", "GT6247E", "RD3092W", "PI7715J", "SC5368U", "BX8021O", "EK9154I", "JZ2407C", "YV0730N", "MW4696F",
+                "UL1859V", "DP6073S", "GQ9510H", "IO3386Z", "TE2642K", "AM7019L", "RW5275B", "FX0981P", "KY4138G", "NB8704M",
+                "OJ1460D", "PL5627R", "SH9933T", "UZ7289Y", "VT2556A", "WE6112X", "XK3778E", "YC0445W", "ZI8001J", "BS4367U",
+                "CF1034O", "DG5990I", "EJ2256C", "HM6813N", "IP0179F", "JR4735V", "KU8391S", "LV1658H", "MX5214Z", "NY9870K"
+            ];
+
+            const targetUrls = {
+                btnProvaMorfo: "https://inaciomaximoo.github.io/treino/morfom3.html",
+                btnProvaAPS: "https://inaciomaximoo.github.io/treino/aps.html",
+                btnProvaFarmaco: "https://inaciomaximoo.github.io/treino/farmaco.html",
+                btnCalculadora: "https://inaciomaximoo.github.io/treino/calculadora.html",
+                btnProvaOSCE: null // Prova OSCE sem URL definida por enquanto
+            };
+
+            function showPinModal() {
+                pinModalContainer.style.display = 'flex';
+                setTimeout(() => {
+                    pinModalContainer.querySelector('.pin-modal-content').style.opacity = '1';
+                }, 10);
+                pinInput.focus();
+            }
+
+            function hidePinModal() {
+                pinModalContainer.querySelector('.pin-modal-content').style.opacity = '0';
+                setTimeout(() => {
+                    pinModalContainer.style.display = 'none';
+                }, 300);
+            }
+
+            function grantAccess() {
+                localStorage.setItem(localStorageKeyAccess, 'true');
+                hidePinModal();
+                mainContentButtons.forEach(button => {
+                    button.disabled = false;
+                });
+                pinErrorMessage.textContent = '';
+                pinErrorMessage.style.visibility = 'hidden';
+            }
+
+            function handlePinSubmit() {
+                const enteredPin = pinInput.value.trim().toUpperCase();
+                if (validPins.includes(enteredPin)) {
+                    grantAccess();
+                } else {
+                    pinErrorMessage.textContent = 'PIN inválido. Tente novamente.';
+                    pinErrorMessage.style.visibility = 'visible';
+                    pinInput.value = '';
+                    pinInput.focus();
+                }
+            }
+
+            function handleMainButtonClick(event) {
+                const targetId = event.target.dataset.targetId;
+                if (targetId && targetUrls[targetId]) {
+                    window.location.href = targetUrls[targetId];
+                } else if (targetId === 'btnProvaOSCE' && targetUrls[targetId] === null) {
+                    alert('A Prova OSCE ainda não está disponível.');
+                } else {
+                    console.warn(`Nenhuma URL de destino para o botão com ID: ${targetId}`);
+                }
+            }
+
+            // Lógica Principal
+            if (localStorage.getItem(localStorageKeyAccess) === 'true') {
+                hidePinModal();
+                mainContentButtons.forEach(button => {
+                    button.disabled = false;
+                    button.addEventListener('click', handleMainButtonClick);
+                });
+            } else {
+                showPinModal();
+                mainContentButtons.forEach(button => {
+                    button.disabled = true;
+                });
+
+                const processPinSubmission = () => {
+                    handlePinSubmit();
+                    if (localStorage.getItem(localStorageKeyAccess) === 'true') {
+                        mainContentButtons.forEach(button => {
+                            button.disabled = false;
+                            button.addEventListener('click', handleMainButtonClick);
+                        });
+                    }
+                };
+                
+                submitPinButton.addEventListener('click', processPinSubmission);
+                pinInput.addEventListener('keypress', (event) => {
+                    if (event.key === 'Enter') {
+                        processPinSubmission();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
