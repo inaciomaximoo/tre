@@ -1,0 +1,2252 @@
+<!DOCTYPE html>
+ <html lang="pt-BR">
+ <head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+   <title>Simulado</title>
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   <!-- Sons para acerto e erro -->
+  <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
+  <audio id="wrongSound" src="wrong.mp3" preload="auto"></audio>
+ 
+   <style>
+     :root {
+       --bg-gradient-start: #ece9e6;
+       --bg-gradient-end: #ffffff;
+       --primary: #2979ff;
+       --primary-dark: #1c54b2;
+       --accent: #00c853;
+       --accent-light: #0cd85a;
+       --danger: #f44336;
+       --danger-light: #ffebee;
+       --text: #263238;
+       --text-light: #546e7a;
+       --border: #cfd8dc;
+       --card-bg: #ffffff;
+       --shadow-color: rgba(0, 0, 0, 0.1);
+       --disabled-bg: #e0e0e0;
+       --disabled-text: #9e9e9e;
+       --transition-speed: 0.3s;
+     }
+ 
+     * {
+       box-sizing: border-box;
+       margin: 0;
+       padding: 0;
+     }
+ 
+     body {
+       font-family: 'Poppins', sans-serif;
+       background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+       color: var(--text);
+       padding: 30px 15px;
+       min-height: 100vh;
+       display: flex;
+       justify-content: center;
+       align-items: flex-start;
+     }
+ 
+     .main-container {
+       max-width: 850px;
+       width: 100%;
+     }
+ 
+     .quiz-card, .results-card {
+       background-color: var(--card-bg);
+       border-radius: 16px;
+       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+       padding: 35px;
+       margin-bottom: 30px;
+       animation: slideUpFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+       opacity: 0;
+     }
+ 
+     .quiz-header {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       margin-bottom: 25px;
+       padding-bottom: 15px;
+       border-bottom: 1px solid var(--border);
+     }
+ 
+     .quiz-title {
+       font-size: 1.6rem;
+       font-weight: 700;
+       color: var(--primary);
+     }
+ 
+     .question-counter {
+       font-size: 0.9rem;
+       font-weight: 600;
+       background-color: #e3f2fd;
+       color: var(--primary-dark);
+       padding: 5px 12px;
+       border-radius: 15px;
+     }
+ 
+     #question-text {
+       font-size: 1.15rem;
+       margin-bottom: 25px;
+       line-height: 1.6;
+       font-weight: 600;
+     }
+ 
+     .image-container {
+       margin-bottom: 25px;
+       text-align: center;
+     }
+ 
+     .image-container img {
+       max-width: 100%;
+       max-height: 400px;
+       border-radius: 10px;
+       border: 1px solid var(--border);
+       box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+       transition: transform 0.3s ease, box-shadow 0.3s ease;
+       cursor: zoom-in;
+     }
+ 
+     .image-container img:hover {
+       transform: scale(1.03);
+       box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+     }
+ 
+     .image-modal {
+       display: none;
+       position: fixed;
+       z-index: 1001;
+       padding-top: 50px;
+       left: 0;
+       top: 0;
+       width: 100%;
+       height: 100%;
+       overflow: auto;
+       background-color: rgba(0,0,0,0.9);
+       animation: fadeInModal 0.3s ease;
+     }
+ 
+     .modal-content {
+       margin: auto;
+       display: block;
+       max-width: 90%;
+       max-height: 90vh;
+       animation: zoomInModal 0.3s ease;
+     }
+ 
+     .close-modal {
+       position: absolute;
+       top: 15px;
+       right: 35px;
+       color: #f1f1f1;
+       font-size: 40px;
+       font-weight: bold;
+       transition: 0.3s;
+       cursor: pointer;
+     }
+ 
+     .close-modal:hover, .close-modal:focus {
+       color: #bbb;
+       text-decoration: none;
+     }
+ 
+     .options {
+       list-style: none;
+       margin-top: 20px;
+     }
+ 
+     .options li {
+       margin-bottom: 15px;
+     }
+ 
+     .option {
+       background-color: #f1f3f5;
+       padding: 15px 20px;
+       border-radius: 10px;
+       cursor: pointer;
+       transition: all 0.2s ease-in-out;
+       border: 2px solid transparent;
+       display: flex;
+       align-items: baseline;
+     }
+ 
+     .option-letter {
+       font-weight: 700;
+       margin-right: 10px;
+       color: var(--primary);
+     }
+ 
+     .option:hover {
+       background-color: #e9ecef;
+       border-color: var(--primary);
+       transform: translateX(5px);
+     }
+ 
+     .option.selected {
+       border-color: var(--primary-dark);
+       background-color: #d1e3ff;
+     }
+ 
+     .option.correct {
+       border-color: var(--accent) !important;
+       background-color: var(--accent-light) !important;
+       color: #1b5e20;
+       font-weight: 600;
+     }
+ 
+     .option.correct .option-letter {
+       color: var(--accent);
+     }
+ 
+     .option.incorrect {
+       border-color: var(--danger) !important;
+       background-color: var(--danger-light) !important;
+       color: #c62828;
+       font-weight: 600;
+     }
+ 
+     .option.incorrect .option-letter {
+       color: var(--danger);
+     }
+ 
+     .options.disabled .option {
+       pointer-events: none;
+       opacity: 0.8;
+     }
+ 
+     .options.disabled .option:not(.selected):not(.correct) {
+       background-color: #f8f9fa;
+       opacity: 0.7;
+     }
+ 
+     .button-container {
+       text-align: right;
+       margin-top: 30px;
+     }
+ 
+     .button {
+       background-color: var(--primary);
+       color: white;
+       padding: 12px 30px;
+       border: none;
+       border-radius: 8px;
+       cursor: pointer;
+       font-weight: 600;
+       font-size: 1rem;
+       transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+       box-shadow: 0 4px 10px rgba(41, 121, 255, 0.3);
+     }
+ 
+     .button:hover {
+       background-color: var(--primary-dark);
+       transform: translateY(-2px);
+       box-shadow: 0 6px 15px rgba(41, 121, 255, 0.4);
+     }
+ 
+     .button:active {
+       transform: translateY(0);
+       box-shadow: 0 4px 10px rgba(41, 121, 255, 0.3);
+     }
+ 
+     .button:disabled {
+       background-color: var(--disabled-bg);
+       color: var(--disabled-text);
+       cursor: not-allowed;
+       box-shadow: none;
+       transform: none;
+     }
+ 
+     .results-card h2 {
+       color: var(--primary);
+       margin-bottom: 15px;
+       text-align: center;
+       font-size: 1.8rem;
+     }
+ 
+     .results-card p {
+       text-align: center;
+       font-size: 1.1rem;
+       margin-bottom: 30px;
+       color: var(--text-light);
+     }
+ 
+     .chart-container {
+       width: 100%;
+       max-width: 400px;
+       margin: 0 auto 30px auto;
+     }
+ 
+     .congrats-popup {
+       position: fixed;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100%;
+       background-color: rgba(0,0,0,0.8);
+       display: flex;
+       flex-direction: column;
+       justify-content: center;
+       align-items: center;
+       z-index: 2000;
+       animation: fadeIn 0.5s;
+     }
+ 
+     .congrats-content {
+       background-color: white;
+       padding: 30px;
+       border-radius: 15px;
+       max-width: 90%;
+       text-align: center;
+       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+     }
+ 
+     .congrats-message {
+       font-size: 1.5rem;
+       margin-bottom: 20px;
+       color: var(--primary);
+       font-weight: bold;
+     }
+ 
+     .close-popup {
+       margin-top: 20px;
+       padding: 10px 20px;
+       background-color: var(--primary);
+       color: white;
+       border: none;
+       border-radius: 8px;
+       cursor: pointer;
+       font-weight: 600;
+     }
+ 
+     @keyframes slideUpFadeIn {
+       from {
+         opacity: 0;
+         transform: translateY(40px);
+       }
+       to {
+         opacity: 1;
+         transform: translateY(0);
+       }
+     }
+ 
+     @keyframes fadeInModal {
+       from { opacity: 0; }
+       to { opacity: 1; }
+     }
+ 
+     @keyframes zoomInModal {
+       from { transform: scale(0.7); }
+       to { transform: scale(1); }
+     }
+ 
+     @keyframes fadeIn {
+       from { opacity: 0; }
+       to { opacity: 1; }
+     }
+ 
+     @media (max-width: 600px) {
+       body { padding: 20px 10px; }
+       .quiz-card, .results-card { padding: 20px; }
+       .quiz-title { font-size: 1.4rem; }
+       #question-text { font-size: 1.05rem; }
+       .option { padding: 12px 15px; }
+       .button { padding: 10px 20px; font-size: 0.95rem;}
+       .results-card h2 { font-size: 1.5rem; }
+       .results-card p { font-size: 1rem; }
+     }
+   </style>
+ </head>
+ <body>
+   <div class="main-container">
+     <div id="quiz-container"></div>
+     <div id="results-container" style="display: none;"></div>
+   </div>
+ 
+   <div id="imageModal" class="image-modal">
+     <span class="close-modal" id="closeModalBtn">&times;</span>
+     <img class="modal-content" id="modalImageContent">
+   </div>
+ 
+   <script>
+     // =============================================
+     // BANCO DE QUESTÕES
+     // =============================================
+     const sampleQuestions = [
+  {
+    "enunciado": "Dentre os beneficios das estatinas, podemos citar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Reduz óxido nítrico; aumenta a infiltração de monócitos na parede arterial e enfraquece o revestimento fibroso das placas ateroscleróticas",
+      "b": "Efeito anti-inflamatório; reduz agregação plaquetária e diminui o depósito de trombos plaquetários",
+      "c": "Apresenta um efeito protetor hepático símile; Estimula enzimas do citocromo P450 a metabolizar placas ateroscleóticas",
+      "d": "Reduz óxido nítrico e tem um papel pró-inflamatório"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "É correto afirmar sobre as vias de administração da insulina",
+    "imagem": null,
+    "alternativas": {
+      "a": "A via intradérmica é a mais eficiente por não correr o risco de diminuição da dose aplicada",
+      "b": "A velocidade de absorção é mais pronunciada na região abdominal",
+      "c": "Deve ser administrada por via subcutânea",
+      "d": "A via intramuscular é a mais eficiente por ter uma absorção acelerada, ocasionando um controle mais adequado da glicemia, com menos riscos"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Marque a afirmativa correta sobre a insulina em bolus:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Seus tipos podem ser a insulina regular humana e os análogos de ação lenta",
+      "b": "É também conhecida como insulina NPH",
+      "c": "Deve ser administrada pela manhã para ter uma ação que contemple o dia inteiro",
+      "d": "Tem ação mais rápida, em torno de 4 a 6h"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Fármaco capaz de reduzir níveis de colesterol total e LDL-C, que inibe a absorção do colesterol pelos enterócitos no intestino. Este fármaco diminui LDL em 15-20%, diminui triglicerideos (5%) e aumenta HDL (1-2%). Estamos nos referindo a qual fármaco?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Colesevelam",
+      "b": "Ezetimiba",
+      "c": "Fluvastatina",
+      "d": "Fenofibrato"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Qual hipoglicemiante é contra-indicado em paciente com comprometimento hepático?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Glibenclamida",
+      "b": "Glipizida",
+      "c": "Glimepirida",
+      "d": "Glizazida"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Um grupo de fármaco usado na clínica para dislipidemias pode promover vários benefícios ao paciente. Dentre esses benefícios, podemos citar: Aumentam a síntese de NO endotelial; tem papel anti-inflamatório, além de reduzir a agregação plaquetária e diminuir o depósito de trombos plaquetários. A qual grupo de fármaco estamos nos referindo:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Niacina",
+      "b": "Ezetimiba",
+      "c": "Fibratos",
+      "d": "Estatinas"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Quanto as estatinas, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Constitui a terapia farmacológica de primeira linha para reduzir os lipídios e prevenir eventos de Cardiopatias em adultos, porém contra-indicado em mulheres após a menopausa",
+      "b": "Sinvastatina, Clofibrato e Genfibrosila são exemplos de estatinas potentes",
+      "c": "Mevastatina e Pravastatina são as estatinas mais potentes, quando usadas em doses altas, porém sem efeitos sobre os triglicerideos",
+      "d": "As estatinas são o principal recurso disponível para redução do LDL-colesterol, reduzindo o risco de AVE aterotrombótico e os ataque isquêmicos transitórios em pacientes com e sem Cardiopatia"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta sobre a mistura de insulinas",
+    "imagem": null,
+    "alternativas": {
+      "a": "Preferencialmente é utilizada em DM tipo I",
+      "b": "Não se recomenda rotineiramente a mistura de insulinas",
+      "c": "A combinação entre as insulinas NPH e regular humana é bastante utilizada na prática clínica",
+      "d": "Somente a combinação entre análogos de insulina é utilizada"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Segundo as Diretrizes do National Cholesterol Education Program (NCEP) para o tratamento de pacientes com dislipidemia, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Prevenção secundária: Deve-se identificar os níveis de fatores de risco associados a risco aumentado de evento de cardiopatias",
+      "b": "Prevenção primária: pacientes que tiveram evento anterior de Cardiopatia, com tratamento dos fatores de risco",
+      "c": "Prevenção secundária: tratamento dos fatores de risco para evitar a primeira vez de evento de Cardiopatia",
+      "d": "Prevenção primordial: deve-se evitar o desenvolvimento de fatores de risco ao invés de tratar fatores de risco já estabelecidos"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "As principais causas de ateroma são:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Hipercolesterolemia, com baixos níveis de lipoproteínas de alta densidade HDL-C e elevação do LDL-C; Estilo de vida; Diabetes tipo 2; Idade avançada e História familiar",
+      "b": "Hipercolesterolemia, com baixos níveis de HDL-C e baixo LDL-C; Estilo de vida; Diabetes tipo 2; Idade avançada e Coagulopatias",
+      "c": "Baixos níveis de HDL-C e elevado LDL-C; Hipertensão; Diabetes tipo 1 e Coagulopatias",
+      "d": "Hipercolesterolemia, com altos níveis de HDL-C e baixo LDL-C; Estilo de vida; Diabetes tipo 1; Coagulopatias e História familiar"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Quanto ao mecanismo de ação das estatinas, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "As estatinas inibem a absorção do colesterol, reduzindo assim, drasticamente, os níveis de colesterol total e frações",
+      "b": "As estatinas se ligam ao receptor PPARa, estimulando assim, a oxidação de ácidos graxos e a síntese da enzima lipase de lipoproteína (LPL), liberando ácidos graxos nas fezes",
+      "c": "Por possuírem carga positiva, as estatinas são capazes de se ligar aos ácidos biliares, formando complexos grandes, reduzindo assim, a sua absorção no TGI",
+      "d": "As estatinas são inibidores competitivos da 3-hidroxi-3metilglutaril-coenzima A (HMG-CoA) redutase, enzima que catalisa uma etapa limitante da biossíntese do colesterol"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Quanto a Ezetimiba, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Seu uso é extremamente seguro na gravidez",
+      "b": "Diminui-se a absorção de colesterol e triglicérides no trato gastrointestinal em até 54%.",
+      "c": "Deve ser administrado, de preferência, associado aos fármacos sequestradores de ácidos biliares, como a Colestiramina.",
+      "d": "E um inibidor da absorção do colesterol que atua nas células da borda em escova, inibindo a ação da proteína transportadora de colesterol e sendo capaz de reduzir em 15-20% o LDL-C quando administrado isoladamente."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Sobre a insulina basal, é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "É também conhecida como insulina regular",
+      "b": "Sua administração geralmente é realizada 1 a 2x/dia dependendo do tipo de insulina basal",
+      "c": "É produzida a partir de tecnologia derivada do RNA",
+      "d": "Possui efeito mais curto"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "O horário de administração das insulinas é fator importante para o melhor controle do DM. Sobre isso, assinale a alternativa verdadeira:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A insulina regular humana deve ser administrada imediatamente antes das refeições",
+      "b": "A insulina regular humana deve ser administrada 30 a 45 minutos antes das refeições",
+      "c": "A insulina NPH somente pode ser administrada 1x/dia",
+      "d": "A insulina NPH é administrada após cada uma das principais refeições diárias"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta sobre a hipertrigliceridemia",
+    "imagem": null,
+    "alternativas": {
+      "a": "O uso de estatinas constitui uma das mais eficazes formas de tratamento",
+      "b": "Na hipertrigliceridemia familiar, os níveis de LDL também estão elevados",
+      "c": "A hipertrigliceridemia familiar é uma das principais causas",
+      "d": "O tratamento engloba a prática de atividades físicas e o início precoce no uso de medicamentos"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "São fármaco sequestradores de sais biliares ou resinas:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Ezetimiba e Colestiramina",
+      "b": "Colestipol e Colestiramina",
+      "c": "Fenofibrato e Genfibrozila",
+      "d": "Colesevelam e Sinvastatina"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "É correto afirmar sobre os análogos de insulina",
+    "imagem": null,
+    "alternativas": {
+      "a": "Os análogos da insulina só possuem ação prolongada",
+      "b": "Os análogos de insulina só possuem ação curta",
+      "c": "São exemplos de análogos de insulina: Lispro, aspart e glargina",
+      "d": "A combinação a análogos de insulina não é recomendada"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "A metformina é um dos hipoglicemiantes mais usados na prática clínica. Sobre essa medicação é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Ideal para paciente idosos e dislipidêmicos, com funções hepática e renal normais",
+      "b": "Ideal para pacientes idosos, dislipidêmicos e com funções hepática e renal alteradas",
+      "c": "Provoca importante ação na pressão arterial",
+      "d": "Não pode ser usado em associação com outras medicações"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Quanto ao horário preferencial de administração das estatinas, podemos afirmar que a única que não tem restrição de horário para a sua administração é:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Lovastatina",
+      "b": "Sinvastatina",
+      "c": "Atorvastatina",
+      "d": "Pravastatina"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Quanto a hipercolesterolemia familiar, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Doença autossômica dominante, caracterizada por defeitos no receptor de LDL",
+      "b": "Não é responsivo a tratamento com estatinas ou fibratos",
+      "c": "Caracteriza-se por níveis plasmáticos elevados de colesterol total e colesterol HDL e LDL, com concentrações normais de triglicerídios",
+      "d": "Caracteriza-se por elevadas concentrações plasmáticas de triglicerídios (200 a 500 mg/dl ou mais), quando medidas depois de uma noite de jejum"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "São exemplos de hipoglicemiantes orais:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Acarbose e exenatida",
+      "b": "Liraglutida e sitagliptina",
+      "c": "Sitagliptina e saxagliptina",
+      "d": "Exenatida e liraglutida"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Estatinas, como por exemplo a Sinvastatina, devem ser administradas a noite. Por qual motivo?",
+    "imagem": null,
+    "alternativas": {
+      "a": "A sintese de triglicérides é mais elevada ao longo do dia",
+      "b": "A síntese hepática do colesterol é máxima entre 2h e 6h da manhã",
+      "c": "A degradação do colesterol é máxima entre 2h e 6h da manhã",
+      "d": "A escolha do horário é mais cômoda para o paciente"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Qual principal mecanismo de ação das sulfonilureias?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Liberação de incretinas pelo intestino, estimulando a secreção de insulina",
+      "b": "Ativar a enzima de regulação da energia, a AMPK",
+      "c": "Aumenta a liberação de insulina do pâncreas, por meio da inibição dos canais de KATP",
+      "d": "Ligação aos receptores PPARy, regulando o transporte e metabolização dos lipídeos"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Que condição é considerada como um dos principais fatores de risco para o desenvolvimento da DM?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Dislipidemia",
+      "b": "Esteatose hepática",
+      "c": "Obesidade periférica",
+      "d": "Obesidade abdominal"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Paciente apresentando uma glicemia de jejum de 100 mg/dl, Teste de tolerância a glicose de 180 mg/dl e hemoglobina glicada de 6,0%. Baseado nestes dados laboratoriais, qual seria sua hipótese diagnóstica?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Normoglicemia",
+      "b": "Não é possível ter um diagnóstico com esses valores",
+      "c": "Diabetes mellitus",
+      "d": "Pré-Diabetes mellitus"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "O pâncreas secreta insulina de duas maneiras: gotas contínuas e em bolus. Sobre isso, é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A insulina basal sempre aumenta após uma refeição",
+      "b": "A forma de secreção em bolus representa uma baixa produção de insulina, mas que aumenta dependendo do nível de açúcar no sangue",
+      "c": "A secreção tipo gotas contínuas é conhecida também como insulina basal",
+      "d": "O nível de insulina basal permanece sempre alto para um controle mais contínuo e efetivo da glicemia"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "É correto afirmar sobre doença ateromatosa:",
+    "imagem": null,
+    "alternativas": {
+      "a": "As frações do colesterol (como HDL e LDL) elevados são fatores que aumentam o risco para a formação de placas de ateroma",
+      "b": "A idade avançada não é fator de risco para o surgimento de doença ateromatosa",
+      "c": "Dislipidemia, sedentarismo e diabetes mellitus tipo II são condições que causam ateromatose",
+      "d": "O histórico familiar não representa fator importante na ateromatose"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Paciente apresenta glicose pós-prandial muito elevada. Nesta condição, que hipoglicemiante poderia ser indicado?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Repaglinida",
+      "b": "Glibenclamida",
+      "c": "Glimepirida",
+      "d": "Clorpropamida"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Quanto as estatinas, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "As estatinas são totalmente contra-indicadas em mulheres cardiopatas após a menopausa",
+      "b": "As estatinas são o principal recurso disponível para redução do LDL-colesterol",
+      "c": "As estatinas estão relacionadas a risco aumentado de AVE aterotrombótico e risco de ataques isquêmicos transitórios",
+      "d": "As estatinas são totalmente contra-indicadas para pacientes jovens e idosos acima de 70 anos"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "O mecanismo de ação da Ezetimiba é:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O fármaco sequestra ácidos biliares, formam-se complexos grandes, os quais não podem ser absorvidos pelo trato gastrointestinal",
+      "b": "Inibe a enzima transportadora responsável pelo transporte do colesterol (NPC1L1)",
+      "c": "O fármaco inibe a enzima adenilato ciclase dos adipócitos-via GPCR109A",
+      "d": "O fármaco irá interagir com o receptor ativado pelo proliferador peroxissômico (PPAR)"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Sobre a hipercolesterolemia é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O LDL é conhecido popularmente como o colesterol bom",
+      "b": "Colesterol total elevado deve sempre ser tratado com medicação e mudanças no estilo de vida",
+      "c": "A aterosclerose proveniente da hipercoslerolemia é determinada principalmente pela presença aumentada de HDL",
+      "d": "Importante causa de aterosclerose, o que leva ao óbito cerca de 1/3 dos indivíduos de meia idade e idade avançada com essa condição"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta sobre diabetes mellitus:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O Diabetes gestacional é condição transitória, restrita ao período gestacional",
+      "b": "O DM tipo II possui etiologia complexa e multifatorial e geralmente acomete indivíduos a partir da quarta década de vida",
+      "c": "O DM chamado MODY está associado a uma herança autonômica recessiva",
+      "d": "O DM tipo I se desenvolve a partir da adolescência"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Marque a opção que contenha características da Liraglutida",
+    "imagem": null,
+    "alternativas": {
+      "a": "Via de administração subcutânea, uso 1x/dia, níveis máximos de absorção entre 2-10 h, eliminação principalmente por via renal ou intestinal",
+      "b": "Via de administração intramuscular, uso 1x/dia, níveis máximos de absorção entre 8-12 h. eliminação principalmente por vias metabólicas das proteínas plasmáticas",
+      "c": "Via de administração subcutânea (tipo caneta), uso 1x/dia, níveis máximos de absorção entre 8-12 h, eliminação principalmente por vias metabólicas das proteínas plasmáticas",
+      "d": "Via de administração oral, uso 1x/dia, níveis máximos de absorção entre 1-12 h, eliminação principalmente por vias metabólicas das proteínas plasmáticas"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "São efeitos colaterais das estatinas:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Febre e hiperglicemia",
+      "b": "Impotência e Risco de AVC",
+      "c": "Cardiopatias e Risco de AVC",
+      "d": "Hepatotoxicidade e Miopatia"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "A classe dos inibidores da HGM-Coa redutase consegue reduzir os níveis de LDL-C em 20-55% e triglicérides em 7-30%. Qual fármaco pertence a esta classe?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Colestiramina e Colestipol",
+      "b": "Sinvastatina e Atorvastatina",
+      "c": "Niacina e Colestiramina",
+      "d": "Clofibrato e Genfibrozila"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Assinale a opção correta sobre os tipos de insulina e suas ações.",
+    "imagem": null,
+    "alternativas": {
+      "a": "A insulina basal é conhecida como NPH e tem efeito mais prolongado",
+      "b": "A insulina regular tem ação lenta",
+      "c": "A insulina NPH está associada a duas substâncias (protamina e zinco), o que ocasiona um efeito mais rápido",
+      "d": "A insulina bolus possui ação mais prolongada"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "O DM é frequentemente associado a outras condições clínicas e laboratoriais que exercerão um efeito sinérgico no risco cardiovascular. Dentre elas, podemos citar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Dislipidemia, hipertensão arterial pulmonar e sistêmica",
+      "b": "Dislipidemia, hipertensão arterial sistêmica e insuficiência cardíaca",
+      "c": "Hipertensão arterial sistêmica, dislipidemia e microalbuminúria",
+      "d": "Microalbuminúria, glomerulonefrite e hipertensão arterial sistêmica"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Paciente de 45 anos apresenta os seguintes valores em seu exame de colesterol e triglicérides, realizados em jejum: CT: 255 mg/dl; HDL: 38; LDL: 186; Triglicérides: 220. Valores de referência: CT (<190); HDL (>40); LDL (<130); Triglicérides (<150). Baseado nestes valores, assinale o diagnóstico que reflete melhor essa condição:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Os valores estão compatíveis com a idade",
+      "b": "O paciente apresenta hipercolesterolemia",
+      "c": "O paciente apresenta hipertrigliceridemia",
+      "d": "O paciente apresenta dislipidemia mista"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Paciente idoso com diabetes mellitus, está apresentando deterioração da sua função renal. Que hipoglicemiante poderia ser o mais indicado?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Repaglinida",
+      "b": "Metformina",
+      "c": "Clorpropamida",
+      "d": "Acarbose"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Na escolha do tipo de tratamento para DM, podemos levar em consideração vários fatores, dentre alguns podemos citar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Dieta, prática de atividades físicas e histórico familiar",
+      "b": "Fisiopatologia de cada caso, mecanismo de ação do fármaco e efeitos colaterais",
+      "c": "Mecanismo de ação do fármaco, custo e dieta do paciente",
+      "d": "Fisiopatologia de cada caso, mecanismo de ação do fármaco e dieta do paciente"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Quanto aos efeitos colaterais e contra indicações dos inibidores da ECA, assinale a opção verdadeira.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Podem precipitar insuficiência renal aguda e são contra indicados na aterosclerose.",
+      "b": "Podem provocar hipercalemia e são contra indicados após infarto agudo do miocárdio",
+      "c": "Podem provocar hipercalemia e são contra indicados na gravidez (teratogênico).",
+      "d": "Podem provocar hipopotasemia (principalmente quando usados com diuréticos poupadores de potássio) e são contra indicados em estados depressivos."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Quanto a hipercolesterolemia familiar, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Não é responsivo a tratamento com estatinas ou fibratos.",
+      "b": "Caracteriza-se por níveis plasmáticos elevados de colesterol total e colesterol HDL e LDL, com concentrações normais de trigliceridios.",
+      "c": "Doença autossômica dominante, caracterizada por defeitos no receptor de LDL.",
+      "d": "Caracteriza-se por elevadas concentrações plasmáticas de triglicerídios (200 a 500 mg/dl ou mais), quando medidas depois de uma noite de jejum."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Os inibidores da Enzima Conversora da Angiotensina podem ser classificados em três classes. Desta forma, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Captopril e Fosinopril são pró-fármacos.",
+      "b": "O Captopril é um fármaco hidrossolúvel e não metabolizável, excretado inalterado pelos rins.",
+      "c": "O Enalapril é um pró-fármaco - Ativo depois de sua conversão pelo metabolismo hepático, tendo como produto ativo o enalaprilato.",
+      "d": "Captopril e Enalapril são pró-fármacos e para produzirem efeito farmacológico precisam antes ser metabolizados no fígado."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "São sequestradores de ácidos biliares ou resinas:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Colestiramina e Ezetimiba",
+      "b": "Lovastatina e Ezetimiba",
+      "c": "Colestiramina e Colestipol",
+      "d": "Colestipol e Lovastatina"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "É correto afirmar sobre doença ateromatosa:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O histórico familiar não representa fator importante na ateromatose.",
+      "b": "As frações do colesterol (como HDL e LDL) elevados são fatores que aumentam o risco para a formação de placas de ateroma.",
+      "c": "Dislipidemia, sedentarismo e diabetes mellitus tipo II são condições que causam ateromatose.",
+      "d": "A idade avançada não é fator de risco para o surgimento de doença ateromatosa."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "São efeitos colaterais dos inibidores da ECA:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Tosse e Angioedema.",
+      "b": "Insuficiência Renal Aguda e AVC.",
+      "c": "Diarreia e Insuficiência Renal Aguda.",
+      "d": "Tosse e Diarreia."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "A classe dos inibidores da HGM-Coa redutase consegue reduzir os níveis de LDL-C em 20-55% e triglicérides em 7-30%. Qual fármaco pertence a esta classe?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Sinvastatina e Atorvastatina",
+      "b": "Niacina e Colestiramina",
+      "c": "Colestiramina e Colestipol",
+      "d": "Clofibrato e Genfibrozila"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Quanto aos fármacos inibidores da enzima conversora da angiotensina, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Podem ser cardiotóxicos.",
+      "b": "Aumentam o fluxo sanguíneo renal e promovem maior retenção de sódio e água.",
+      "c": "Aumentam a resistência vascular renal e diminuem o fluxo sanguíneo renal.",
+      "d": "Produzem vasodilatação por dois mecanismos: Atuando no SRAA e por ter efeitos complementares na decomposição da bradicinina."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "São fármacos antagonistas de receptor da angiotensina II:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Captopril, Enalapril e Lisinopril.",
+      "b": "Captopril, Losartana e Valsartana.",
+      "c": "Losartana, Valsartana e Telmisartana.",
+      "d": "Lisinopril, Losartana e Enalapril."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Clofibrato, Genfibrozila e Fenofibrato são fármacos da classe:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Resinas",
+      "b": "Ácido Nicotínico",
+      "c": "Fibratos",
+      "d": "Estatinas"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Um grupo de fármaco usado na clínica para dislipidemias pode promover vários benefícios ao paciente. Dentre esses benefícios, podemos citar: Aumentam a síntese de NO endotelial; tem papel anti-inflamatório, além de reduzir a agregação plaquetária e diminuir o depósito de trombos plaquetários. A qual grupo de fármaco estamos nos referindo:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Ezetimiba",
+      "b": "Niacina",
+      "c": "Fibratos",
+      "d": "Estatinas"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Primeiro composto aprovado para reduzir níveis de colesterol total e LDL-C, que inibe a absorção do colesterol pelos enterócitos no intestino:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Niacina Cristalina",
+      "b": "Genfibrozila",
+      "c": "Ezetimiba",
+      "d": "Rosuvastatina"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Estatinas, como por exemplo a Sinvastatina, devem ser administradas a noite. Por qual motivo?",
+    "imagem": null,
+    "alternativas": {
+      "a": "A degradação do colesterol é máxima entre 2h e 6h da manhã.",
+      "b": "A escolha do horário é mais cômoda para o paciente.",
+      "c": "A síntese hepática do colesterol é máxima entre 2h e 6h da manhã.",
+      "d": "A síntese de triglicérides é mais elevada ao longo do dia."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta, referente a classificação das lipoproteínas.",
+    "imagem": null,
+    "alternativas": {
+      "a": "HDL e LDL (Ruim) e VLDL (Bom)",
+      "b": "VLDL e LDL (Ruim) e HDL (Bom).",
+      "c": "VLDL e HDL (Ruim) e LDL (Bom)",
+      "d": "VLDL e LDL (Ruim) e IDL (Bom)"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Sobre a hipercolesterolemia é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O LDL é conhecido popularmente como o colesterol bom.",
+      "b": "Colesterol total elevado deve sempre ser tratado com medicação e mudanças no estilo de vida.",
+      "c": "A aterosclerose proveniente da hipercoslerolemia é determinada principalmente pela presença aumentada de HDL.",
+      "d": "Importante causa de aterosclerose, o que leva ao óbito cerca de 1/3 dos indivíduos de meia idade e idade avançada com essa condição."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Qual fármaco age inibindo o transporte que capta colesterol do lúmen dos enterócitos jejunais, inibindo a enzima transportadora responsável pelo transporte do colesterol (NPC1L1)?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Niacina",
+      "b": "Clofibrato",
+      "c": "Ezetimiba",
+      "d": "Lovastatina"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Quanto ao horário preferencial de administração das estatinas, podemos afirmar que a única que não tem restrição de horário para a sua administração é:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Sinvastatina",
+      "b": "Atorvastatina",
+      "c": "Pravastatina",
+      "d": "Lovastatina"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Quanto a Ezetimiba, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "É um inibidor da absorção do colesterol que atua nas células da borda em escova, inibindo a ação da proteína transportadora de colesterol e sendo capaz de reduzir em 15-20% o LDL-C quando administrado isoladamente.",
+      "b": "Seu uso é extremamente seguro na gravidez.",
+      "c": "Deve ser administrado, de preferência, associado aos fármacos sequestradores de ácidos biliares, como a Colestiramina.",
+      "d": "Diminui-se a absorção de colesterol e triglicérides no trato gastrointestinal em até 54%."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "O mecanismo de ação da Ezetimiba é:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O fármaco inibe a enzima adenilato ciclase dos adipócitos-via GPCR109A",
+      "b": "O fármaco irá interagir com o receptor ativado pelo proliferador peroxissômico (PPAR).",
+      "c": "Inibe a enzima transportadora responsável pelo transporte do colesterol (NPC1L1).",
+      "d": "O fármaco sequestra ácidos biliares, formam-se complexos grandes, os quais não podem ser absorvidos pelo trato gastrointestinal."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Quanto as estatinas, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "As estatinas são o principal recurso disponível para redução do LDL-colesterol, reduzindo o risco de AVE aterotrombótico e os ataque isquêmicos transitórios em pacientes com e sem Cardiopatia.",
+      "b": "Constitui a terapia farmacológica de primeira linha para reduzir os lipídios e prevenir eventos de Cardiopatias em adultos, porém contra-indicado em mulheres após a menopausa.",
+      "c": "Sinvastatina, Clofibrato e Genfibrosila são exemplos de estatinas potentes.",
+      "d": "Mevastatina e Pravastatina são as estatinas mais potentes, quando usadas em doses altas, porém sem efeitos sobre os triglicerídeos."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "As principais causas de ateroma são:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Diabetes tipo 2, Histórico familiar, Hepatopatia e Tabagismo",
+      "b": "Dislipidemias, Estilo de vida, Diabetes tipo 2 e Histórico familiar",
+      "c": "Estilo de vida, Diabetes tipo 2 e Doença renal crônica",
+      "d": "Dislipidemia, Estilo de vida, Hepatopatia e Anemia Megaloblástica"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Segundo as Diretrizes do National Cholesterol Education Program (NCEP) para o tratamento de pacientes com dislipidemia, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Prevenção secundária: Deve-se identificar os níveis de fatores de risco associados a risco aumentado de evento de cardiopatias",
+      "b": "Prevenção primária: pacientes que tiveram evento anterior de Cardiopatia, com tratamento dos fatores de risco.",
+      "c": "Prevenção secundária: tratamento dos fatores de risco para evitar a primeira vez de evento de Cardiopatia;",
+      "d": "Prevenção primordial: deve-se evitar o desenvolvimento de fatores de risco ao invés de tratar fatores de risco já estabelecidos."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Paciente de 45 anos apresenta os seguintes valores em seu exame de colesterol e triglicérides, realizados em jejum: CT: 255 mg/dl; HDL: 38; LDL: 186; Triglicérides: 220. Valores de referência: CT (<190); HDL (>40); LDL (<130); Triglicérides (<150). Baseado nestes valores, assinale o diagnóstico que reflete melhor essa condição:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O paciente apresenta hipertrigliceridemia.",
+      "b": "O paciente apresenta dislipidemia mista.",
+      "c": "O paciente apresenta hipercolesterolemia.",
+      "d": "Os valores estão compatíveis com a idade."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Assinale o fármaco da classe dos inibidores diretos da renina:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Irbesartana",
+      "b": "Alisquireno",
+      "c": "Telmisartana",
+      "d": "Lisinopril"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Quanto ao mecanismo de ação das estatinas, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "As estatinas são inibidores competitivos da 3-hidroxi-3metilglutaril-coenzima A (HMG-CoA) redutase, enzima que catalisa uma etapa limitante da biossíntese do colesterol.",
+      "b": "As estatinas se ligam ao receptor PPARa, estimulando assim, a oxidação de ácidos graxos e a síntese da enzima lipase de lipoproteina (LPL), liberando ácidos graxos nas fezes.",
+      "c": "As estatinas inibem a absorção do colesterol, reduzindo assim, drasticamente, os níveis de colesterol total e frações.",
+      "d": "Por possuírem carga positiva, as estatinas são capazes de se ligar aos ácidos biliares, formando complexos grandes, reduzindo assim, a sua absorção no TGI."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Este grupo de fármaco tem como mecanismo de ação interagir com o receptor ativado pelo proliferador peroxissômico (PPAR). Estamos nos referindo a qual grupo de fármaco?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Estatinas",
+      "b": "Resinas",
+      "c": "Fibratos",
+      "d": "Niacina"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "São efeitos colaterais das estatinas:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Hepatotoxicidade e Miopatia.",
+      "b": "Cardiopatias e Risco de AVC.",
+      "c": "Impotência e Risco de AVC.",
+      "d": "Febre e hiperglicemia."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Quanto ao sistema Renina-Angiotensina, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A angiotensina II provoca a liberação de vasopressina (hormônio antidiurético) pelas adrenais.",
+      "b": "A aldosterona e a vasopressina provocam retenção renal de sódio.",
+      "c": "A enzima ECA quebra da angiotensina I e produz angiotensina II, que por sua vez possui atividade vasodilatadora.",
+      "d": "A aldosterona provoca retenção renal de potássio."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "As principais causas de ateroma são:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Hipercolesterolemia, com baixos níveis de lipoproteínas de alta densidade HDL-C e elevação do LDL-C; Estilo de vida; Diabetes tipo 2; Idade avançada e História familiar.",
+      "b": "Hipercolesterolemia, com baixos níveis de HDL-C e baixo LDL-C; Estilo de vida; Diabetes tipo 2; Idade avançada e Coagulopatias.",
+      "c": "Hipercolesterolemia, com altos níveis de HDL-C e baixo LDL-C; Estilo de vida; Diabetes tipo 1; Coagulopatias e História familiar.",
+      "d": "Baixos níveis de HDL-C e elevado LDL-C; Hipertensão; Diabetes tipo 1 e Coagulopatias."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Dentre os benefícios das estatinas, podemos citar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Reduz óxido nítrico; aumenta a infiltração de monócitos na parede arterial e enfraquece o revestimento fibroso das placas ateroscleróticas.",
+      "b": "Apresenta um efeito protetor hepático símile; Estimula enzimas do citocromo P450 a metabolizar placas ateroscleóticas.",
+      "c": "Efeito anti-inflamatório; reduz agregação plaquetária e diminui o depósito de trombos plaquetários.",
+      "d": "Reduz óxido nítrico e tem um papel pró-inflamatório."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Qual fármaco Antagonista de receptor de Angiotensina II é de escolha na profilaxia do acidente vascular encefálico?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Irbesartana",
+      "b": "Valsartana",
+      "c": "Losartana",
+      "d": "Candesartana"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Dentre as estatinas, quais são pró-fármacos?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Mevastatina e Rosuvastatina",
+      "b": "Lovastatina e Sinvatatina",
+      "c": "Pitavastatina e Rosuvastatina",
+      "d": "Pitavastatina e Fluvastatina"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Fármaco capaz de reduzir níveis de colesterol total e LDL-C, que inibe a absorção do colesterol pelos enterócitos no intestino. Este fármaco diminui LDL em 15-20%, diminui triglicerídeos (5%) e aumenta HDL (1-2%). Estamos nos referindo a qual fármaco?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Colesevelam",
+      "b": "Fluvastatina",
+      "c": "Ezetimiba",
+      "d": "Fenofibrato"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Quanto as estatinas, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "As estatinas estão relacionadas a risco aumentado de AVE aterotrombótico e risco de ataques isquêmicos transitórios.",
+      "b": "As estatinas são totalmente contra-indicadas em mulheres cardiopatas após a menopausa.",
+      "c": "As estatinas são totalmente contra-indicadas para pacientes jovens e idosos acima de 70 anos.",
+      "d": "As estatinas são o principal recurso disponível para redução do LDL-colesterol."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta sobre a hipertrigliceridemia.",
+    "imagem": null,
+    "alternativas": {
+      "a": "O uso de estatinas constitui uma das mais eficazes formas de tratamento.",
+      "b": "A hipertrigliceridemia familiar é uma das principais causas.",
+      "c": "Na hipertrigliceridemia familiar, os níveis de LDL também estão elevados.",
+      "d": "O tratamento engloba a prática de atividades físicas e o início precoce no uso de medicamentos."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "São fármaco sequestradores de sais biliares ou resinas:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Colestipol e Colestiramina",
+      "b": "Colesevelam e Sinvastatina",
+      "c": "Ezetimiba e Colestiramina",
+      "d": "Fenofibrato e Genfibrozila"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "O sistema Renina-Angiotensina-Aldosterona regula a PA através das ações da Angiotensina II. Desta forma, podemos afirmar que ocorre:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Liberação de aldosterona, reabsorção de Na+ dos túbulos renais e homeostasia dos eletrólitos e líquidos.",
+      "b": "Renina e Angiotensina II promovem retenção de potássio e vasodilatação periférica.",
+      "c": "Liberação de Angiotensina II, depleção de Na+ dos túbulos renais e homeostasia dos eletrólitos e líquidos.",
+      "d": "Liberação de aldosterona e depleção de Na+ dos túbulos renais."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Quanto ao sistema renina-angiotensina-aldosterona, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Angiotensina I é quebrada pela enzima conversora da angiotensina (ECA), produzindo a angiotensina II, vai promover relaxamento da parede dos vasos.",
+      "b": "Quando a PA cai (no caso da pressão sistólica, para 100 mm Hg ou menos), os rins liberam a enzima renina na corrente sanguínea.",
+      "c": "Aldosterona e vasopressina provocam aumento da diurese.",
+      "d": "A renina age diretamente na medula da supra-renal e libera aldosterona na corrente sanguínea."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "São efeitos colaterais das estatinas:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Hepatotoxicidade, Rabdomiólise e Miopatia",
+      "b": "Miopatia, Hipotireoidismo e Diarreia",
+      "c": "Nefrotoxicidade, Rabdomiólise e Tireoidite de Hashimoto",
+      "d": "Hepatopatia, Náuseas e Edema periférico"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Os fármacos inibidores da ECA têm várias aplicações clínicas, tais como:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Tratar a insuficiência cardíaca e a insuficiência renal.",
+      "b": "Usados para tratar estenose bilateral da artéria renal.",
+      "c": "No tratamento da insuficiência renal aguda, além de possuir propriedades antiateroscleróticas.",
+      "d": "Tratar a insuficiência cardíaca com fração de ejeção reduzida e também usados no anti-remodelamento cardíaco pós-infarto."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta sobre diabetes mellitus:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O Diabetes gestacional é condição transitória, restrita ao período gestacional",
+      "b": "O DM tipo II possui etiologia complexa e multifatorial e geralmente acomete indivíduos a partir da quarta década de vida",
+      "c": "O DM tipo I se desenvolve a partir da adolescência",
+      "d": "O DM chamado MODY está associado a uma herança autonômica recessiva"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Quanto ao mecanismo de ação das estatinas, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "As estatinas se ligam ao receptor PPARa, estimulando assim, a oxidação de ácidos graxos e a síntese da enzima lipase de lipoproteina (LPL), liberando ácidos graxos nas fezes",
+      "b": "As estatinas são inibidores competitivos da 3-hidroxi-3metilglutaril-coenzima A (HMG-CoA) redutase, enzima que catalisa uma etapa limitante da biossíntese do colesterol",
+      "c": "Por possuírem carga positiva, as estatinas são capazes de se ligar aos ácidos biliares, formando complexos grandes, reduzindo assim, a sua absorção no TGI",
+      "d": "As estatinas inibem a absorção do colesterol, reduzindo assim, drasticamente, os níveis de colesterol total e frações"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Marque a opção que contenha características da Liraglutida",
+    "imagem": null,
+    "alternativas": {
+      "a": "Via de administração intramuscular, uso 1x/dia, níveis máximos de absorção entre 8-12 h, eliminação principalmente por vias metabólicas das proteínas plasmáticas",
+      "b": "Via de administração subcutânea (tipo caneta), uso 1x/dia, níveis máximos de absorção entre 8-12 h, eliminação principalmente por vias metabólicas das proteínas plasmáticas",
+      "c": "Via de administração oral, uso 1x/día, níveis máximos de absorção entre 1-12 h, eliminação principalmente por vias metabólicas das proteínas plasmáticas",
+      "d": "Via de administração subcutânea, uso 1x/dia, níveis máximos de absorção entre 2-10 h, eliminação principalmente por via renal ou intestinal"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Paciente apresenta glicose pós-prandial muito elevada. Nesta condição, que hipoglicemiante poderia ser indicado?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Glibenclamida",
+      "b": "Glimepirida",
+      "c": "Repaglinida",
+      "d": "Clorpropamida"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta sobre a hipertrigliceridemia",
+    "imagem": null,
+    "alternativas": {
+      "a": "O tratamento engloba a prática de atividades físicas e o início precoce no uso de medicamentos",
+      "b": "A hipertrigliceridemia familiar é uma das principais causas",
+      "c": "Na hipertrigliceridemia familiar, os níveis de LDL também estão elevados",
+      "d": "O uso de estatinas constitui uma das mais eficazes formas de tratamento"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "As principais causas de ateroma são:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Baixos níveis de HDL-C e elevado LDL-C; Hipertensão; Diabetes tipo 1 e Coagulopatias",
+      "b": "Hipercolesterolemia, com baixos níveis de lipoproteínas de alta densidade HDL-C e elevação do LDL-C; Estilo de vida; Diabetes tipo 2; Idade avançada e História familiar",
+      "c": "Hipercolesterolemia, com baixos níveis de HDL-C e baixo LDL-C; Estilo de vida; Diabetes tipo 2; Idade avançada e Coagulopatias",
+      "d": "Hipercolesterolemia, com altos níveis de HDL-C e baixo LDL-C; Estilo de vida; Diabetes tipo 1; Coagulopatias e História familiar"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "O pâncreas secreta insulina de duas maneiras: gotas continuas e em bolus. Sobre isso, é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A insulina basal sempre aumenta após uma refeição",
+      "b": "A forma de secreção em bolus representa uma baixa produção de insulina, mas que aumenta dependendo do nível de açúcar no sangue",
+      "c": "A secreção tipo gotas contínuas é conhecida também como insulina basal",
+      "d": "O nível de insulina basal permanece sempre alto para um controle mais contínuo e efetivo da glicemia"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Dentre os beneficios das estatinas, podemos citar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Reduz óxido nítrico e tem um papel pró-inflamatório",
+      "b": "Efeito anti-inflamatório; reduz agregação plaquetária e diminui o depósito de trombos plaquetários",
+      "c": "Apresenta um efeito protetor hepático símile; Estimula enzimas do citocromo P450 a metabolizar placas ateroscleóticas",
+      "d": "Reduz óxido nítrico; aumenta a infiltração de monócitos na parede arterial e enfraquece o revestimento fibroso das placas ateroscleróticas"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Quanto a Ezetimiba, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Deve ser administrado, de preferência, associado aos fármacos sequestradores de ácidos biliares, como a Colestiramina.",
+      "b": "Seu uso é extremamente seguro na gravidez",
+      "c": "É um inibidor da absorção do colesterol que atua nas células da borda em escova, inibindo a ação da proteína transportadora de colesterol e sendo capaz de reduzir em 15-20% o LDL-C quando administrado isoladamente.",
+      "d": "Diminui-se a absorção de colesterol e triglicérides no trato gastrointestinal em até 54%."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Segundo as Diretrizes do National Cholesterol Education Program (NCEP) para o tratamento de pacientes com dislipidemia, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Prevenção secundária: tratamento dos fatores de risco para evitar a primeira vez de evento de Cardiopatia",
+      "b": "Prevenção secundária: Deve-se identificar os níveis de fatores de risco associados a risco aumentado de evento de cardiopatias",
+      "c": "Prevenção primária: pacientes que tiveram evento anterior de Cardiopatia, com tratamento dos fatores de risco",
+      "d": "Prevenção primordial: deve-se evitar o desenvolvimento de fatores de risco ao invés de tratar fatores de risco já estabelecidos"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Qual hipoglicemiante é contra-indicado em paciente com comprometimento hepático?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Glimepirida",
+      "b": "Glipizida",
+      "c": "Glizazida",
+      "d": "Glibenclamida"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "É correto afirmar sobre os análogos de insulina",
+    "imagem": null,
+    "alternativas": {
+      "a": "Os análogos da insulina só possuem ação prolongada",
+      "b": "A combinação a análogos de insulina não é recomendada",
+      "c": "Os análogos de insulina só possuem ação curta",
+      "d": "São exemplos de análogos de insulina: Lispro, aspart e glargina"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Paciente de 45 anos apresenta os seguintes valores em seu exame de colesterol e triglicérides, realizados em jejum: CT: 255 mg/dl; HDL: 38; LDL: 186; Triglicérides: 220. Valores de referência: CT (<190); HDL (>40); LDL (<130); Triglicérides (<150). Baseado nestes valores, assinale o diagnóstico que reflete melhor essa condição:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O paciente apresenta hipercolesterolemia",
+      "b": "O paciente apresenta hipertrigliceridemia",
+      "c": "Os valores estão compatíveis com a idade",
+      "d": "O paciente apresenta dislipidemia mista"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "O horário de administração das insulinas é fator importante para o melhor controle do DM. Sobre isso, assinale a alternativa verdadeira:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A insulina NPH é administrada após cada uma das principais refeições diárias",
+      "b": "A insulina regular humana deve ser administrada imediatamente antes das refeições",
+      "c": "A insulina NPH somente pode ser administrada 1x/dia",
+      "d": "A insulina regular humana deve ser administrada 30 a 45 minutos antes das refeições"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "É correto afirmar sobre doença ateromatosa:",
+    "imagem": null,
+    "alternativas": {
+      "a": "As frações do colesterol (como HDL e LDL) elevados são fatores que aumentam o risco para a formação de placas de ateroma",
+      "b": "O histórico familiar não representa fator importante na ateromatose",
+      "c": "A idade avançada não é fator de risco para o surgimento de doença ateromatosa",
+      "d": "Dislipidemia, sedentarismo e diabetes mellitus tipo II são condições que causam ateromatose"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Fármaco capaz de reduzir níveis de colesterol total e LDL-C, que inibe a absorção do colesterol pelos enterócitos no intestino. Este fármaco diminui LDL em 15-20%, diminui triglicerídeos (5%) e aumenta HDL (1-2%). Estamos nos referindo a qual fármaco?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Ezetimiba",
+      "b": "Colesevelam",
+      "c": "Fluvastatina",
+      "d": "Fenofibrato"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Na escolha do tipo de tratamento para DM, podemos levar em consideração vários fatores, dentre alguns podemos citar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Fisiopatologia de cada caso, mecanismo de ação do fármaco e efeitos colaterais",
+      "b": "Mecanismo de ação do fármaco, custo e dieta do paciente",
+      "c": "Fisiopatologia de cada caso, mecanismo de ação do fármaco e dieta do paciente",
+      "d": "Dieta, prática de atividades físicas e histórico familiar"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "É correto afirmar sobre as vias de administração da insulina",
+    "imagem": null,
+    "alternativas": {
+      "a": "A velocidade de absorção é mais pronunciada na região abdominal",
+      "b": "A via intramuscular é a mais eficiente por ter uma absorção acelerada, ocasionando um controle mais adequado da glicemia, com menos riscos",
+      "c": "Deve ser administrada por via subcutânea",
+      "d": "A via intradérmica é a mais eficiente por não correr o risco de diminuição da dose aplicada"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Estatinas, como por exemplo a Sinvastatina, devem ser administradas a noite. Por qual motivo?",
+    "imagem": null,
+    "alternativas": {
+      "a": "A degradação do colesterol é máxima entre 2h e 6h da manhã",
+      "b": "A síntese hepática do colesterol é máxima entre 2h e 6h da manhã",
+      "c": "A escolha do horário é mais cômoda para o paciente",
+      "d": "A síntese de triglicérides é mais elevada ao longo do dia"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "O DM é frequentemente associado a outras condições clínicas e laboratoriais que exercerão um efeito sinérgico no risco cardiovascular. Dentre elas, podemos citar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Dislipidemia, hipertensão arterial sistêmica e insuficiência cardíaca",
+      "b": "Hipertensão arterial sistêmica, dislipidemia e microalbuminúria",
+      "c": "Microalbuminúria, glomerulonefrite e hipertensão arterial sistêmica",
+      "d": "Dislipidemia, hipertensão arterial pulmonar e sistêmica"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "A classe dos inibidores da HGM-Coa redutase consegue reduzir os níveis de LDL-C em 20-55% e triglicérides em 7-30%. Qual fármaco pertence a esta classe?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Colestiramina e Colestipol",
+      "b": "Niacina e Colestiramina",
+      "c": "Clofibrato e Genfibrozila",
+      "d": "Sinvastatina e Atorvastatina"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Sobre a insulina basal, é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Possui efeito mais curto",
+      "b": "Sua administração geralmente é realizada 1 a 2x/dia dependendo do tipo de insulina basal",
+      "c": "É também conhecida como insulina regular",
+      "d": "É produzida a partir de tecnologia derivada do RNA"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Assinale a opção correta sobre os tipos de insulina e suas ações.",
+    "imagem": null,
+    "alternativas": {
+      "a": "A insulina bolus possui ação mais prolongada",
+      "b": "A insulina NPH está associada a duas substâncias (protamina e zinco), o que ocasiona um efeito mais rápido",
+      "c": "A insulina regular tem ação lenta",
+      "d": "A insulina basal é conhecida como NPH e tem efeito mais prolongado"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "São fármaco sequestradores de sais biliares ou resinas:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Colesevelam e Sinvastatina",
+      "b": "Colestipol e Colestiramina",
+      "c": "Fenofibrato e Genfibrozila",
+      "d": "Ezetimiba e Colestiramina"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Qual principal mecanismo de ação das sulfonilureias?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Liberação de incretinas pelo intestino, estimulando a secreção de insulina",
+      "b": "Ligação aos receptores PPARy, regulando o transporte e metabolização dos lipídeos",
+      "c": "Ativar a enzima de regulação da energia, a AMPK",
+      "d": "Aumenta a liberação de insulina do pâncreas, por meio da inibição dos canais de KATP"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta sobre a mistura de insulinas",
+    "imagem": null,
+    "alternativas": {
+      "a": "A combinação entre as insulinas NPH e regular humana é bastante utilizada na prática clínica",
+      "b": "Não se recomenda rotineiramente a mistura de insulinas",
+      "c": "Somente a combinação entre análogos de insulina é utilizada",
+      "d": "Preferencialmente é utilizada em DM tipo I"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Quanto a hipercolesterolemia familiar, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Caracteriza-se por elevadas concentrações plasmáticas de triglicerídios (200 a 500 mg/dt ou mais), quando medidas depois de uma noite de jejum",
+      "b": "Não é responsivo a tratamento com estatinas ou fibratos",
+      "c": "Caracteriza-se por níveis plasmáticos elevados de colesterol total e colesterol HDL e LDL, com concentrações normais de triglicerídios",
+      "d": "Doença autossômica dominante, caracterizada por defeitos no receptor de LDL"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Quanto as estatinas, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Mevastatina e Pravastatina são as estatinas mais potentes, quando usadas em doses altas, porém sem efeitos sobre os triglicerídeos",
+      "b": "Sinvastatina, Clofibrato e Genfibrosila são exemplos de estatinas potentes",
+      "c": "Constitui a terapia farmacológica de primeira linha para reduzir os lipídios e prevenir eventos de Cardiopatias em adultos, porém contra-indicado em mulheres após a menopausa",
+      "d": "As estatinas são o principal recurso disponível para redução do LDL-colesterol, reduzindo o risco de AVE aterotrombótico e os ataque isquêmicos transitórios em pacientes com e sem Cardiopatia"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "A metformina é um dos hipoglicemiantes mais usados na prática clínica. Sobre essa medicação é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Não pode ser usado em associação com outras medicações",
+      "b": "Ideal para paciente idosos e dislipidêmicos, com funções hepática e renal normais",
+      "c": "Provoca importante ação na pressão arterial",
+      "d": "Ideal para pacientes idosos, dislipidêmicos e com funções hepática e renal alteradas"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "São exemplos de hipoglicemiantes orais:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Acarbose e exenatida",
+      "b": "Sitagliptina e saxagliptina",
+      "c": "Exenatida e liraglutida",
+      "d": "Liraglutida e sitagliptina"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "O mecanismo de ação da Ezetimiba é:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Inibe a enzima transportadora responsável pelo transporte do colesterol (NPC1L1)",
+      "b": "O fármaco sequestra ácidos biliares, formam-se complexos grandes, os quais não podem ser absorvidos pelo trato gastrointestinal",
+      "c": "O fármaco inibe a enzima adenilato ciclase dos adipócitos-via GPCR109A",
+      "d": "O fármaco irá interagir com o receptor ativado pelo proliferador peroxissômico (PPAR)"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Um grupo de fármaco usado na clínica para dislipidemias pode promover vários benefícios ao paciente. Dentre esses benefícios, podemos citar: Aumentam a síntese de NO endotelial; tem papel anti-inflamatório, além de reduzir a agregação plaquetária e diminuir o depósito de trombos plaquetários. A qual grupo de fármaco estamos nos referindo:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Niacina",
+      "b": "Estatinas",
+      "c": "Ezetimiba",
+      "d": "Fibratos"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Marque a afirmativa correta sobre a insulina em bolus:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Seus tipos podem ser a insulina regular humana e os análogos de ação lenta",
+      "b": "Deve ser administrada pela manhã para ter uma ação que contemple o dia inteiro",
+      "c": "É também conhecida como insulina NPH",
+      "d": "Tem ação mais rápida, em torno de 4 a 6h"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Quanto as estatinas, podemos afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "As estatinas são totalmente contra-indicadas em mulheres cardiopatas após a menopausa",
+      "b": "As estatinas estão relacionadas a risco aumentado de AVE aterotrombótico e risco de ataques isquêmicos transitórios",
+      "c": "As estatinas são o principal recurso disponível para redução do LDL-colesterol",
+      "d": "As estatinas são totalmente contra-indicadas para pacientes jovens e idosos acima de 70 anos"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Paciente apresentando uma glicemia de jejum de 100 mg/dl, Teste de tolerância a glicose de 180 mg/dl e hemoglobina glicada de 6,0%. Baseado nestes dados laboratoriais, qual seria sua hipótese diagnóstica?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Diabetes mellitus",
+      "b": "Não é possível ter um diagnóstico com esses valores",
+      "c": "Pré-Diabetes mellitus",
+      "d": "Normoglicemia"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "São efeitos colaterais das estatinas:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Hepatotoxicidade e Miopatia",
+      "b": "Impotência e Risco de AVC",
+      "c": "Febre e hiperglicemia",
+      "d": "Cardiopatias e Risco de AVC"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Sobre a hipercolesterolemia é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A aterosclerose proveniente da hipercoslerolemia é determinada principalmente pela presença aumentada de HDL",
+      "b": "Importante causa de aterosclerose, o que leva ao óbito cerca de 1/3 dos indivíduos de meia idade e idade avançada com essa condição",
+      "c": "Colesterol total elevado deve sempre ser tratado com medicação e mudanças no estilo de vida",
+      "d": "O LDL é conhecido popularmente como o colesterol bom"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Paciente idoso com diabetes mellitus, está apresentando deterioração da sua função renal. Que hipoglicemiante poderia ser o mais indicado?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Acarbose",
+      "b": "Repaglinida",
+      "c": "Metformina",
+      "d": "Clorpropamida"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Que condição é considerada como um dos principais fatores de risco para o desenvolvimento da DM?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Obesidade abdominal",
+      "b": "Esteatose hepática",
+      "c": "Obesidade periférica",
+      "d": "Dislipidemia"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Quanto ao horário preferencial de administração das estatinas, podemos afirmar que a única que não tem restrição de horário para a sua administração é:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Sinvastatina",
+      "b": "Atorvastatina",
+      "c": "Lovastatina",
+      "d": "Pravastatina"
+    },
+    "correta": "b"
+  },
+];
+ 
+     // =============================================
+     // LÓGICA DO QUIZ
+     // =============================================
+     let shuffledQuestions = [];
+     let currentQuestionIndex = 0;
+     let questionsInBatch = 0;
+     let scoreBatch = 0;
+     let resultsHistory = [];
+     let currentChart = null;
+
+
+    const allIframes = [
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lista-mais-g-y-do-planeta-terra-2-0-1308/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eu-quero-comer-voce-99397/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/rat-dance-music-93451/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/pou-estourado-48183/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/sua-mae-sabe-que-voce-gosta-de-rapazes-80078/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/toma-milk-shake-de-morango-59364/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/rojao-super-estourado-44057/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-da-minha-foia-19424/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vai-tomar-no-c-pir4nh444-34654/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-e-neymar-47-40647/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/e-agora-vai-entra-o-grosso-75362/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/caramba-que-p1nto-enorme-42382/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/o-homem-uma-maquina-uma-besta-enjaulada-66045/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/manda-foto-pivete-4508/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/som-do-zap-zap-estourado-15594/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-empurra-mole-59742/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/foi-quando-gyro-finalmente-entendeu-41342/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/uicideboy-intro-gmi2-36329/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/abc-da-amazonia-61531/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/corinthians-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cruzeiro-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eae-mane-cade-o-pix-mwahahaha-8598/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/posso-te-ligar-agora-ou-tua-mulher-54107/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/para-de-mandar-audio-to-na-ucrania-47141/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ponte-preta-radio-globo-91750/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/coritiba-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/dolly-estourado-50496/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/imbroxavel-44092/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-ze-gotinha-26753/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/hino-da-urss-53471/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lobo-pidao-50489/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/voce-vem-almocar-23752/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vinheta-ifood/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/spongebob-fail-11236/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/botao-do-whatsapp-97196/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/1-2-3-4-flamengo-18569/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ai-chavinho-25347/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/tralalero-funk-20181/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/indian-song-7sek-58379/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/hello-moto-estourado-73372/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/plantao-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/aw-shit-here-go-again-cj-from-gta-sa-97151/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cala-a-boca-e-escuta-o-som-da-minha-kombi-ai-2767/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/qui-fase-que-ta-o-curintia-43357/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/musica-triste-meme-41946/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/pare/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-ferrei-amigos-estevao-31478/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ele-ta-pedindo-pra-ser-empurrado-4066/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/papu-papu-papu-58837/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/biometria-13888/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/brasil-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/agostinho-carrara-autonomo-28476/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/freddie/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bem-te-vi-passaro-58874/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/grito-do-tom-35478/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/what-bottom-text-meme-sanctuary-guardian-s-24591/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/acorda-monark-17462/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-mata-de-uma-vez-trio-parada-dura-572/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-mata-de-uma-vez-31687/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/aumenta-o-som-marcelo-dig-dig-dig-74686/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vinheta-jornal-nacional/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cr7-bom-dia-34785/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bad-to-the-bone-meme-22189/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ai-programa-hora-do-faro-melhor-qualidade-5308/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/donald-trump-build-a-wall/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/quien-estaba-hablando-contigo-73597/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bom-dia-sao-10h-silvio-santos/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-de-xampu-de-mulher/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/avocados-fron-mexico-5538/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-globo-1-621/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-globo-2-83971/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/e-o-pintinho-piu-26037/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bilu-o-et-brasileiro/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/som-motor-f1-51289/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/buzina-de-caminhao-byrm-17163/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/caminhao-de-gas/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/re-caminhao-67082/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/o-moco-o-caminhao-tombou-35530/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/toque-do-motorola-28486/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/encara-messi-23845/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cr7-vou-ao-u-ao-messi-36080/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/linkin-park-in-the-end-versao-forro-brazil-79061/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vx-without-me-forro-estourado-27992/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/minha-pomba-forro-21153/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/champions-league-forro-42023/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/tu-conhece-a-paola-63959/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-feijao-puro-34490/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/chora-viola/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/sinonimos-chitaozinho-xororo-brasil-27832/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eu-to-maluco-to-doente-to-doidao-14644/embed/" frameborder="0" scrolling="no"></iframe>'
+];
+let availableIframes = []; // Começa vazia, será preenchida na primeira chamada
+// --- FIM DAS NOVAS VARIÁVEIS ---
+
+// ... resto das suas variáveis globais ...
+     const quizContainer = document.getElementById('quiz-container');
+     const resultsContainer = document.getElementById('results-container');
+     const imageModal = document.getElementById('imageModal');
+     const modalImageContent = document.getElementById('modalImageContent');
+     const closeModalBtn = document.getElementById('closeModalBtn');
+    
+ 
+     // Funções auxiliares
+     function shuffleArray(array) {
+       for (let i = array.length - 1; i > 0; i--) {
+         const j = Math.floor(Math.random() * (i + 1));
+         [array[i], array[j]] = [array[j], array[i]];
+       }
+       return array;
+     }
+ 
+     function playSound(id) {
+       const sound = document.getElementById(id);
+       if (sound) {
+         sound.currentTime = 0;
+         sound.play().catch(e => console.log("Audio play failed:", e));
+       }
+     }
+ 
+     // Funções do modal de imagem
+     function openImageModal(src) {
+       if (!src) return;
+       modalImageContent.src = src;
+       imageModal.style.display = "block";
+     }
+ 
+     function closeImageModal() {
+       imageModal.style.display = "none";
+       modalImageContent.src = "";
+     }
+ 
+     // Lógica principal
+     function startQuiz() {
+       shuffledQuestions = shuffleArray([...sampleQuestions]);
+       currentQuestionIndex = 0;
+       questionsInBatch = 0;
+       scoreBatch = 0;
+       resultsHistory = [];
+       resultsContainer.style.display = 'none';
+       quizContainer.style.display = 'block';
+       renderQuestion(currentQuestionIndex);
+     }
+ 
+     function renderQuestion(index) {
+       if (index >= shuffledQuestions.length) {
+         showFinalResults();
+         return;
+       }
+ 
+       const question = shuffledQuestions[index];
+       const totalQuestions = shuffledQuestions.length;
+ 
+       quizContainer.innerHTML = `
+         <div class="quiz-card">
+           <div class="quiz-header">
+             <span class="quiz-title">Questão ${index + 1}</span>
+             <span class="question-counter">${index + 1} / ${totalQuestions}</span>
+           </div>
+           <p id="question-text">${question.enunciado}</p>
+           ${question.imagem ? `
+             <div class="image-container">
+               <img src="${question.imagem}" alt="Imagem da questão" onclick="openImageModal('${question.imagem}')">
+             </div>
+           ` : ''}
+           <ul class="options">
+             ${Object.entries(question.alternativas).map(([key, value]) => `
+               <li>
+                 <div class="option" data-option="${key}">
+                   <span class="option-letter">${key.toUpperCase()})</span> ${value}
+                 </div>
+               </li>
+             `).join('')}
+           </ul>
+           <div class="button-container">
+             <button class="button" id="next-btn" onclick="handleNext()" disabled>Próxima</button>
+           </div>
+         </div>
+       `;
+ 
+       document.querySelectorAll('.option').forEach(el => {
+         el.addEventListener('click', handleAnswerSelection);
+       });
+     }
+ 
+     function handleAnswerSelection(event) {
+       const selectedOptionElement = event.currentTarget;
+       const optionsContainer = selectedOptionElement.closest('.options');
+ 
+       if (optionsContainer.classList.contains('disabled')) return;
+ 
+       optionsContainer.classList.add('disabled');
+ 
+       const userAnswer = selectedOptionElement.getAttribute('data-option');
+       const currentQuestion = shuffledQuestions[currentQuestionIndex];
+       const correctAnswer = currentQuestion.correta;
+ 
+       selectedOptionElement.classList.add('selected');
+       if (userAnswer === correctAnswer) {
+         selectedOptionElement.classList.add('correct');
+         scoreBatch++;
+         playSound('correctSound');
+       } else {
+         selectedOptionElement.classList.add('incorrect');
+         playSound('wrongSound');
+         const correctOptionElement = optionsContainer.querySelector(`.option[data-option="${correctAnswer}"]`);
+         if (correctOptionElement) {
+           correctOptionElement.classList.add('correct');
+         }
+       }
+ 
+       questionsInBatch++;
+       document.getElementById('next-btn').disabled = false;
+     }
+ 
+     function handleNext() {
+       currentQuestionIndex++;
+       const isEndOfBatch = (questionsInBatch === 10) || (currentQuestionIndex >= shuffledQuestions.length);
+ 
+       if (isEndOfBatch) {
+         showBatchResults();
+       } else {
+         renderQuestion(currentQuestionIndex);
+       }
+     }
+ 
+function showBatchResults() {
+    quizContainer.style.display = 'none';
+    resultsContainer.style.display = 'block';
+
+    const batchNumber = resultsHistory.length + 1;
+    const totalInBatch = questionsInBatch; // Quantas questões foram respondidas neste bloco
+    const percentage = totalInBatch > 0 ? Math.round((scoreBatch / totalInBatch) * 100) : 0;
+    const scoreThreshold = 0.7; // 70% - Limite definido
+
+    resultsHistory.push({ batch: batchNumber, score: scoreBatch, total: totalInBatch });
+
+    resultsContainer.innerHTML = `
+        <div class="results-card">
+            <h2>Resultado - Bloco ${batchNumber}</h2>
+            <p>Você acertou ${scoreBatch} de ${totalInBatch} questões (${percentage}%).</p>
+            <div class="chart-container">
+                <canvas id="resultsChart"></canvas>
+            </div>
+            <div class="button-container">
+                ${currentQuestionIndex < shuffledQuestions.length ?
+                '<button class="button" onclick="continueQuiz()">Continuar</button>' :
+                '<button class="button" onclick="showFinalResults()">Ver Resultado Final</button>'
+                }
+            </div>
+        </div>
+    `;
+
+    renderChart(scoreBatch, totalInBatch - scoreBatch);
+
+    // --- MODIFICAÇÃO ADICIONADA ---
+    // Verifica se o desempenho no bloco atual foi >= 70%
+    if (totalInBatch > 0 && (scoreBatch / totalInBatch) >= scoreThreshold) {
+        // Mostra o popup de parabéns com iframe aleatório
+        // Usamos setTimeout para dar um pequeno tempo para o usuário ver o resultado do bloco antes do popup
+        setTimeout(showRandomCongratsPopup, 500); // Atraso de 0.5 segundos (opcional)
+    }
+    // --- FIM DA MODIFICAÇÃO ---
+
+
+    // Reseta os contadores para o próximo bloco (movido para depois da verificação)
+    scoreBatch = 0;
+    questionsInBatch = 0;
+}
+ 
+     function renderChart(correct, incorrect) {
+       const ctx = document.getElementById('resultsChart').getContext('2d');
+ 
+       if (currentChart) {
+         currentChart.destroy();
+       }
+ 
+       currentChart = new Chart(ctx, {
+         type: 'doughnut',
+         data: {
+           labels: ['Corretas', 'Incorretas'],
+           datasets: [{
+             label: 'Desempenho',
+             data: [correct, incorrect],
+             backgroundColor: [
+               'rgba(75, 192, 192, 0.7)',
+               'rgba(255, 99, 132, 0.7)'
+             ],
+             borderColor: [
+               'rgba(75, 192, 192, 1)',
+               'rgba(255, 99, 132, 1)'
+             ],
+             borderWidth: 1
+           }]
+         },
+         options: {
+           responsive: true,
+           maintainAspectRatio: true,
+           plugins: {
+             legend: {
+               position: 'top',
+             },
+             tooltip: {
+               callbacks: {
+                 label: function(context) {
+                   return `${context.label}: ${context.parsed}`;
+                 }
+               }
+             }
+           }
+         }
+       });
+     }
+ 
+     function continueQuiz() {
+       resultsContainer.style.display = 'none';
+       quizContainer.style.display = 'block';
+       renderQuestion(currentQuestionIndex);
+     }
+ 
+     function showRandomCongratsPopup() {
+       const iframes = [
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lista-mais-g-y-do-planeta-terra-2-0-1308/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eu-quero-comer-voce-99397/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/rat-dance-music-93451/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/pou-estourado-48183/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/sua-mae-sabe-que-voce-gosta-de-rapazes-80078/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/toma-milk-shake-de-morango-59364/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/rojao-super-estourado-44057/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-da-minha-foia-19424/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vai-tomar-no-c-pir4nh444-34654/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-e-neymar-47-40647/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/e-agora-vai-entra-o-grosso-75362/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/caramba-que-p1nto-enorme-42382/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/o-homem-uma-maquina-uma-besta-enjaulada-66045/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/manda-foto-pivete-4508/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/som-do-zap-zap-estourado-15594/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-empurra-mole-59742/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/foi-quando-gyro-finalmente-entendeu-41342/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/uicideboy-intro-gmi2-36329/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/abc-da-amazonia-61531/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/corinthians-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cruzeiro-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eae-mane-cade-o-pix-mwahahaha-8598/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/posso-te-ligar-agora-ou-tua-mulher-54107/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/para-de-mandar-audio-to-na-ucrania-47141/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ponte-preta-radio-globo-91750/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/coritiba-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/dolly-estourado-50496/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/imbroxavel-44092/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-ze-gotinha-26753/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/hino-da-urss-53471/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lobo-pidao-50489/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/voce-vem-almocar-23752/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vinheta-ifood/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/spongebob-fail-11236/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/botao-do-whatsapp-97196/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/1-2-3-4-flamengo-18569/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ai-chavinho-25347/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/tralalero-funk-20181/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/indian-song-7sek-58379/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/hello-moto-estourado-73372/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/plantao-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/aw-shit-here-go-again-cj-from-gta-sa-97151/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cala-a-boca-e-escuta-o-som-da-minha-kombi-ai-2767/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/qui-fase-que-ta-o-curintia-43357/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/musica-triste-meme-41946/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/pare/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-ferrei-amigos-estevao-31478/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ele-ta-pedindo-pra-ser-empurrado-4066/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/papu-papu-papu-58837/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/biometria-13888/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/brasil-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/agostinho-carrara-autonomo-28476/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/freddie/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bem-te-vi-passaro-58874/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/grito-do-tom-35478/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/what-bottom-text-meme-sanctuary-guardian-s-24591/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/acorda-monark-17462/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-mata-de-uma-vez-trio-parada-dura-572/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-mata-de-uma-vez-31687/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/aumenta-o-som-marcelo-dig-dig-dig-74686/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vinheta-jornal-nacional/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cr7-bom-dia-34785/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bad-to-the-bone-meme-22189/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ai-programa-hora-do-faro-melhor-qualidade-5308/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/donald-trump-build-a-wall/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/quien-estaba-hablando-contigo-73597/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bom-dia-sao-10h-silvio-santos/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-de-xampu-de-mulher/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/avocados-fron-mexico-5538/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-globo-1-621/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-globo-2-83971/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/e-o-pintinho-piu-26037/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bilu-o-et-brasileiro/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/som-motor-f1-51289/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/buzina-de-caminhao-byrm-17163/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/caminhao-de-gas/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/re-caminhao-67082/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/o-moco-o-caminhao-tombou-35530/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/toque-do-motorola-28486/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/encara-messi-23845/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cr7-vou-ao-u-ao-messi-36080/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/linkin-park-in-the-end-versao-forro-brazil-79061/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vx-without-me-forro-estourado-27992/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/minha-pomba-forro-21153/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/champions-league-forro-42023/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/tu-conhece-a-paola-63959/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-feijao-puro-34490/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/chora-viola/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/sinonimos-chitaozinho-xororo-brasil-27832/embed/" frameborder="0" scrolling="no"></iframe>',
+  '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eu-to-maluco-to-doente-to-doidao-14644/embed/" frameborder="0" scrolling="no"></iframe>'
+];
+ 
+    const randomIframe = iframes[Math.floor(Math.random() * iframes.length)];
+
+    // --- MODIFICAÇÃO ADICIONADA ---
+    // Remove qualquer popup antigo antes de criar um novo
+    const existingPopup = document.querySelector('.congrats-popup');
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+    // --- FIM DA MODIFICAÇÃO ---
+
+    const popup = document.createElement('div');
+    popup.className = 'congrats-popup';
+    popup.innerHTML = `
+    <div class="congrats-content">
+    {/* --- MODIFICAÇÃO NA MENSAGEM --- */}
+    <p class="congrats-message">Parabéns! Você acertou 70% ou mais neste bloco!</p>
+    <div class="random-iframe">${randomIframe}</div>
+    <button class="button close-popup" onclick="this.closest('.congrats-popup').remove()">Fechar</button>
+    </div>
+    `;
+
+    document.body.appendChild(popup);
+}
+ 
+     function showFinalResults() {
+    quizContainer.style.display = 'none';
+    resultsContainer.style.display = 'block';
+
+    let totalCorrect = 0;
+    let totalAttempted = 0;
+    resultsHistory.forEach(batch => {
+        totalCorrect += batch.score;
+        totalAttempted += batch.total;
+    });
+    const finalPercentage = totalAttempted > 0 ? Math.round((totalCorrect / totalAttempted) * 100) : 0;
+
+    // --- MODIFICAÇÃO AQUI ---
+    // Removemos a chamada ao popup daqui, pois agora ela acontece em showBatchResults
+    /*
+    if ((totalCorrect / totalAttempted) >= 0.7) {
+        setTimeout(showRandomCongratsPopup, 1000); // REMOVIDO/COMENTADO
+    }
+    */
+    // --- FIM DA MODIFICAÇÃO ---
+
+
+    resultsContainer.innerHTML = `
+        <div class="results-card">
+            <h2>Simulado Finalizado!</h2>
+            <p>Seu desempenho geral: ${totalCorrect} de ${totalAttempted} questões corretas (${finalPercentage}%).</p>
+            <div class="chart-container">
+                <canvas id="finalResultsChart"></canvas>
+            </div>
+            <div class="button-container">
+                <button class="button" onclick="startQuiz()">Reiniciar Simulado</button>
+            </div>
+        </div>
+    `;
+    renderFinalChart(resultsHistory);
+}
+ 
+     function renderFinalChart(history) {
+       const ctx = document.getElementById('finalResultsChart').getContext('2d');
+       if (currentChart) {
+         currentChart.destroy();
+       }
+ 
+       const labels = history.map(b => `Bloco ${b.batch}`);
+       const data = history.map(b => b.total > 0 ? (b.score / b.total) * 100 : 0);
+ 
+       currentChart = new Chart(ctx, {
+         type: 'bar',
+         data: {
+           labels: labels,
+           datasets: [{
+             label: '% Acerto por Bloco',
+             data: data,
+             backgroundColor: 'rgba(54, 162, 235, 0.7)',
+             borderColor: 'rgba(54, 162, 235, 1)',
+             borderWidth: 1
+           }]
+         },
+         options: {
+           scales: {
+             y: {
+               beginAtZero: true,
+               max: 100,
+               ticks: {
+                 callback: function(value) {
+                   return value + '%';
+                 }
+               }
+             }
+           },
+           responsive: true,
+           maintainAspectRatio: true,
+           plugins: {
+             legend: { display: false },
+             tooltip: {
+               callbacks: {
+                 label: function(context) {
+                   return `Bloco ${context.label}: ${context.parsed.y.toFixed(1)}%`;
+                 }
+               }
+             }
+           }
+         }
+       });
+     }
+ 
+     // Event listeners
+     closeModalBtn.onclick = closeImageModal;
+     imageModal.onclick = function(event) {
+       if (event.target == imageModal) {
+         closeImageModal();
+       }
+     }
+ 
+     // Torna funções globais
+     window.openImageModal = openImageModal;
+     window.closeImageModal = closeImageModal;
+     window.handleNext = handleNext;
+     window.continueQuiz = continueQuiz;
+     window.startQuiz = startQuiz;
+ 
+     // Inicia o quiz
+     document.addEventListener('DOMContentLoaded', startQuiz);
+   </script>
+ </body>
+ </html>
