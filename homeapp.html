@@ -13,7 +13,7 @@
         --primary: #2979ff;
         --primary-dark: #1c54b2;
         --accent: #00c853;
-        --accent-light: #0cd85a; /* Ajustado para melhor contraste/uso */
+        --accent-light: #69f0ae; 
         --danger: #f44336;
         --danger-light: #ffebee;
         --text: #263238;
@@ -32,320 +32,32 @@
         padding: 0;
       }
 
-      /* Estilos do Body e Main Container */
       body {
         font-family: 'Poppins', sans-serif;
         background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
         color: var(--text);
-        padding: 30px 15px;
+        padding: 0; /* Removido padding para iframe ocupar tela toda, se necessário */
         min-height: 100vh;
         display: flex;
         justify-content: center;
-        align-items: flex-start;
+        align-items: center; /* Centraliza o .main-container se o body for flex container direto */
       }
 
       .main-container {
         max-width: 850px;
         width: 100%;
+        padding: 30px 15px; /* Movido padding para cá */
       }
-
-      /* CSS Original Fornecido (Quiz, Results, etc.) - Mantido como no original */
-      .quiz-card, .results-card {
-        background-color: var(--card-bg);
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-        padding: 35px;
-        margin-bottom: 30px;
-        animation: slideUpFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        opacity: 0;
-      }
-
-      .quiz-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid var(--border);
-      }
-
-      .quiz-title {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: var(--primary);
-      }
-
-      .question-counter {
-        font-size: 0.9rem;
-        font-weight: 600;
-        background-color: #e3f2fd;
-        color: var(--primary-dark);
-        padding: 5px 12px;
-        border-radius: 15px;
-      }
-
-      #question-text {
-        font-size: 1.15rem;
-        margin-bottom: 25px;
-        line-height: 1.6;
-        font-weight: 600;
-      }
-
-      .image-container {
-        margin-bottom: 25px;
-        text-align: center;
-      }
-
-      .image-container img {
-        max-width: 100%;
-        max-height: 400px;
-        border-radius: 10px;
-        border: 1px solid var(--border);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        cursor: zoom-in;
-      }
-
-      .image-container img:hover {
-        transform: scale(1.03);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-      }
-
-      .image-modal {
-        display: none;
-        position: fixed;
-        z-index: 1001;
-        padding-top: 50px;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.9);
-        animation: fadeInModal 0.3s ease;
-      }
-
-      .modal-content { /* Este é para o modal da imagem, não confundir com o pin-modal-content */
-        margin: auto;
-        display: block;
-        max-width: 90%;
-        max-height: 90vh;
-        animation: zoomInModal 0.3s ease;
-      }
-
-      .close-modal {
-        position: absolute;
-        top: 15px;
-        right: 35px;
-        color: #f1f1f1;
-        font-size: 40px;
-        font-weight: bold;
-        transition: 0.3s;
-        cursor: pointer;
-      }
-
-      .close-modal:hover, .close-modal:focus {
-        color: #bbb;
-        text-decoration: none;
-      }
-
-      .options {
-        list-style: none;
-        margin-top: 20px;
-      }
-
-      .options li {
-        margin-bottom: 15px;
-      }
-
-      .option {
-        background-color: #f1f3f5;
-        padding: 15px 20px;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-        border: 2px solid transparent;
-        display: flex;
-        align-items: baseline;
-      }
-
-      .option-letter {
-        font-weight: 700;
-        margin-right: 10px;
-        color: var(--primary);
-      }
-
-      .option:hover {
-        background-color: #e9ecef;
-        border-color: var(--primary);
-        transform: translateX(5px);
-      }
-
-      .option.selected {
-        border-color: var(--primary-dark);
-        background-color: #d1e3ff;
-      }
-
-      .option.correct {
-        border-color: var(--accent) !important;
-        background-color: var(--accent-light) !important; /* Usando a variável ajustada */
-        color: #1b5e20; /* Texto mais escuro para contraste */
-        font-weight: 600;
-      }
-      .option.correct .option-letter { color: #1b5e20; } /* Ajuste para consistência */
-
-
-      .option.incorrect {
-        border-color: var(--danger) !important;
-        background-color: var(--danger-light) !important;
-        color: #c62828;
-        font-weight: 600;
-      }
-      .option.incorrect .option-letter { color: var(--danger); }
-
-
-      .options.disabled .option {
-        pointer-events: none;
-        opacity: 0.8;
-      }
-
-      .options.disabled .option:not(.selected):not(.correct) {
-        background-color: #f8f9fa;
-        opacity: 0.7;
-      }
-
-      .button-container {
-        text-align: right;
-        margin-top: 30px;
-      }
-
-      .button {
-        background-color: var(--primary);
-        color: white;
-        padding: 12px 30px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-        box-shadow: 0 4px 10px rgba(41, 121, 255, 0.3);
-        text-decoration: none;
-        display: inline-block;
-      }
-
-      .button:hover {
-        background-color: var(--primary-dark);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(41, 121, 255, 0.4);
-      }
-
-      .button:active {
-        transform: translateY(0);
-        box-shadow: 0 4px 10px rgba(41, 121, 255, 0.3);
-      }
-
-      .button:disabled {
-        background-color: var(--disabled-bg);
-        color: var(--disabled-text);
-        cursor: not-allowed;
-        box-shadow: none;
-        transform: none;
-      }
-
-      .results-card h2 {
-        color: var(--primary);
-        margin-bottom: 15px;
-        text-align: center;
-        font-size: 1.8rem;
-      }
-
-      .results-card p {
-        text-align: center;
-        font-size: 1.1rem;
-        margin-bottom: 30px;
-        color: var(--text-light);
-      }
-
-      .chart-container {
-        width: 100%;
-        max-width: 400px;
-        margin: 0 auto 30px auto;
-      }
-
-      /* Pop-up de congratulações e Modal de PIN compartilham animações */
-      .congrats-popup { /* Também usado como base para o pin-modal-container */
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.8);
-        display: flex; /* Modificado para flex para centralizar melhor */
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 2000;
-        animation: fadeIn 0.5s;
-        opacity: 1; /* Garante que começa visível se 'flex' for o display inicial */
-      }
-
-      .congrats-content { /* Também usado como base para o pin-modal-content */
-        background-color: white;
-        padding: 30px;
-        border-radius: 15px;
-        max-width: 90%;
-        text-align: center;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        animation: slideUpFadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-      }
-
-      .congrats-message {
-        font-size: 1.5rem;
-        margin-bottom: 20px;
-        color: var(--primary);
-        font-weight: bold;
-      }
-
-      .close-popup {
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: var(--primary);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-      }
-
-      /* Animações */
-      @keyframes slideUpFadeIn {
-        from { opacity: 0; transform: translateY(40px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      @keyframes fadeInModal { /* Para o modal da imagem */
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-      @keyframes zoomInModal { /* Para o conteúdo do modal da imagem */
-        from { transform: scale(0.7); }
-        to { transform: scale(1); }
-      }
-      @keyframes fadeIn { /* Usado pelo popup de congratulações e modal de PIN */
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-
-      /* Estilos Adicionais para a Homepage (como fornecido) */
+      
+      /* Estilos Homepage Card */
       .homepage-card {
         background-color: var(--card-bg);
         border-radius: 16px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.08);
         padding: 35px;
-        margin-top: 20px;
-        margin-bottom: 30px;
+        /* margin-top e margin-bottom removidos pois o main-container já tem padding */
         animation: slideUpFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        opacity: 0; /* Inicia oculto para animação */
+        opacity: 0;
         width: 100%;
       }
 
@@ -357,20 +69,11 @@
         padding-bottom: 25px;
         border-bottom: 1px solid var(--border);
       }
-
-      .app-icon-placeholder {
-        width: 80px;
-        height: 80px;
-        margin-bottom: 20px;
-      }
+      .app-icon-placeholder { width: 80px; height: 80px; margin-bottom: 20px; }
       .app-icon-placeholder svg { width: 100%; height: 100%; }
-      .app-title {
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: var(--primary-dark);
-        text-align: center;
-      }
+      .app-title { font-size: 2.2rem; font-weight: 700; color: var(--primary-dark); text-align: center; }
       .app-menu { display: flex; flex-direction: column; gap: 25px; }
+      
       .theme-section {
         padding: 25px;
         background-color: #fdfdff;
@@ -379,148 +82,141 @@
         box-shadow: 0 4px 8px rgba(0,0,0,0.05);
       }
       .theme-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: var(--primary);
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #e0e0e0;
-        text-align: center;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        font-size: 1.5rem; font-weight: 600; color: var(--primary); margin-bottom: 20px;
+        padding-bottom: 10px; border-bottom: 1px solid #e0e0e0; text-align: center;
+        display: flex; align-items: center; justify-content: center;
       }
-      .section-icon {
-        width: 26px;
-        height: 26px;
-        margin-right: 10px;
-        color: var(--primary);
-        flex-shrink: 0;
+      .section-icon { width: 26px; height: 26px; margin-right: 10px; color: var(--primary); flex-shrink: 0; }
+      
+      .theme-section .button {
+        display: block; width: 100%; margin-bottom: 15px; text-align: center;
+        background-color: var(--primary); color: white; padding: 12px 30px;
+        border: none; border-radius: 8px; cursor: pointer;
+        font-weight: 600; font-size: 1rem;
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 10px rgba(41, 121, 255, 0.3); text-decoration: none;
       }
-      /* Ajuste para que botões e links estilizados como botões se comportem da mesma forma */
-      .theme-section .button, .theme-section a.button {
-        display: block;
-        width: 100%;
-        margin-bottom: 15px;
-        text-align: center;
+      .theme-section .button:hover {
+        background-color: var(--primary-dark); transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(41, 121, 255, 0.4);
       }
-      .theme-section .button:last-child, .theme-section a.button:last-child {
-        margin-bottom: 0;
+      .theme-section .button:disabled {
+        background-color: var(--disabled-bg); color: var(--disabled-text);
+        cursor: not-allowed; box-shadow: none; transform: none;
       }
+      .theme-section .button:last-child { margin-bottom: 0; }
 
-      /* Estilos para o Modal de PIN */
+      /* Modal de PIN */
       .pin-modal-container {
-          display: none; /* Começa escondido, será mostrado por JS */
-          position: fixed;
-          z-index: 2000;
-          left: 0;
-          top: 0;
-          width: 100%;
-          height: 100%;
-          overflow: auto; /* Para permitir rolagem se o conteúdo for muito grande, embora não deva ser */
-          background-color: rgba(0,0,0,0.7);
-          justify-content: center; /* Centraliza horizontalmente */
-          align-items: center; /* Centraliza verticalmente */
-          animation: fadeIn 0.3s ease; /* Usando animação existente */
+        display: none; position: fixed; z-index: 2000;
+        left: 0; top: 0; width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.85);
+        justify-content: center; align-items: center;
+        animation: fadeIn 0.3s ease;
       }
-
       .pin-modal-content {
-          background-color: var(--card-bg);
-          color: var(--text);
-          padding: 30px 35px;
-          border-radius: 12px;
-          box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-          width: 90%;
-          max-width: 400px;
-          text-align: center;
-          /* Animação ao aparecer */
-          animation: slideUpFadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-          opacity: 0; /* Começa invisível para a animação funcionar */
+        background-color: var(--card-bg); color: var(--text); padding: 30px 35px;
+        border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        width: 90%; max-width: 400px; text-align: center;
+        animation: slideUpFadeInModal 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        opacity: 0;
       }
-
-      .pin-modal-content h2 {
-          color: var(--primary-dark); /* Título mais destacado */
-          margin-bottom: 15px;
-          font-size: 1.7rem; /* Tamanho um pouco maior */
-      }
-
-      .pin-modal-content p {
-          font-size: 1rem;
-          color: var(--text-light);
-          margin-bottom: 25px; /* Mais espaço antes do input */
-      }
-
+      .pin-modal-content h2 { color: var(--primary-dark); margin-bottom: 15px; font-size: 1.7rem; }
+      .pin-modal-content p { font-size: 1rem; color: var(--text-light); margin-bottom: 25px; }
       #pinInput {
-          width: calc(100% - 24px); /* Ajuste para padding interno */
-          padding: 14px; /* Mais padding para toque fácil */
-          margin-bottom: 25px; /* Mais espaço antes do botão */
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          font-size: 1.1rem; /* Fonte maior para o PIN */
-          text-align: center;
-          font-family: 'Poppins', sans-serif; /* Garante a fonte */
-          transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        width: calc(100% - 24px); padding: 14px; margin-bottom: 25px;
+        border: 1px solid var(--border); border-radius: 8px;
+        font-size: 1.1rem; text-align: center; font-family: 'Poppins', sans-serif;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
       }
-
-      #pinInput:focus {
-          outline: none;
-          border-color: var(--primary);
-          box-shadow: 0 0 0 3px rgba(41, 121, 255, 0.25); /* Destaque mais visível */
-      }
-
+      #pinInput:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(41, 121, 255, 0.25); }
       #submitPinButton {
-          background-color: var(--primary);
-          color: white;
-          padding: 14px 30px;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: 600;
-          font-size: 1rem;
-          transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease;
-          width: 100%;
+        display: block; width: 100%; text-align: center; background-color: var(--primary);
+        color: white; padding: 14px 30px; border: none; border-radius: 8px; cursor: pointer;
+        font-weight: 600; font-size: 1rem; transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease;
       }
-
-      #submitPinButton:hover {
-          background-color: var(--primary-dark);
-          transform: translateY(-1px); /* Efeito sutil ao passar o mouse */
-      }
-
+      #submitPinButton:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
       #pinErrorMessage {
-          margin-top: 15px;
-          font-size: 0.9rem;
-          font-weight: 600;
-          color: var(--danger);
-          min-height: 1.2em; /* Reserva espaço para a mensagem, evitando saltos no layout */
-          display: block; /* Mudar para block e controlar visibilidade com opacidade ou conteúdo */
-          visibility: hidden; /* Escondido por padrão, mas ocupando espaço */
+        margin-top: 15px; font-size: 0.9rem; font-weight: 600; color: var(--danger);
+        min-height: 1.2em; visibility: hidden;
       }
 
+      /* Iframe Viewer Styles */
+      #iframeViewer {
+        display: none; 
+        position: fixed; 
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background-color: rgba(0, 0, 0, 0.6); 
+        z-index: 3000; 
+        padding: 2vh; /* Use vh/vw para padding responsivo */
+        box-sizing: border-box;
+        justify-content: center; 
+        align-items: center; 
+        animation: fadeIn 0.3s ease;
+      }
+      .iframe-window {
+        background-color: var(--card-bg);
+        width: 100%; 
+        height: 100%;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+        overflow: hidden; 
+        display: flex;
+        flex-direction: column;
+        animation: slideUpFadeInModal 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        opacity: 0;
+      }
+      .iframe-header {
+        padding: 8px 15px;
+        text-align: right;
+        background-color: #e9ecef; 
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0; /* Não encolher o header */
+      }
+      #closeIframeButton {
+        font-size: 1.8rem; font-weight: bold; line-height: 1;
+        cursor: pointer; border: none; background: transparent;
+        color: var(--text-light); padding: 5px;
+      }
+      #closeIframeButton:hover { color: var(--text); }
+      #contentIframe {
+        width: 100%;
+        flex-grow: 1; /* Ocupa o espaço restante */
+        border: none;
+      }
 
-      /* Media Queries (original + ajustes) */
-      @media (max-width: 600px) {
-        body { padding: 20px 10px; }
-        .quiz-card, .results-card, .homepage-card { padding: 20px; }
-        .quiz-title { font-size: 1.4rem; }
-        #question-text { font-size: 1.05rem; }
-        .option { padding: 12px 15px; }
-        .button { padding: 10px 20px; font-size: 0.95rem;}
-        .results-card h2 { font-size: 1.5rem; }
-        .results-card p { font-size: 1rem; }
-        .app-title { font-size: 1.8rem; }
+      /* Animações */
+      @keyframes slideUpFadeIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes slideUpFadeInModal { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+      /* Media Queries */
+      @media (max-width: 768px) { /* Ajustado para tablets e mobile */
+        .main-container { padding: 20px 10px; }
+        .homepage-card { padding: 25px; }
+        .app-title { font-size: 1.9rem; }
+        .theme-title { font-size: 1.4rem; }
+        .theme-section .button { padding: 12px 20px; font-size: 0.95rem;}
+        
+        #iframeViewer { padding: 10px; } /* Menos padding em telas menores */
+        .iframe-header { padding: 6px 12px; }
+        #closeIframeButton { font-size: 1.6rem; }
+      }
+       @media (max-width: 480px) { /* Ajustes mais finos para mobile */
+        .main-container { padding: 15px 5px; }
+        .homepage-card { padding: 20px; }
+        .app-title { font-size: 1.7rem; }
         .theme-title { font-size: 1.3rem; }
-        .section-icon { width: 22px; height: 22px; margin-right: 8px;}
-
         .pin-modal-content { padding: 25px 20px; }
         .pin-modal-content h2 { font-size: 1.5rem; }
         #pinInput { padding: 12px; font-size: 1rem; }
-        #submitPinButton { padding: 12px 25px; }
       }
     </style>
 </head>
 <body>
     <div class="main-container">
-        <div class="homepage-card">
+        <div class="homepage-card" style="display: none;">
             <header class="app-header">
                 <div class="app-icon-placeholder">
                     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -558,19 +254,14 @@
                     <button type="button" class="button" data-target-id="btnProvaFarmaco">Prova de Farmacologia</button>
                     <button type="button" class="button" data-target-id="btnProvaOSCE">Prova OSCE</button>
                 </section>
-
                 <section class="theme-section">
                     <h2 class="theme-title">
                         <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <title>Ícone de Calculadora</title>
                             <rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
                             <rect x="7" y="6" width="10" height="4.5" rx="1" stroke="currentColor" stroke-width="1.5"/>
-                            <circle cx="8.5" cy="13.5" r="1" fill="currentColor"/>
-                            <circle cx="12" cy="13.5" r="1" fill="currentColor"/>
-                            <circle cx="15.5" cy="13.5" r="1" fill="currentColor"/>
-                            <circle cx="8.5" cy="17.5" r="1" fill="currentColor"/>
-                            <circle cx="12" cy="17.5" r="1" fill="currentColor"/>
-                            <circle cx="15.5" cy="17.5" r="1" fill="currentColor"/>
+                            <circle cx="8.5" cy="13.5" r="1" fill="currentColor"/><circle cx="12" cy="13.5" r="1" fill="currentColor"/><circle cx="15.5" cy="13.5" r="1" fill="currentColor"/>
+                            <circle cx="8.5" cy="17.5" r="1" fill="currentColor"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/><circle cx="15.5" cy="17.5" r="1" fill="currentColor"/>
                         </svg>
                         Ferramentas
                     </h2>
@@ -590,112 +281,130 @@
         </div>
     </div>
 
+    <div id="iframeViewer">
+        <div class="iframe-window">
+            <div class="iframe-header">
+                <button id="closeIframeButton" title="Fechar">&times;</button>
+            </div>
+            <iframe id="contentIframe" title="Conteúdo Externo" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+            </div>
+    </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const pinModalContainer = document.getElementById('pinModalContainer');
-            const pinInput = document.getElementById('pinInput');
-            const submitPinButton = document.getElementById('submitPinButton');
-            const pinErrorMessage = document.getElementById('pinErrorMessage');
-            const mainContentButtons = document.querySelectorAll('.app-menu .button');
+    document.addEventListener('DOMContentLoaded', () => {
+        const homepageCard = document.querySelector('.homepage-card');
+        const pinModalContainer = document.getElementById('pinModalContainer');
+        const pinInput = document.getElementById('pinInput');
+        const submitPinButton = document.getElementById('submitPinButton');
+        const pinErrorMessage = document.getElementById('pinErrorMessage');
+        const mainContentButtons = document.querySelectorAll('.app-menu .button');
 
-            const localStorageKeyAccess = 'studyAppAccessGranted_v2'; // Mudei para v2 para invalidar acessos antigos com PINs diferentes, se necessário.
+        // Iframe elements
+        const iframeViewer = document.getElementById('iframeViewer');
+        const contentIframe = document.getElementById('contentIframe');
+        const closeIframeButton = document.getElementById('closeIframeButton');
+        const appMenu = document.querySelector('.app-menu'); // Para referência se precisar esconder só o menu
 
-            // Lista de 50 PINs válidos (fornecida por você)
-            const validPins = [
-                "AP7361Q", "ZR2905D", "KX5018P", "VB1172M", "CJ9843G", "HU6709R", "NF4551B", "OW3216T", "QS8823Y", "LM0574A",
-                "FY1980X", "GT6247E", "RD3092W", "PI7715J", "SC5368U", "BX8021O", "EK9154I", "JZ2407C", "YV0730N", "MW4696F",
-                "UL1859V", "DP6073S", "GQ9510H", "IO3386Z", "TE2642K", "AM7019L", "RW5275B", "FX0981P", "KY4138G", "NB8704M",
-                "OJ1460D", "PL5627R", "SH9933T", "UZ7289Y", "VT2556A", "WE6112X", "XK3778E", "YC0445W", "ZI8001J", "BS4367U",
-                "CF1034O", "DG5990I", "EJ2256C", "HM6813N", "IP0179F", "JR4735V", "KU8391S", "LV1658H", "MX5214Z", "NY9870K"
-            ];
+        const localStorageKeyAccess = 'studyAppAccessGranted_v2';
+        const validPins = [
+            "AP7361Q", // "ZR2905D", "KX5018P", "VB1172M", "CJ9843G", "HU6709R", "NF4551B", "OW3216T", "QS8823Y", "LM0574A",
+      //      "FY1980X", "GT6247E", "RD3092W", "PI7715J", "SC5368U", "BX8021O", "EK9154I", "JZ2407C", "YV0730N", "MW4696F",
+      //      "UL1859V", "DP6073S", "GQ9510H", "IO3386Z", "TE2642K", "AM7019L", "RW5275B", "FX0981P", "KY4138G", "NB8704M",
+      //      "OJ1460D", "PL5627R", "SH9933T", "UZ7289Y", "VT2556A", "WE6112X", "XK3778E", "YC0445W", "ZI8001J", "BS4367U",
+      //      "CF1034O", "DG5990I", "EJ2256C", "HM6813N", "IP0179F", "JR4735V", "KU8391S", "LV1658H", "MX5214Z", "NY9870K"
+        ];
+        const targetUrls = {
+            btnProvaMorfo: "https://inaciomaximoo.github.io/treino/morfom3.html",
+            btnProvaAPS: "https://inaciomaximoo.github.io/treino/aps.html",
+            btnProvaFarmaco: "https://inaciomaximoo.github.io/treino/farmaco.html",
+            btnCalculadora: "https://inaciomaximoo.github.io/treino/calculadora.html",
+            btnProvaOSCE: null
+        };
 
-            const targetUrls = {
-                btnProvaMorfo: "https://inaciomaximoo.github.io/treino/morfom3.html",
-                btnProvaAPS: "https://inaciomaximoo.github.io/treino/aps.html",
-                btnProvaFarmaco: "https://inaciomaximoo.github.io/treino/farmaco.html",
-                btnCalculadora: "https://inaciomaximoo.github.io/treino/calculadora.html",
-                btnProvaOSCE: null // Prova OSCE sem URL definida por enquanto
-            };
+        function showPinModal() {
+            homepageCard.style.display = 'none';
+            iframeViewer.style.display = 'none'; // Garante que iframe não esteja visível
+            pinModalContainer.style.display = 'flex';
+            pinModalContainer.querySelector('.pin-modal-content').style.opacity = '1';
+            pinInput.value = ''; // Limpa o campo de PIN
+            pinInput.focus();
+            pinErrorMessage.textContent = '';
+            pinErrorMessage.style.visibility = 'hidden';
+        }
 
-            function showPinModal() {
-                pinModalContainer.style.display = 'flex';
-                setTimeout(() => {
-                    pinModalContainer.querySelector('.pin-modal-content').style.opacity = '1';
-                }, 10);
+        function hidePinModal() {
+            pinModalContainer.querySelector('.pin-modal-content').style.opacity = '0';
+            setTimeout(() => { pinModalContainer.style.display = 'none'; }, 300);
+        }
+
+        function showHomepageContent() {
+            hidePinModal();
+            iframeViewer.style.display = 'none'; // Garante que iframe não esteja visível
+            homepageCard.style.display = 'block'; // A animação CSS deve cuidar da aparição
+            mainContentButtons.forEach(button => {
+                button.disabled = false;
+                if (!button.hasAttribute('data-listener-added')) {
+                    button.addEventListener('click', handleMainButtonClick);
+                    button.setAttribute('data-listener-added', 'true');
+                }
+            });
+        }
+        
+        function grantAccess() {
+            localStorage.setItem(localStorageKeyAccess, 'true');
+            showHomepageContent();
+        }
+
+        function handlePinSubmit() {
+            const enteredPin = pinInput.value.trim().toUpperCase();
+            if (validPins.includes(enteredPin)) {
+                grantAccess();
+            } else {
+                pinErrorMessage.textContent = 'PIN inválido. Tente novamente.';
+                pinErrorMessage.style.visibility = 'visible';
+                pinInput.value = '';
                 pinInput.focus();
             }
+        }
 
-            function hidePinModal() {
-                pinModalContainer.querySelector('.pin-modal-content').style.opacity = '0';
-                setTimeout(() => {
-                    pinModalContainer.style.display = 'none';
-                }, 300);
-            }
+        function handleMainButtonClick(event) {
+            const targetId = event.currentTarget.dataset.targetId;
+            const url = targetUrls[targetId];
 
-            function grantAccess() {
-                localStorage.setItem(localStorageKeyAccess, 'true');
-                hidePinModal();
-                mainContentButtons.forEach(button => {
-                    button.disabled = false;
-                });
-                pinErrorMessage.textContent = '';
-                pinErrorMessage.style.visibility = 'hidden';
-            }
-
-            function handlePinSubmit() {
-                const enteredPin = pinInput.value.trim().toUpperCase();
-                if (validPins.includes(enteredPin)) {
-                    grantAccess();
-                } else {
-                    pinErrorMessage.textContent = 'PIN inválido. Tente novamente.';
-                    pinErrorMessage.style.visibility = 'visible';
-                    pinInput.value = '';
-                    pinInput.focus();
-                }
-            }
-
-            function handleMainButtonClick(event) {
-                const targetId = event.target.dataset.targetId;
-                if (targetId && targetUrls[targetId]) {
-                    window.location.href = targetUrls[targetId];
-                } else if (targetId === 'btnProvaOSCE' && targetUrls[targetId] === null) {
-                    alert('A Prova OSCE ainda não está disponível.');
-                } else {
-                    console.warn(`Nenhuma URL de destino para o botão com ID: ${targetId}`);
-                }
-            }
-
-            // Lógica Principal
-            if (localStorage.getItem(localStorageKeyAccess) === 'true') {
-                hidePinModal();
-                mainContentButtons.forEach(button => {
-                    button.disabled = false;
-                    button.addEventListener('click', handleMainButtonClick);
-                });
+            if (url) {
+                homepageCard.style.display = 'none'; // Esconde o menu principal
+                contentIframe.src = url;
+                iframeViewer.style.display = 'flex'; // Mostra o visualizador do iframe
+                iframeViewer.querySelector('.iframe-window').style.opacity = '1'; // Para animação
+            } else if (targetId === 'btnProvaOSCE' && url === null) {
+                alert('A Prova OSCE ainda não está disponível.');
             } else {
-                showPinModal();
-                mainContentButtons.forEach(button => {
-                    button.disabled = true;
-                });
-
-                const processPinSubmission = () => {
-                    handlePinSubmit();
-                    if (localStorage.getItem(localStorageKeyAccess) === 'true') {
-                        mainContentButtons.forEach(button => {
-                            button.disabled = false;
-                            button.addEventListener('click', handleMainButtonClick);
-                        });
-                    }
-                };
-                
-                submitPinButton.addEventListener('click', processPinSubmission);
-                pinInput.addEventListener('keypress', (event) => {
-                    if (event.key === 'Enter') {
-                        processPinSubmission();
-                    }
-                });
+                console.warn(`Nenhuma URL de destino para o botão com ID: ${targetId}`);
             }
+        }
+
+        closeIframeButton.addEventListener('click', () => {
+            iframeViewer.querySelector('.iframe-window').style.opacity = '0';
+            setTimeout(() => {
+                iframeViewer.style.display = 'none';
+                contentIframe.src = 'about:blank'; // Limpa o iframe para interromper carregamento/scripts
+                homepageCard.style.display = 'block'; // Mostra o menu principal novamente
+            }, 300); // Tempo para animação de fade out
         });
+
+        // Lógica Principal de Inicialização
+        if (localStorage.getItem(localStorageKeyAccess) === 'true') {
+            showHomepageContent();
+        } else {
+            showPinModal();
+            mainContentButtons.forEach(button => { button.disabled = true; });
+            
+            submitPinButton.addEventListener('click', handlePinSubmit);
+            pinInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') handlePinSubmit();
+            });
+        }
+    });
     </script>
 </body>
 </html>
