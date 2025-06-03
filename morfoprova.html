@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage do Aplicativo de Estudos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+      /* CSS :root e Reset */
+      :root {
+        --bg-gradient-start: #ece9e6;
+        --bg-gradient-end: #ffffff;
+        --primary: #2979ff;
+        --primary-dark: #1c54b2;
+        --accent: #00c853;
+        --accent-light: #69f0ae; 
+        --danger: #f44336;
+        --danger-light: #ffebee;
+        --text: #263238;
+        --text-light: #546e7a;
+        --border: #cfd8dc;
+        --card-bg: #ffffff;
+        --shadow-color: rgba(0, 0, 0, 0.1);
+        --disabled-bg: #e0e0e0;
+        --disabled-text: #9e9e9e;
+        --transition-speed: 0.3s;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+        color: var(--text);
+        padding: 0; /* Removido padding para iframe ocupar tela toda, se necessário */
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center; /* Centraliza o .main-container se o body for flex container direto */
+      }
+
+      .main-container {
+        max-width: 850px;
+        width: 100%;
+        padding: 30px 15px; /* Movido padding para cá */
+      }
+      
+      /* Estilos Homepage Card */
+      .homepage-card {
+        background-color: var(--card-bg);
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        padding: 35px;
+        /* margin-top e margin-bottom removidos pois o main-container já tem padding */
+        animation: slideUpFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        opacity: 0;
+        width: 100%;
+      }
+
+      .app-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 35px;
+        padding-bottom: 25px;
+        border-bottom: 1px solid var(--border);
+      }
+      .app-icon-placeholder { width: 80px; height: 80px; margin-bottom: 20px; }
+      .app-icon-placeholder svg { width: 100%; height: 100%; }
+      .app-title { font-size: 2.2rem; font-weight: 700; color: var(--primary-dark); text-align: center; }
+      .app-menu { display: flex; flex-direction: column; gap: 25px; }
+      
+      .theme-section {
+        padding: 25px;
+        background-color: #fdfdff;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      }
+      .theme-title {
+        font-size: 1.5rem; font-weight: 600; color: var(--primary); margin-bottom: 20px;
+        padding-bottom: 10px; border-bottom: 1px solid #e0e0e0; text-align: center;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .section-icon { width: 26px; height: 26px; margin-right: 10px; color: var(--primary); flex-shrink: 0; }
+      
+      .theme-section .button {
+        display: block; width: 100%; margin-bottom: 15px; text-align: center;
+        background-color: var(--primary); color: white; padding: 12px 30px;
+        border: none; border-radius: 8px; cursor: pointer;
+        font-weight: 600; font-size: 1rem;
+        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 10px rgba(41, 121, 255, 0.3); text-decoration: none;
+      }
+      .theme-section .button:hover {
+        background-color: var(--primary-dark); transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(41, 121, 255, 0.4);
+      }
+      .theme-section .button:disabled {
+        background-color: var(--disabled-bg); color: var(--disabled-text);
+        cursor: not-allowed; box-shadow: none; transform: none;
+      }
+      .theme-section .button:last-child { margin-bottom: 0; }
+
+      /* Modal de PIN */
+      .pin-modal-container {
+        display: none; position: fixed; z-index: 2000;
+        left: 0; top: 0; width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.85);
+        justify-content: center; align-items: center;
+        animation: fadeIn 0.3s ease;
+      }
+      .pin-modal-content {
+        background-color: var(--card-bg); color: var(--text); padding: 30px 35px;
+        border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        width: 90%; max-width: 400px; text-align: center;
+        animation: slideUpFadeInModal 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        opacity: 0;
+      }
+      .pin-modal-content h2 { color: var(--primary-dark); margin-bottom: 15px; font-size: 1.7rem; }
+      .pin-modal-content p { font-size: 1rem; color: var(--text-light); margin-bottom: 25px; }
+      #pinInput {
+        width: calc(100% - 24px); padding: 14px; margin-bottom: 25px;
+        border: 1px solid var(--border); border-radius: 8px;
+        font-size: 1.1rem; text-align: center; font-family: 'Poppins', sans-serif;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      #pinInput:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(41, 121, 255, 0.25); }
+      #submitPinButton {
+        display: block; width: 100%; text-align: center; background-color: var(--primary);
+        color: white; padding: 14px 30px; border: none; border-radius: 8px; cursor: pointer;
+        font-weight: 600; font-size: 1rem; transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease;
+      }
+      #submitPinButton:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
+      #pinErrorMessage {
+        margin-top: 15px; font-size: 0.9rem; font-weight: 600; color: var(--danger);
+        min-height: 1.2em; visibility: hidden;
+      }
+
+      /* Iframe Viewer Styles */
+      #iframeViewer {
+        display: none; 
+        position: fixed; 
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background-color: rgba(0, 0, 0, 0.6); 
+        z-index: 3000; 
+        padding: 2vh; /* Use vh/vw para padding responsivo */
+        box-sizing: border-box;
+        justify-content: center; 
+        align-items: center; 
+        animation: fadeIn 0.3s ease;
+      }
+      .iframe-window {
+        background-color: var(--card-bg);
+        width: 100%; 
+        height: 100%;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+        overflow: hidden; 
+        display: flex;
+        flex-direction: column;
+        animation: slideUpFadeInModal 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        opacity: 0;
+      }
+      .iframe-header {
+        padding: 8px 15px;
+        text-align: right;
+        background-color: #e9ecef; 
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0; /* Não encolher o header */
+      }
+      #closeIframeButton {
+        font-size: 1.8rem; font-weight: bold; line-height: 1;
+        cursor: pointer; border: none; background: transparent;
+        color: var(--text-light); padding: 5px;
+      }
+      #closeIframeButton:hover { color: var(--text); }
+      #contentIframe {
+        width: 100%;
+        flex-grow: 1; /* Ocupa o espaço restante */
+        border: none;
+      }
+
+      /* Animações */
+      @keyframes slideUpFadeIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes slideUpFadeInModal { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+      /* Media Queries */
+      @media (max-width: 768px) { /* Ajustado para tablets e mobile */
+        .main-container { padding: 20px 10px; }
+        .homepage-card { padding: 25px; }
+        .app-title { font-size: 1.9rem; }
+        .theme-title { font-size: 1.4rem; }
+        .theme-section .button { padding: 12px 20px; font-size: 0.95rem;}
+        
+        #iframeViewer { padding: 10px; } /* Menos padding em telas menores */
+        .iframe-header { padding: 6px 12px; }
+        #closeIframeButton { font-size: 1.6rem; }
+      }
+       @media (max-width: 480px) { /* Ajustes mais finos para mobile */
+        .main-container { padding: 15px 5px; }
+        .homepage-card { padding: 20px; }
+        .app-title { font-size: 1.7rem; }
+        .theme-title { font-size: 1.3rem; }
+        .pin-modal-content { padding: 25px 20px; }
+        .pin-modal-content h2 { font-size: 1.5rem; }
+        #pinInput { padding: 12px; font-size: 1rem; }
+      }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="homepage-card" style="display: none;">
+            <header class="app-header">
+                <div class="app-icon-placeholder">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="iconGradientHeader" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:var(--primary-dark);stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:var(--primary);stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M5 55 Q50 35 95 55 L50 75 Z" fill="url(#iconGradientHeader)"/>
+                        <rect x="0" y="25" width="100" height="15" rx="2" fill="url(#iconGradientHeader)"/>
+                        <line x1="80" y1="40" x2="80" y2="60" stroke="var(--accent)" stroke-width="3"/>
+                        <circle cx="80" cy="60" r="4" fill="var(--accent)"/>
+                        <circle cx="50" cy="32.5" r="5" fill="#FFFFFF"/>
+                    </svg>
+                </div>
+                <h1 class="app-title">Plataforma de Estudos</h1>
+            </header>
+
+            <main class="app-menu">
+                <section class="theme-section">
+                    <h2 class="theme-title">
+                        <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <title>Ícone de Provas</title>
+                            <path d="M17 3H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V5C19 3.89543 18.1046 3 17 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 7H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 11H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 15H12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M13.5 14.5L14.5 15.5L16.5 13.5" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Simulados e Provas
+                    </h2>
+                    <button type="button" class="button" data-target-id="btnProvaMorfo">Prova de Morfo (turma 34 e 33)</button>
+                    <button type="button" class="button" data-target-id="btnProvaOSCE">Prova OSCE</button>
+                </section>
+                <section class="theme-section">
+                    <h2 class="theme-title">
+                        <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <title>Ícone de Calculadora</title>
+                            <rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <rect x="7" y="6" width="10" height="4.5" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                            <circle cx="8.5" cy="13.5" r="1" fill="currentColor"/><circle cx="12" cy="13.5" r="1" fill="currentColor"/><circle cx="15.5" cy="13.5" r="1" fill="currentColor"/>
+                            <circle cx="8.5" cy="17.5" r="1" fill="currentColor"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/><circle cx="15.5" cy="17.5" r="1" fill="currentColor"/>
+                        </svg>
+                        Ferramentas
+                    </h2>
+                    <button type="button" class="button" data-target-id="btnCalculadora">Calculadora Acadêmica</button>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <div id="pinModalContainer" class="pin-modal-container">
+        <div class="pin-modal-content">
+            <h2>Acesso Restrito</h2>
+            <p>Por favor, insira seu PIN para continuar:</p>
+            <input type="password" id="pinInput" placeholder="Seu PIN">
+            <button type="button" id="submitPinButton">Acessar</button>
+            <p id="pinErrorMessage"></p>
+        </div>
+    </div>
+
+    <div id="iframeViewer">
+        <div class="iframe-window">
+            <div class="iframe-header">
+                <button id="closeIframeButton" title="Fechar">&times;</button>
+            </div>
+            <iframe id="contentIframe" title="Conteúdo Externo" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+            </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const homepageCard = document.querySelector('.homepage-card');
+        const pinModalContainer = document.getElementById('pinModalContainer');
+        const pinInput = document.getElementById('pinInput');
+        const submitPinButton = document.getElementById('submitPinButton');
+        const pinErrorMessage = document.getElementById('pinErrorMessage');
+        const mainContentButtons = document.querySelectorAll('.app-menu .button');
+
+        // Iframe elements
+        const iframeViewer = document.getElementById('iframeViewer');
+        const contentIframe = document.getElementById('contentIframe');
+        const closeIframeButton = document.getElementById('closeIframeButton');
+        const appMenu = document.querySelector('.app-menu'); // Para referência se precisar esconder só o menu
+
+
+// "AP7361Q","ZR2905D" , "KX5018P", , "CJ9843G", "HU6709R", "NF4551B", "OW3216T", "QS8823Y", "LM0574A", "VB1172M"
+      //      "FY1980X", "GT6247E", "RD3092W", "PI7715J", "SC5368U", "BX8021O", "EK9154I", "JZ2407C", "YV0730N", "MW4696F",
+      //     , "DP6073S", "GQ9510H", "IO3386Z", "TE2642K", "AM7019L", , "FX0981P", "KY4138G", "NB8704M",
+      //      "OJ1460D", "PL5627R", "SH9933T", "UZ7289Y", "VT2556A", "WE6112X", "XK3778E", "YC0445W", "ZI8001J", "BS4367U",
+      //      "CF1034O", "DG5990I", "EJ2256C", "HM6813N", "IP0179F", "JR4735V", "KU8391S", "LV1658H", "MX5214Z", "NY9870K"   "IP0179F"
+
+
+        
+        const localStorageKeyAccess = 'studyAppAccessGranted_v2';
+        const validPins = ["RW5275B","naquinha123s","Maxxx","macaquin","maedothomas","natzinha"];
+
+
+        const targetUrls = {
+            btnProvaMorfo: "https://inaciomaximoo.github.io/treino/morfom3.html",
+            btnProvaAPS: "https://inaciomaximoo.github.io/treino/aps.html",
+            btnProvaFarmaco: "https://inaciomaximoo.github.io/treino/farmaco.html",
+            btnCalculadora: "https://inaciomaximoo.github.io/treino/calculadora.html",
+            btnProvaOSCE: null
+        };
+
+        function showPinModal() {
+            homepageCard.style.display = 'none';
+            iframeViewer.style.display = 'none'; // Garante que iframe não esteja visível
+            pinModalContainer.style.display = 'flex';
+            pinModalContainer.querySelector('.pin-modal-content').style.opacity = '1';
+            pinInput.value = ''; // Limpa o campo de PIN
+            pinInput.focus();
+            pinErrorMessage.textContent = '';
+            pinErrorMessage.style.visibility = 'hidden';
+        }
+
+        function hidePinModal() {
+            pinModalContainer.querySelector('.pin-modal-content').style.opacity = '0';
+            setTimeout(() => { pinModalContainer.style.display = 'none'; }, 300);
+        }
+
+        function showHomepageContent() {
+            hidePinModal();
+            iframeViewer.style.display = 'none'; // Garante que iframe não esteja visível
+            homepageCard.style.display = 'block'; // A animação CSS deve cuidar da aparição
+            mainContentButtons.forEach(button => {
+                button.disabled = false;
+                if (!button.hasAttribute('data-listener-added')) {
+                    button.addEventListener('click', handleMainButtonClick);
+                    button.setAttribute('data-listener-added', 'true');
+                }
+            });
+        }
+        
+        function grantAccess() {
+            localStorage.setItem(localStorageKeyAccess, 'true');
+            showHomepageContent();
+        }
+
+        function handlePinSubmit() {
+            const enteredPin = pinInput.value.trim().toUpperCase();
+            if (validPins.includes(enteredPin)) {
+                grantAccess();
+            } else {
+                pinErrorMessage.textContent = 'PIN inválido. Tente novamente.';
+                pinErrorMessage.style.visibility = 'visible';
+                pinInput.value = '';
+                pinInput.focus();
+            }
+        }
+
+        function handleMainButtonClick(event) {
+            const targetId = event.currentTarget.dataset.targetId;
+            const url = targetUrls[targetId];
+
+            if (url) {
+                homepageCard.style.display = 'none'; // Esconde o menu principal
+                contentIframe.src = url;
+                iframeViewer.style.display = 'flex'; // Mostra o visualizador do iframe
+                iframeViewer.querySelector('.iframe-window').style.opacity = '1'; // Para animação
+            } else if (targetId === 'btnProvaOSCE' && url === null) {
+                alert('A Prova OSCE ainda não está disponível.');
+            } else {
+                console.warn(`Nenhuma URL de destino para o botão com ID: ${targetId}`);
+            }
+        }
+
+        closeIframeButton.addEventListener('click', () => {
+            iframeViewer.querySelector('.iframe-window').style.opacity = '0';
+            setTimeout(() => {
+                iframeViewer.style.display = 'none';
+                contentIframe.src = 'about:blank'; // Limpa o iframe para interromper carregamento/scripts
+                homepageCard.style.display = 'block'; // Mostra o menu principal novamente
+            }, 300); // Tempo para animação de fade out
+        });
+
+        // Lógica Principal de Inicialização
+        if (localStorage.getItem(localStorageKeyAccess) === 'true') {
+            showHomepageContent();
+        } else {
+            showPinModal();
+            mainContentButtons.forEach(button => { button.disabled = true; });
+            
+            submitPinButton.addEventListener('click', handlePinSubmit);
+            pinInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') handlePinSubmit();
+            });
+        }
+    });
+    </script>
+</body>
+</html>
