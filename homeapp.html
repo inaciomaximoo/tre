@@ -6,232 +6,402 @@
     <title>Homepage do Aplicativo de Estudos</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-      /* CSS :root e Reset */
-      :root {
-        --bg-gradient-start: #ece9e6;
-        --bg-gradient-end: #ffffff;
-        --primary: #2979ff;
-        --primary-dark: #1c54b2;
-        --accent: #00c853;
-        --accent-light: #69f0ae; 
-        --danger: #f44336;
-        --danger-light: #ffebee;
-        --text: #263238;
-        --text-light: #546e7a;
-        --border: #cfd8dc;
-        --card-bg: #ffffff;
-        --shadow-color: rgba(0, 0, 0, 0.1);
-        --disabled-bg: #e0e0e0;
-        --disabled-text: #9e9e9e;
-        --transition-speed: 0.3s;
-      }
+        /* CSS :root e Reset */
+        :root {
+            --bg-gradient-start: #ece9e6;
+            --bg-gradient-end: #ffffff;
+            --primary: #2979ff;
+            --primary-dark: #1c54b2;
+            --accent: #00c853;
+            --accent-light: rgba(0, 200, 83, 0.15); /* Ajustado para melhor visibilidade com fundo */
+            --danger: #f44336;
+            --danger-light: rgba(244, 67, 54, 0.1);
+            --text: #263238;
+            --text-light: #546e7a;
+            --border: #cfd8dc;
+            --card-bg: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --disabled-bg: #e0e0e0;
+            --disabled-text: #9e9e9e;
+            --transition-speed: 0.3s;
+            --button-hover-bg: #e0e0e0; /* Cor de hover para botões no modo claro */
+            --input-bg: #fff;
+            --section-bg: #fdfdff; /* Fundo das seções temáticas */
+        }
 
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
+        body.dark-mode {
+            --bg-gradient-start: #1f2937;
+            --bg-gradient-end: #111827;
+            --primary: #60a5fa;
+            --primary-dark: #3b82f6;
+            --accent: #34d399;
+            --accent-light: rgba(52, 211, 153, 0.15);
+            --danger: #f87171;
+            --danger-light: rgba(248, 113, 113, 0.15);
+            --text: #e5e7eb;
+            --text-light: #9ca3af;
+            --border: #4b5563;
+            --card-bg: #2d3748; /* Alterado para um cinza um pouco mais claro que o --button-hover-bg */
+            --shadow-color: rgba(0, 0, 0, 0.4); /* Sombra mais pronunciada no escuro */
+            --disabled-bg: #4b5563;
+            --disabled-text: #9ca3af;
+            --button-hover-bg: #374151; /* Cor de hover para botões no modo escuro */
+            --input-bg: #374151;
+            --section-bg: #374151; /* Fundo das seções temáticas no modo escuro */
+        }
 
-      body {
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-        color: var(--text);
-        padding: 0; /* Removido padding para iframe ocupar tela toda, se necessário */
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center; /* Centraliza o .main-container se o body for flex container direto */
-      }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-      .main-container {
-        max-width: 850px;
-        width: 100%;
-        padding: 30px 15px; /* Movido padding para cá */
-      }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text);
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background var(--transition-speed), color var(--transition-speed);
+        }
+
+        .main-container {
+            max-width: 850px;
+            width: 100%;
+            padding: 30px 15px;
+        }
+
+        .homepage-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            padding: 35px;
+            animation: slideUpFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            opacity: 0;
+            width: 100%;
+            position: relative;
+            transition: background-color var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        .dark-mode-toggle-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-light);
+            width: 44px; /* Levemente maior */
+            height: 44px; /* Levemente maior */
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem; /* Ajustado para ícones de emoji */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all var(--transition-speed);
+            z-index: 10;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+        .dark-mode-toggle-button:hover {
+            background-color: var(--button-hover-bg);
+            border-color: var(--primary);
+            color: var(--primary); /* Cor do ícone no hover */
+            transform: scale(1.1);
+        }
       
-      /* Estilos Homepage Card */
-      .homepage-card {
-        background-color: var(--card-bg);
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-        padding: 35px;
-        /* margin-top e margin-bottom removidos pois o main-container já tem padding */
-        animation: slideUpFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        opacity: 0;
-        width: 100%;
-      }
 
-      .app-header {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 35px;
-        padding-bottom: 25px;
-        border-bottom: 1px solid var(--border);
-      }
-      .app-icon-placeholder { width: 80px; height: 80px; margin-bottom: 20px; }
-      .app-icon-placeholder svg { width: 100%; height: 100%; }
-      .app-title { font-size: 2.2rem; font-weight: 700; color: var(--primary-dark); text-align: center; }
-      .app-menu { display: flex; flex-direction: column; gap: 25px; }
+        .app-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            transition: border-color var(--transition-speed);
+        }
+
+        .header-avatar-container {
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        .header-avatar-container:hover {
+            transform: scale(1.05);
+        }
+        #selectedAvatarDisplay {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid var(--primary);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            object-fit: cover;
+            background-color: var(--card-bg); 
+            transition: border-color var(--transition-speed), background-color var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        .app-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            text-align: center;
+            transition: color var(--transition-speed);
+        }
+        .app-menu { display: flex; flex-direction: column; gap: 25px; }
+
+        .theme-section {
+            padding: 25px;
+            background-color: var(--section-bg); 
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            transition: background-color var(--transition-speed), border-color var(--transition-speed), box-shadow var(--transition-speed);
+        }
+       
+        .theme-title {
+            font-size: 1.5rem; font-weight: 600; color: var(--primary); margin-bottom: 20px;
+            padding-bottom: 10px; border-bottom: 1px solid var(--border); text-align: center;
+            display: flex; align-items: center; justify-content: center;
+            transition: color var(--transition-speed), border-color var(--transition-speed);
+        }
+        .section-icon { width: 26px; height: 26px; margin-right: 10px; color: var(--primary); flex-shrink: 0; transition: color var(--transition-speed); }
+
+        .theme-section .button {
+            display: block; width: 100%; margin-bottom: 15px; text-align: center;
+            background-color: var(--primary); color: white; padding: 12px 30px;
+            border: none; border-radius: 8px; cursor: pointer;
+            font-weight: 600; font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(41, 121, 255, 0.2); text-decoration: none;
+        }
+         body.dark-mode .theme-section .button {
+            color: var(--text); /* Texto do botão mais claro no modo escuro */
+            box-shadow: 0 4px 10px rgba(0,0,0, 0.3);
+         }
+
+        .theme-section .button:hover {
+            background-color: var(--primary-dark); transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(41, 121, 255, 0.3);
+        }
+        body.dark-mode .theme-section .button:hover {
+            background-color: var(--primary-dark);
+             box-shadow: 0 6px 15px rgba(0,0,0, 0.4);
+        }
+
+        .theme-section .button:disabled {
+            background-color: var(--disabled-bg); color: var(--disabled-text);
+            cursor: not-allowed; box-shadow: none; transform: none;
+        }
+        .theme-section .button:last-child { margin-bottom: 0; }
+
+        .pin-modal-container, .avatar-modal-overlay {
+            background-color: rgba(0,0,0,0.88);
+        }
+        .pin-modal-content, .avatar-modal-content-box {
+            background-color: var(--card-bg);
+            color: var(--text);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+        .pin-modal-content h2, .avatar-modal-content-box h2 {
+             color: var(--primary-dark);
+             transition: color var(--transition-speed);
+        }
+        .pin-modal-content p {
+            color: var(--text-light);
+            transition: color var(--transition-speed);
+        }
+        #pinInput {
+            background-color: var(--input-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color var(--transition-speed), color var(--transition-speed);
+        }
+        #pinInput:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--accent-light); /* Usando accent-light para o foco */
+        }
       
-      .theme-section {
-        padding: 25px;
-        background-color: #fdfdff;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-      }
-      .theme-title {
-        font-size: 1.5rem; font-weight: 600; color: var(--primary); margin-bottom: 20px;
-        padding-bottom: 10px; border-bottom: 1px solid #e0e0e0; text-align: center;
-        display: flex; align-items: center; justify-content: center;
-      }
-      .section-icon { width: 26px; height: 26px; margin-right: 10px; color: var(--primary); flex-shrink: 0; }
+        #submitPinButton {
+            background-color: var(--primary);
+            color: white;
+        }
+         body.dark-mode #submitPinButton {
+            color: var(--text);
+         }
+        #submitPinButton:hover {
+            background-color: var(--primary-dark);
+        }
+        #pinErrorMessage {
+            color: var(--danger);
+        }
+
+        #iframeViewer {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: rgba(0, 0, 0, 0.75);
+            z-index: 3000;
+            padding: 2vh;
+            box-sizing: border-box;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .iframe-window {
+            background-color: var(--card-bg);
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px var(--shadow-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: slideUpFadeInModal 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            opacity: 0;
+            transition: background-color var(--transition-speed), box-shadow var(--transition-speed);
+        }
+        .iframe-header {
+            padding: 8px 15px;
+            text-align: right;
+            background-color: var(--button-hover-bg); /* Usando uma cor neutra */
+            border-bottom: 1px solid var(--border);
+            transition: background-color var(--transition-speed), border-color var(--transition-speed);
+            flex-shrink: 0;
+        }
+       
+        #closeIframeButton {
+            font-size: 1.8rem; font-weight: bold; line-height: 1;
+            cursor: pointer; border: none; background: transparent;
+            color: var(--text-light); padding: 5px;
+            transition: color var(--transition-speed);
+        }
+        #closeIframeButton:hover { color: var(--text); }
+        #contentIframe {
+            width: 100%;
+            flex-grow: 1;
+            border: none;
+        }
+
+        .avatar-modal-overlay {
+            display: none; 
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center; align-items: center;
+            z-index: 4000;
+            animation: fadeIn 0.3s ease;
+        }
+        .avatar-modal-content-box {
+            background-color: var(--card-bg);
+            padding: 25px; border-radius: 12px;
+            box-shadow: 0 8px 30px var(--shadow-color);
+            width: 90%; max-width: 500px; 
+            text-align: center;
+            animation: slideUpFadeInModal 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            opacity: 0;
+        }
+        .avatar-modal-content-box h2 {
+            color: var(--primary-dark);
+            font-size: 1.6rem; margin-bottom: 20px;
+        }
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 15px; margin-bottom: 25px;
+            max-height: 50vh; overflow-y: auto;
+            padding: 10px;
+            background-color: var(--button-hover-bg); /* Fundo sutil para a grade */
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: background-color var(--transition-speed), border-color var(--transition-speed);
+        }
       
-      .theme-section .button {
-        display: block; width: 100%; margin-bottom: 15px; text-align: center;
-        background-color: var(--primary); color: white; padding: 12px 30px;
-        border: none; border-radius: 8px; cursor: pointer;
-        font-weight: 600; font-size: 1rem;
-        transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-        box-shadow: 0 4px 10px rgba(41, 121, 255, 0.3); text-decoration: none;
-      }
-      .theme-section .button:hover {
-        background-color: var(--primary-dark); transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(41, 121, 255, 0.4);
-      }
-      .theme-section .button:disabled {
-        background-color: var(--disabled-bg); color: var(--disabled-text);
-        cursor: not-allowed; box-shadow: none; transform: none;
-      }
-      .theme-section .button:last-child { margin-bottom: 0; }
+        .avatar-option {
+            width: 100%; padding-top: 100%; 
+            position: relative; border-radius: 8px;
+            overflow: hidden; cursor: pointer;
+            border: 3px solid transparent;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+        .avatar-option img {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .avatar-option:hover {
+            border-color: var(--primary-light);
+            transform: scale(1.05);
+        }
+        .avatar-option.selected-preview {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-light);
+        }
+        #closeAvatarModalBtn {
+            display: inline-block;
+            background-color: var(--text-light); color: white;
+            padding: 10px 25px; border: none;
+            border-radius: 8px; cursor: pointer;
+            font-weight: 600; font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+        #closeAvatarModalBtn:hover {
+            background-color: var(--text);
+        }
+        body.dark-mode #closeAvatarModalBtn {
+             background-color: var(--disabled-bg);
+             color: var(--text);
+        }
+         body.dark-mode #closeAvatarModalBtn:hover {
+             background-color: var(--button-hover-bg);
+         }
 
-      /* Modal de PIN */
-      .pin-modal-container {
-        display: none; position: fixed; z-index: 2000;
-        left: 0; top: 0; width: 100%; height: 100%;
-        background-color: rgba(0,0,0,0.85);
-        justify-content: center; align-items: center;
-        animation: fadeIn 0.3s ease;
-      }
-      .pin-modal-content {
-        background-color: var(--card-bg); color: var(--text); padding: 30px 35px;
-        border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        width: 90%; max-width: 400px; text-align: center;
-        animation: slideUpFadeInModal 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        opacity: 0;
-      }
-      .pin-modal-content h2 { color: var(--primary-dark); margin-bottom: 15px; font-size: 1.7rem; }
-      .pin-modal-content p { font-size: 1rem; color: var(--text-light); margin-bottom: 25px; }
-      #pinInput {
-        width: calc(100% - 24px); padding: 14px; margin-bottom: 25px;
-        border: 1px solid var(--border); border-radius: 8px;
-        font-size: 1.1rem; text-align: center; font-family: 'Poppins', sans-serif;
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-      }
-      #pinInput:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(41, 121, 255, 0.25); }
-      #submitPinButton {
-        display: block; width: 100%; text-align: center; background-color: var(--primary);
-        color: white; padding: 14px 30px; border: none; border-radius: 8px; cursor: pointer;
-        font-weight: 600; font-size: 1rem; transition: background-color var(--transition-speed) ease, transform var(--transition-speed) ease;
-      }
-      #submitPinButton:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
-      #pinErrorMessage {
-        margin-top: 15px; font-size: 0.9rem; font-weight: 600; color: var(--danger);
-        min-height: 1.2em; visibility: hidden;
-      }
+        @keyframes slideUpFadeIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUpFadeInModal { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-      /* Iframe Viewer Styles */
-      #iframeViewer {
-        display: none; 
-        position: fixed; 
-        top: 0; left: 0;
-        width: 100vw; height: 100vh;
-        background-color: rgba(0, 0, 0, 0.6); 
-        z-index: 3000; 
-        padding: 2vh; /* Use vh/vw para padding responsivo */
-        box-sizing: border-box;
-        justify-content: center; 
-        align-items: center; 
-        animation: fadeIn 0.3s ease;
-      }
-      .iframe-window {
-        background-color: var(--card-bg);
-        width: 100%; 
-        height: 100%;
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.25);
-        overflow: hidden; 
-        display: flex;
-        flex-direction: column;
-        animation: slideUpFadeInModal 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        opacity: 0;
-      }
-      .iframe-header {
-        padding: 8px 15px;
-        text-align: right;
-        background-color: #e9ecef; 
-        border-bottom: 1px solid var(--border);
-        flex-shrink: 0; /* Não encolher o header */
-      }
-      #closeIframeButton {
-        font-size: 1.8rem; font-weight: bold; line-height: 1;
-        cursor: pointer; border: none; background: transparent;
-        color: var(--text-light); padding: 5px;
-      }
-      #closeIframeButton:hover { color: var(--text); }
-      #contentIframe {
-        width: 100%;
-        flex-grow: 1; /* Ocupa o espaço restante */
-        border: none;
-      }
+        @media (max-width: 768px) {
+            .main-container { padding: 20px 10px; }
+            .homepage-card { padding: 25px; }
+            #selectedAvatarDisplay { width: 80px; height: 80px; }
+            .app-title { font-size: 1.9rem; }
+            .theme-title { font-size: 1.4rem; }
+            .theme-section .button { padding: 12px 20px; font-size: 0.95rem;}
+            .dark-mode-toggle-button { top: 15px; right: 15px; width: 40px; height: 40px; font-size: 1.2rem;}
 
-      /* Animações */
-      @keyframes slideUpFadeIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-      @keyframes slideUpFadeInModal { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            #iframeViewer { padding: 10px; }
+            .iframe-header { padding: 6px 12px; }
+            #closeIframeButton { font-size: 1.6rem; }
 
-      /* Media Queries */
-      @media (max-width: 768px) { /* Ajustado para tablets e mobile */
-        .main-container { padding: 20px 10px; }
-        .homepage-card { padding: 25px; }
-        .app-title { font-size: 1.9rem; }
-        .theme-title { font-size: 1.4rem; }
-        .theme-section .button { padding: 12px 20px; font-size: 0.95rem;}
-        
-        #iframeViewer { padding: 10px; } /* Menos padding em telas menores */
-        .iframe-header { padding: 6px 12px; }
-        #closeIframeButton { font-size: 1.6rem; }
-      }
-       @media (max-width: 480px) { /* Ajustes mais finos para mobile */
-        .main-container { padding: 15px 5px; }
-        .homepage-card { padding: 20px; }
-        .app-title { font-size: 1.7rem; }
-        .theme-title { font-size: 1.3rem; }
-        .pin-modal-content { padding: 25px 20px; }
-        .pin-modal-content h2 { font-size: 1.5rem; }
-        #pinInput { padding: 12px; font-size: 1rem; }
-      }
+            .avatar-modal-content-box { max-width: 95%; }
+            .avatar-grid { grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 10px;}
+        }
+        @media (max-width: 480px) {
+            .main-container { padding: 15px 5px; }
+            .homepage-card { padding: 20px; }
+            #selectedAvatarDisplay { width: 70px; height: 70px; }
+            .app-title { font-size: 1.7rem; }
+            .theme-title { font-size: 1.3rem; }
+            .pin-modal-content { padding: 25px 20px; }
+            .pin-modal-content h2 { font-size: 1.5rem; }
+            #pinInput { padding: 12px; font-size: 1rem; }
+            .dark-mode-toggle-button { top: 10px; right: 10px; width: 38px; height: 38px; font-size: 1.1rem;}
+
+            .avatar-grid { grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); gap: 8px;}
+            .avatar-modal-content-box h2 { font-size: 1.4rem; }
+        }
     </style>
 </head>
 <body>
     <div class="main-container">
         <div class="homepage-card" style="display: none;">
+            <button id="darkModeToggle" class="dark-mode-toggle-button" title="Alternar Modo Noturno">🌙</button>
             <header class="app-header">
-                <div class="app-icon-placeholder">
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="iconGradientHeader" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:var(--primary-dark);stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:var(--primary);stop-opacity:1" />
-                            </linearGradient>
-                        </defs>
-                        <path d="M5 55 Q50 35 95 55 L50 75 Z" fill="url(#iconGradientHeader)"/>
-                        <rect x="0" y="25" width="100" height="15" rx="2" fill="url(#iconGradientHeader)"/>
-                        <line x1="80" y1="40" x2="80" y2="60" stroke="var(--accent)" stroke-width="3"/>
-                        <circle cx="80" cy="60" r="4" fill="var(--accent)"/>
-                        <circle cx="50" cy="32.5" r="5" fill="#FFFFFF"/>
-                    </svg>
+                <div class="header-avatar-container" id="headerAvatarContainer" title="Clique para mudar o avatar">
+                    <img id="selectedAvatarDisplay" src="https://i.imgur.com/rJXV7uR.png" alt="Avatar">
                 </div>
                 <h1 class="app-title">Plataforma de Estudos</h1>
             </header>
@@ -252,7 +422,7 @@
                     <button type="button" class="button" data-target-id="btnProvaMorfo">Prova de Morfo (turma 34 e 33)</button>
                     <button type="button" class="button" data-target-id="btnProvaAPS">Prova de APS (turma 34 e 33)</button>
                     <button type="button" class="button" data-target-id="btnProvaFarmaco">Prova de Farmacologia (prova romero)</button>
-                    <button type="button" class="button" data-target-id="btnProvaOSCE">Prova OSCE</button>
+                    <button type="button" class="button" data-target-id="btnProvaOSCE">Prova OSCE</button>
                 </section>
                 <section class="theme-section">
                     <h2 class="theme-title">
@@ -287,7 +457,16 @@
                 <button id="closeIframeButton" title="Fechar">&times;</button>
             </div>
             <iframe id="contentIframe" title="Conteúdo Externo" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
-            </div>
+        </div>
+    </div>
+
+    <div id="avatarModalOverlay" class="avatar-modal-overlay">
+        <div class="avatar-modal-content-box">
+            <h2>Escolha seu Avatar</h2>
+            <div id="avatarGrid" class="avatar-grid">
+                </div>
+            <button id="closeAvatarModalBtn">Fechar</button>
+        </div>
     </div>
 
     <script>
@@ -299,53 +478,126 @@
         const pinErrorMessage = document.getElementById('pinErrorMessage');
         const mainContentButtons = document.querySelectorAll('.app-menu .button');
 
-        // Iframe elements
         const iframeViewer = document.getElementById('iframeViewer');
         const contentIframe = document.getElementById('contentIframe');
         const closeIframeButton = document.getElementById('closeIframeButton');
-        const appMenu = document.querySelector('.app-menu'); // Para referência se precisar esconder só o menu
+
+        const headerAvatarContainer = document.getElementById('headerAvatarContainer');
+        const selectedAvatarDisplay = document.getElementById('selectedAvatarDisplay');
+        const avatarModalOverlay = document.getElementById('avatarModalOverlay');
+        const avatarGrid = document.getElementById('avatarGrid');
+        const closeAvatarModalBtn = document.getElementById('closeAvatarModalBtn');
+
+        const darkModeToggleButton = document.getElementById('darkModeToggle');
+        const bodyElement = document.body;
+        const darkModeKey = 'userDarkModePreference_v3'; // Chave atualizada para consistência
+
+        const localStorageKeyAccess = 'studyAppAccessGranted_v2';
+        const localStorageKeyAvatar = 'studyAppSelectedAvatar_v2'; // Chave atualizada
+
+
 
 
       // "AP7361Q","ZR2905D" , "KX5018P", "VB1172M" , "CJ9843G", "HU6709R", "NF4551B", "OW3216T", "QS8823Y", "LM0574A",  "RW5275B"
       //      "FY1980X", "GT6247E", "RD3092W", "PI7715J", "SC5368U", "BX8021O", "EK9154I", "JZ2407C", , ,
-      //     , "DP6073S", , "IO3386Z", "TE2642K", "AM7019L", , "FX0981P", "KY4138G", "NB8704M", "GQ9510H", "IP0179F" "DG5990I"
-      //      "OJ1460D", "PL5627R", "SH9933T", "UZ7289Y", "VT2556A", "WE6112X", "XK3778E", "YC0445W", "ZI8001J", "BS4367U",
+      //     , "DP6073S",  "DG5990I"  , "IO3386Z", "TE2642K", "AM7019L", , "FX0981P", "KY4138G", "NB8704M", "GQ9510H", "IP0179F" "DG5990I"
+      //      "OJ1460D", , "SH9933T", "UZ7289Y", "VT2556A", "WE6112X", "XK3778E", "YC0445W", "ZI8001J", "BS4367U",
       //      "CF1034O", , "EJ2256C", "HM6813N",  "YV0730N" , "JR4735V", "KU8391S", "LV1658H", "MX5214Z", "NY9870K"   "IP0179F"
 
 
-        
-        const localStorageKeyAccess = 'studyAppAccessGranted_v2';
-        const validPins = [  "MW4696F"   ];
 
+        
+        const validPins = [    "PL5627R"  ]; 
+
+
+
+
+
+        
+        const avatarImageLinks = [
+            "https://i.imgur.com/rJXV7uR.png", "https://i.imgur.com/DaNsN4q.png",
+            "https://i.imgur.com/DXkoPU0.png", "https://i.imgur.com/5jDryIk.png",
+            "https://i.imgur.com/ya6quMM.png", "https://i.imgur.com/1G7xknr.png",
+            "https://i.imgur.com/Il4owIz.png", "https://i.imgur.com/P95Sxw6.png",
+            "https://i.imgur.com/ISp1O9O.png"
+        ];
+        const defaultAvatar = avatarImageLinks[0];
 
         const targetUrls = {
             btnProvaMorfo: "https://inaciomaximoo.github.io/treino/morfom3.html",
             btnProvaAPS: "https://inaciomaximoo.github.io/treino/aps.html",
             btnProvaFarmaco: "https://inaciomaximoo.github.io/treino/farmaco.html",
             btnCalculadora: "https://inaciomaximoo.github.io/treino/calculadora.html",
-            btnProvaOSCE: null
-        };
+            btnProvaOSCE: null
+        };
+        
+        function applyDarkMode(isDark) {
+            if (darkModeToggleButton) { // Verifica se o botão existe
+                if (isDark) {
+                    bodyElement.classList.add('dark-mode');
+                    darkModeToggleButton.textContent = '☀️';
+                    darkModeToggleButton.title = "Mudar para Modo Claro";
+                } else {
+                    bodyElement.classList.remove('dark-mode');
+                    darkModeToggleButton.textContent = '🌙';
+                    darkModeToggleButton.title = "Mudar para Modo Noturno";
+                }
+            }
+        }
+
+        function toggleDarkModePreference() {
+            const isCurrentlyDark = bodyElement.classList.contains('dark-mode');
+            applyDarkMode(!isCurrentlyDark);
+            localStorage.setItem(darkModeKey, !isCurrentlyDark);
+        }
+        
+        const savedDarkMode = localStorage.getItem(darkModeKey);
+        if (savedDarkMode !== null) {
+            applyDarkMode(savedDarkMode === 'true');
+        } else {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                 applyDarkMode(true);
+             } else {
+                 applyDarkMode(false);
+             }
+        }
+        if(darkModeToggleButton) {
+            darkModeToggleButton.addEventListener('click', toggleDarkModePreference);
+        }
 
         function showPinModal() {
-            homepageCard.style.display = 'none';
-            iframeViewer.style.display = 'none'; // Garante que iframe não esteja visível
-            pinModalContainer.style.display = 'flex';
-            pinModalContainer.querySelector('.pin-modal-content').style.opacity = '1';
-            pinInput.value = ''; // Limpa o campo de PIN
-            pinInput.focus();
-            pinErrorMessage.textContent = '';
-            pinErrorMessage.style.visibility = 'hidden';
+            if(homepageCard) homepageCard.style.display = 'none';
+            if(iframeViewer) iframeViewer.style.display = 'none';
+            if(avatarModalOverlay) avatarModalOverlay.style.display = 'none';
+            if(pinModalContainer) {
+                pinModalContainer.style.display = 'flex';
+                const content = pinModalContainer.querySelector('.pin-modal-content');
+                if(content) content.style.opacity = '1';
+            }
+            if(pinInput) {
+                pinInput.value = '';
+                pinInput.focus();
+            }
+            if(pinErrorMessage) {
+                pinErrorMessage.textContent = '';
+                pinErrorMessage.style.visibility = 'hidden';
+            }
         }
 
         function hidePinModal() {
-            pinModalContainer.querySelector('.pin-modal-content').style.opacity = '0';
-            setTimeout(() => { pinModalContainer.style.display = 'none'; }, 300);
+            if(pinModalContainer) {
+                const content = pinModalContainer.querySelector('.pin-modal-content');
+                if(content) content.style.opacity = '0';
+                setTimeout(() => { pinModalContainer.style.display = 'none'; }, 300);
+            }
         }
 
         function showHomepageContent() {
             hidePinModal();
-            iframeViewer.style.display = 'none'; // Garante que iframe não esteja visível
-            homepageCard.style.display = 'block'; // A animação CSS deve cuidar da aparição
+            if(iframeViewer) iframeViewer.style.display = 'none';
+            if(avatarModalOverlay) avatarModalOverlay.style.display = 'none';
+            if(homepageCard) homepageCard.style.display = 'block';
+            
             mainContentButtons.forEach(button => {
                 button.disabled = false;
                 if (!button.hasAttribute('data-listener-added')) {
@@ -353,6 +605,7 @@
                     button.setAttribute('data-listener-added', 'true');
                 }
             });
+            loadAndDisplaySelectedAvatar();
         }
         
         function grantAccess() {
@@ -361,12 +614,15 @@
         }
 
         function handlePinSubmit() {
+            if(!pinInput) return;
             const enteredPin = pinInput.value.trim().toUpperCase();
             if (validPins.includes(enteredPin)) {
                 grantAccess();
             } else {
-                pinErrorMessage.textContent = 'PIN inválido. Tente novamente.';
-                pinErrorMessage.style.visibility = 'visible';
+                if(pinErrorMessage){
+                    pinErrorMessage.textContent = 'PIN inválido. Tente novamente.';
+                    pinErrorMessage.style.visibility = 'visible';
+                }
                 pinInput.value = '';
                 pinInput.focus();
             }
@@ -377,37 +633,113 @@
             const url = targetUrls[targetId];
 
             if (url) {
-                homepageCard.style.display = 'none'; // Esconde o menu principal
-                contentIframe.src = url;
-                iframeViewer.style.display = 'flex'; // Mostra o visualizador do iframe
-                iframeViewer.querySelector('.iframe-window').style.opacity = '1'; // Para animação
+                if(homepageCard) homepageCard.style.display = 'none';
+                if(contentIframe) contentIframe.src = url;
+                if(iframeViewer) {
+                    iframeViewer.style.display = 'flex';
+                    const windowEl = iframeViewer.querySelector('.iframe-window');
+                    if(windowEl) windowEl.style.opacity = '1';
+                }
             } else if (targetId === 'btnProvaOSCE' && url === null) {
                 alert('A Prova OSCE ainda não está disponível.');
             } else {
-                console.warn(`Nenhuma URL de destino para o botão com ID: ${targetId}`);
+                console.warn(`Nenhuma URL de destino configurada para o botão com ID: ${targetId}`);
             }
         }
 
-        closeIframeButton.addEventListener('click', () => {
-            iframeViewer.querySelector('.iframe-window').style.opacity = '0';
-            setTimeout(() => {
-                iframeViewer.style.display = 'none';
-                contentIframe.src = 'about:blank'; // Limpa o iframe para interromper carregamento/scripts
-                homepageCard.style.display = 'block'; // Mostra o menu principal novamente
-            }, 300); // Tempo para animação de fade out
-        });
+        if(closeIframeButton) {
+            closeIframeButton.addEventListener('click', () => {
+                if(iframeViewer){
+                    const windowEl = iframeViewer.querySelector('.iframe-window');
+                    if(windowEl) windowEl.style.opacity = '0';
+                    setTimeout(() => {
+                        iframeViewer.style.display = 'none';
+                        if(contentIframe) contentIframe.src = 'about:blank';
+                        if(homepageCard) homepageCard.style.display = 'block';
+                    }, 300);
+                }
+            });
+        }
 
-        // Lógica Principal de Inicialização
+        function loadAndDisplaySelectedAvatar() {
+            const savedAvatarUrl = localStorage.getItem(localStorageKeyAvatar) || defaultAvatar;
+            if(selectedAvatarDisplay) {
+                 selectedAvatarDisplay.src = savedAvatarUrl;
+            }
+        }
+
+        function populateAvatarGrid() {
+            if(!avatarGrid) return;
+            avatarGrid.innerHTML = '';
+            avatarImageLinks.forEach(url => {
+                const avatarWrapper = document.createElement('div');
+                avatarWrapper.className = 'avatar-option';
+                
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = 'Opção de Avatar';
+                img.addEventListener('click', () => {
+                    localStorage.setItem(localStorageKeyAvatar, url);
+                    if(selectedAvatarDisplay) selectedAvatarDisplay.src = url;
+                    document.querySelectorAll('.avatar-option.selected-preview').forEach(el => el.classList.remove('selected-preview'));
+                    img.parentElement.classList.add('selected-preview');
+                    setTimeout(() => {
+                       closeAvatarSelectionModal();
+                    }, 300);
+                });
+                avatarWrapper.appendChild(img);
+                avatarGrid.appendChild(avatarWrapper);
+            });
+        }
+
+        function openAvatarSelectionModal() {
+            populateAvatarGrid();
+            if(selectedAvatarDisplay && avatarGrid){
+                const currentSrc = selectedAvatarDisplay.src;
+                const imagesInGrid = avatarGrid.querySelectorAll('img');
+                imagesInGrid.forEach(img => {
+                    if (img.src === currentSrc) {
+                        img.parentElement.classList.add('selected-preview');
+                    } else {
+                        img.parentElement.classList.remove('selected-preview');
+                    }
+                });
+            }
+            if(avatarModalOverlay){
+                avatarModalOverlay.style.display = 'flex';
+                const contentBox = avatarModalOverlay.querySelector('.avatar-modal-content-box');
+                if(contentBox) contentBox.style.opacity = '1';
+            }
+        }
+
+        function closeAvatarSelectionModal() {
+             if(avatarModalOverlay){
+                const contentBox = avatarModalOverlay.querySelector('.avatar-modal-content-box');
+                if(contentBox) contentBox.style.opacity = '0';
+                setTimeout(() => {
+                    avatarModalOverlay.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        if(headerAvatarContainer) {
+            headerAvatarContainer.addEventListener('click', openAvatarSelectionModal);
+        }
+        if(closeAvatarModalBtn) {
+            closeAvatarModalBtn.addEventListener('click', closeAvatarSelectionModal);
+        }
+
         if (localStorage.getItem(localStorageKeyAccess) === 'true') {
             showHomepageContent();
         } else {
             showPinModal();
             mainContentButtons.forEach(button => { button.disabled = true; });
-            
-            submitPinButton.addEventListener('click', handlePinSubmit);
-            pinInput.addEventListener('keypress', (event) => {
-                if (event.key === 'Enter') handlePinSubmit();
-            });
+            if(submitPinButton && pinInput){
+                submitPinButton.addEventListener('click', handlePinSubmit);
+                pinInput.addEventListener('keypress', (event) => {
+                    if (event.key === 'Enter') handlePinSubmit();
+                });
+            }
         }
     });
     </script>
