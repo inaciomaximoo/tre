@@ -187,19 +187,19 @@
             </div>
             <form id="form-semiologia">
                 <div class="input-group">
-                    <label for="semio_p1">Prova 1 (Peso 1,5):</label>
+                    <label for="semio_p1">Prova 1 (Peso 14%):</label>
                     <input type="number" id="semio_p1" min="0" max="10" step="0.01" placeholder="Nota (0-10)" required>
                 </div>
                 <div class="input-group">
-                    <label for="semio_p2">Prova 2 (Peso 1,5):</label>
+                    <label for="semio_p2">Prova 2 (Peso 14%):</label>
                     <input type="number" id="semio_p2" min="0" max="10" step="0.01" placeholder="Nota (0-10)" required>
                 </div>
                 <div class="input-group">
-                    <label for="semio_proc">Processual (Peso 3):</label>
+                    <label for="semio_proc">Processual (Peso 30%):</label>
                     <input type="number" id="semio_proc" min="0" max="10" step="0.01" placeholder="Nota (0-10)" required>
                 </div>
                 <div class="input-group">
-                    <label for="semio_osce">OSCE (Peso 4):</label>
+                    <label for="semio_osce">OSCE (Peso 42%):</label>
                     <input type="number" id="semio_osce" min="0" max="10" step="0.01" placeholder="Nota (0-10)" required>
                 </div>
                 <div class="button-container">
@@ -340,11 +340,14 @@
     </div>
 
     <script>
-        // Função auxiliar para ler valor e validar
+        // Função auxiliar para ler valor e validar (agora aceita vírgula ou ponto)
         function getValidatedNote(elementId) {
-            const value = parseFloat(document.getElementById(elementId).value);
+            let valueStr = document.getElementById(elementId).value;
+            // Substitui vírgula por ponto para garantir que parseFloat funcione corretamente
+            valueStr = valueStr.replace(',', '.'); 
+            const value = parseFloat(valueStr);
             if (isNaN(value) || value < 0 || value > 10) {
-                throw new Error("Nota inválida para " + elementId + ". Por favor, insira um valor entre 0 e 10.");
+                throw new Error("Nota inválida para " + document.querySelector(`label[for='${elementId}']`).textContent + ". Por favor, insira um valor entre 0 e 10.");
             }
             return value;
         }
@@ -357,8 +360,9 @@
                 const proc = getValidatedNote('semio_proc');
                 const osce = getValidatedNote('semio_osce');
 
-                // Pesos: P1=1.5, P2=1.5, Proc=3, OSCE=4. Soma dos pesos = 10.
-                const notaFinal = (p1 * 1.5 + p2 * 1.5 + proc * 3 + osce * 4) / 10;
+                // Pesos ajustados: Prova 1=14%, Prova 2=14%, Processual=30%, OSCE=42%
+                // Soma dos pesos = 1.4 + 1.4 + 3.0 + 4.2 = 10.0
+                const notaFinal = (p1 * 1.4 + p2 * 1.4 + proc * 3.0 + osce * 4.2) / 10;
                 document.getElementById('resultado_semiologia').textContent = notaFinal.toFixed(2);
             } catch (e) {
                 document.getElementById('resultado_semiologia').textContent = "Erro nos dados!";
@@ -369,12 +373,12 @@
         // 2. Tutoria
         function calcularTutoria() {
             try {
-                const pt = getValidatedNote('tuto_pt');         // Peso 3.5
-                const pm = getValidatedNote('tuto_pm');         // Peso 0.70 * 3.5 = 2.45
-                const ga = getValidatedNote('tuto_ga');         // Peso 0.10 * 3.5 = 0.35
-                const pprat = getValidatedNote('tuto_pprat');   // Peso 0.10 * 3.5 = 0.35
+                const pt = getValidatedNote('tuto_pt');        // Peso 3.5
+                const pm = getValidatedNote('tuto_pm');        // Peso 0.70 * 3.5 = 2.45
+                const ga = getValidatedNote('tuto_ga');        // Peso 0.10 * 3.5 = 0.35
+                const pprat = getValidatedNote('tuto_pprat');  // Peso 0.10 * 3.5 = 0.35
                 const pmorfo = getValidatedNote('tuto_pmorfo'); // Peso 0.10 * 3.5 = 0.35
-                const st = getValidatedNote('tuto_st');         // Peso 3
+                const st = getValidatedNote('tuto_st');        // Peso 3
 
                 // Soma dos pesos = 3.5 + 2.45 + 0.35 + 0.35 + 0.35 + 3 = 10
                 const notaFinal = (pt * 3.5 + pm * 2.45 + ga * 0.35 + pprat * 0.35 + pmorfo * 0.35 + st * 3) / 10;
@@ -441,4 +445,3 @@
     </script>
 </body>
 </html>
-
