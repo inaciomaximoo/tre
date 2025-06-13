@@ -3,158 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Links por Aluno - Turma 36</title>
+    <title>Links de Treino - Turma 36</title>
     <style>
         /* Importando uma fonte moderna do Google Fonts */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
         /* --- Estilização Geral --- */
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f4f7f6; /* Um verde-acinzentado muito claro */
-            color: #444;
+            background-color: #f4f7f9;
+            color: #333;
             margin: 0;
-            padding: 30px 15px;
+            padding: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        /* Estilo para quando o modal estiver aberto */
+        body.modal-open {
+            overflow: hidden; /* Impede o scroll da página de fundo */
         }
 
         /* --- Container Principal --- */
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            text-align: center;
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+            padding: 30px 40px;
         }
 
         .header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-        
-        /* --- Ícone da Home --- */
-        .icon-home svg {
-            width: 48px;
-            height: 48px;
-            fill: #2ecc71; /* Verde Principal */
-            margin-bottom: 10px;
+            text-align: center;
+            border-bottom: 1px solid #e8e8e8;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         h1 {
-            color: #333;
-            font-weight: 600;
-            font-size: 2.5em;
+            color: #2c3e50;
             margin: 0;
+            font-weight: 700;
+            font-size: 2.2em;
         }
 
-        /* --- Grid para os Cartões --- */
-        .cards-grid {
+        /* --- Seções das Etapas --- */
+        .etapa {
+            margin-bottom: 40px;
+        }
+
+        .etapa h2 {
+            text-align: center;
+            color: #34495e;
+            margin-top: 0;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            display: inline-block;
+        }
+        
+        .etapa-header-wrapper {
+             text-align: center;
+        }
+        
+        /* --- Divisor para Tutoria e Morfo --- */
+        .disciplina-wrapper {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 30px;
         }
-
-        /* --- Cartão de cada Pessoa --- */
-        .person-card {
-            background-color: #ffffff;
+        
+        .sub-group {
+            background-color: #fcfcfc;
+            border: 1px solid #f0f0f0;
+            padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
-            padding: 25px;
-            text-align: left;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .person-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .person-card h2 {
-            color: #2ecc71; /* Verde Principal */
+        .sub-group h3 {
             margin-top: 0;
             margin-bottom: 20px;
-            font-size: 1.6em;
-            border-bottom: 2px solid #eafaf1;
-            padding-bottom: 10px;
+            text-align: center;
+            color: #555;
+            font-weight: 600;
         }
-
-        /* --- Container dos Botões --- */
+        
         .button-container {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 12px;
         }
 
-        /* --- Estilo dos Botões (Tags <a>) --- */
+        /* --- Estilo dos Botões --- */
         .btn {
-            flex-grow: 1; /* Faz os botões crescerem para preencher o espaço */
-            text-align: center;
-            padding: 10px 15px;
+            display: block;
+            padding: 12px 20px;
             border-radius: 8px;
             text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9em;
-            border: 2px solid #2ecc71;
-            color: #2ecc71;
-            background-color: transparent;
-            transition: all 0.3s ease;
+            color: #fff;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: none;
+            cursor: pointer; /* Muda o cursor para indicar que é clicável */
+            width: 100%;
         }
 
         .btn:hover {
-            background-color: #2ecc71;
-            color: #ffffff;
-            transform: scale(1.03);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            filter: brightness(1.05);
+        }
+
+        .btn-tutoria {
+            background-color: #3498db; /* Azul */
+        }
+
+        .btn-morfo {
+            background-color: #e74c3c; /* Vermelho/Coral */
+        }
+        
+        /* --- ESTILOS DO MODAL (NOVA PARTE) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0s 0.3s;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-iframe {
+            width: 95%;
+            height: 95%;
+            background-color: #fff;
+            border: none;
+            border-radius: 8px;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 3em;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        
+        .modal-close-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        /* --- Design Responsivo --- */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h1 { font-size: 1.8em; }
+            .disciplina-wrapper {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="main-container">
-
+    <main class="container">
         <header class="header">
-            <div class="icon-home">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" /></svg>
-            </div>
-            <h1>Página de Links</h1>
+            <h1>Links de Treino - Turma 36</h1>
         </header>
 
-        <div class="cards-grid">
-            
-            <section class="person-card">
-                <h2>Ketlin Carrapeiro:</h2>
-                <div class="button-container">
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/3etpM2tutoriaasd.html" target="_blank" rel="noopener noreferrer" class="btn">3ª Etapa M2 - Tutoria</a>
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/3etpM2MORFOGGG.html" target="_blank" rel="noopener noreferrer" class="btn">3ª Etapa M2 - Morfo</a>
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/3ETPm3MORFOgg.html" target="_blank" rel="noopener noreferrer" class="btn">3ª Etapa M3 - Morfo</a>
+        <section class="etapa">
+            <div class="etapa-header-wrapper">
+                <h2>1ª ETAPA</h2>
+            </div>
+            <div class="disciplina-wrapper">
+                <div class="sub-group">
+                    <h3>Tutoria</h3>
+                    <div class="button-container">
+                        </div>
                 </div>
-            </section>
-
-            <section class="person-card">
-                <h2>Ricardo Viera Camargo:</h2>
-                <div class="button-container">
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/2ETPm2ggTutoria.html" target="_blank" rel="noopener noreferrer" class="btn">2ª Etapa M2 - Tutoria</a>
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/2etpM2morfoggg.html" target="_blank" rel="noopener noreferrer" class="btn">2ª Etapa M2 - Morfo</a>
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/3etpM2tutoriaasd.html" target="_blank" rel="noopener noreferrer" class="btn">3ª Etapa M2 - Tutoria</a>
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/3etpM2MORFOGGG.html" target="_blank" rel="noopener noreferrer" class="btn">3ª Etapa M2 - Morfo</a>
+                <div class="sub-group">
+                    <h3>Morfo</h3>
+                    <div class="button-container">
+                        <button class="btn btn-morfo" data-src="https://inaciomaximoo.github.io/treino/turma36/1etpM1morfooo.html">Módulo 1 - Morfo</button>
+                    </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <section class="person-card">
-                <h2>Luciana:</h2>
-                <div class="button-container">
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/3etpM2tutoriaasd.html" target="_blank" rel="noopener noreferrer" class="btn">3ª Etapa M2 - Tutoria</a>
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/3etpM2MORFOGGG.html" target="_blank" rel="noopener noreferrer" class="btn">3ª Etapa M2 - Morfo</a>
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/1etpM1morfooo.html" target="_blank" rel="noopener noreferrer" class="btn">1ª Etapa M1 - Morfo</a>
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/3etpM1tutoriaaagfs.html" target="_blank" rel="noopener noreferrer" class="btn">3ª Etapa M1 - Tutoria</a>
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/3ETPm1MORFOgg.html" target="_blank" rel="noopener noreferrer" class="btn">3ª Etapa M1 - Morfo</a>
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/2ETPm2ggTutoria.html" target="_blank" rel="noopener noreferrer" class="btn">2ª Etapa M2 - Tutoria</a>
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/2etpM2morfoggg.html" target="_blank" rel="noopener noreferrer" class="btn">2ª Etapa M2 - Morfo</a>
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/tutoriat36.html" target="_blank" rel="noopener noreferrer" class="btn">Tutoria Turma 36</a>
-                    <a href="https://inaciomaximoo.github.io/treino/turma36/3ETPm3MORFOgg.html" target="_blank" rel="noopener noreferrer" class="btn">3ª Etapa M3 - Morfo</a>
+        <section class="etapa">
+            <div class="etapa-header-wrapper">
+                <h2>2ª ETAPA</h2>
+            </div>
+            <div class="disciplina-wrapper">
+                <div class="sub-group">
+                    <h3>Tutoria</h3>
+                    <div class="button-container">
+                        <button class="btn btn-tutoria" data-src="https://inaciomaximoo.github.io/treino/turma36/2ETPm2ggTutoria.html">Módulo 2 - Tutoria</button>
+                    </div>
                 </div>
-            </section>
+                <div class="sub-group">
+                    <h3>Morfo</h3>
+                    <div class="button-container">
+                        <button class="btn btn-morfo" data-src="https://inaciomaximoo.github.io/treino/turma36/2etpM2morfoggg.html">Módulo 2 - Morfo</button>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        </div>
+        <section class="etapa">
+             <div class="etapa-header-wrapper">
+                <h2>3ª ETAPA</h2>
+            </div>
+            <div class="disciplina-wrapper">
+                <div class="sub-group">
+                    <h3>Tutoria</h3>
+                    <div class="button-container">
+                        <button class="btn btn-tutoria" data-src="https://inaciomaximoo.github.io/treino/turma36/3etpM1tutoriaaagfs.html">Módulo 1 - Tutoria</button>
+                        <button class="btn btn-tutoria" data-src="https://inaciomaximoo.github.io/treino/turma36/3etpM2tutoriaasd.html">Módulo 2 - Tutoria</button>
+                        <button class="btn btn-tutoria" data-src="https://inaciomaximoo.github.io/treino/turma36/tutoriat36.html">Tutoria Geral T36</button>
+                    </div>
+                </div>
+                <div class="sub-group">
+                    <h3>Morfo</h3>
+                    <div class="button-container">
+                        <button class="btn btn-morfo" data-src="https://inaciomaximoo.github.io/treino/turma36/3ETPm1MORFOgg.html">Módulo 1 - Morfo</button>
+                        <button class="btn btn-morfo" data-src="https://inaciomaximoo.github.io/treino/turma36/3etpM2MORFOGGG.html">Módulo 2 - Morfo</button>
+                        <button class="btn btn-morfo" data-src="https://inaciomaximoo.github.io/treino/turma36/3ETPm3MORFOgg.html">Módulo 3 - Morfo</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="modal-overlay" class="modal-overlay">
+        <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+        <iframe id="modal-iframe" class="modal-iframe" src="" allowfullscreen></iframe>
     </div>
+
+    <script>
+        // Seleciona todos os elementos importantes
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalIframe = document.getElementById('modal-iframe');
+        const closeButton = document.getElementById('modal-close-btn');
+        const openButtons = document.querySelectorAll('.btn');
+
+        // Função para abrir o modal
+        function openModal(url) {
+            if (url) {
+                modalIframe.setAttribute('src', url);
+                modalOverlay.classList.add('visible');
+                document.body.classList.add('modal-open');
+            }
+        }
+
+        // Função para fechar o modal
+        function closeModal() {
+            modalOverlay.classList.remove('visible');
+            document.body.classList.remove('modal-open');
+            // Limpa o src do iframe para parar a execução do site em segundo plano
+            modalIframe.setAttribute('src', '');
+        }
+
+        // Adiciona o evento de clique a cada botão de link
+        openButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const url = button.dataset.src; // Pega a URL do atributo 'data-src'
+                openModal(url);
+            });
+        });
+
+        // Adiciona o evento de clique ao botão de fechar
+        closeButton.addEventListener('click', closeModal);
+
+        // Adiciona evento para fechar o modal clicando no fundo escuro
+        modalOverlay.addEventListener('click', (event) => {
+            // Se o clique foi no próprio overlay (fundo) e não no iframe
+            if (event.target === modalOverlay) {
+                closeModal();
+            }
+        });
+
+        // Adiciona evento para fechar o modal com a tecla 'Escape'
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && modalOverlay.classList.contains('visible')) {
+                closeModal();
+            }
+        });
+    </script>
 
 </body>
 </html>
