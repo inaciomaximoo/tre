@@ -1,0 +1,3297 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simulador de Provas Personalizado</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    
+    <audio id="correctSound" src="correct.mp3" preload="auto"></audio>
+    <audio id="wrongSound" src="wrong.mp3" preload="auto"></audio>
+
+    <style>
+        :root {
+            --bg-main: #f0f2f5;
+            --bg-card: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #555555;
+            --primary-color: #3a86ff; 
+            --primary-light: #69a5ff;
+            --primary-dark: #005cbb;
+            --accent-color: #2ecc71;
+            --accent-light: #e6ffee;
+            --danger-color: #e74c3c;
+            --danger-light: #ffebee;
+            --warning-color: #FF9800; 
+            --warning-light: #FFF3E0;
+            --border-color: #d1d9e6;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --font-main: 'Poppins', sans-serif;
+            --font-mono: 'Roboto Mono', monospace;
+            --border-radius-main: 12px;
+            --transition-speed: 0.3s;
+            --purple-accent: #7c4dff; 
+        } 
+
+        .dark-mode {
+            --bg-main: #1e1e2f;
+            --bg-card: #2a2a3a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #9e9e9e;
+            --primary-color: #7c4dff; 
+            --primary-light: #9d7bff;
+            --primary-dark: #5e35b1;
+            --accent-color: #00e676;
+            --accent-light: rgba(0, 230, 118, 0.1);
+            --danger-color: #ff5252;
+            --danger-light: rgba(255, 82, 82, 0.1);
+            --warning-color: #FFA726;
+            --warning-light: rgba(255, 167, 38, 0.15);
+            --border-color: #424242;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            padding: 20px 15px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            background: var(--bg-card);
+            border-radius: var(--border-radius-main);
+            box-shadow: 0 8px 25px var(--shadow-color);
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center; 
+            margin-bottom: 25px;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        #quizPage .header {
+            flex-direction: row; 
+            justify-content: space-between; 
+        }
+        #quizPage .header h1#quizTitle {
+            margin-bottom: 0; 
+            text-align: left; 
+            flex-grow: 1; 
+        }
+        #quizPage .header .dark-mode-toggle {
+            width: auto; 
+            margin-bottom: 0;
+        }
+
+        
+        #resultsPage .header {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #resultsPage .header h1 {
+            margin-bottom: 0; 
+        }
+        #resultsPage .header .dark-mode-toggle {
+            margin-bottom: 0; 
+            width: auto; 
+        }
+
+
+        h1, h2, h3, h4 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        h1 { font-size: 1.8rem; text-align: center; }
+        h2 { font-size: 1.5rem; }
+        h3 { font-size: 1.3rem; text-align: center; }
+        h4 { font-size: 1.1rem; color: var(--text-secondary); font-weight: 600; }
+
+        .dark-mode-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            padding: 8px 12px; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            box-shadow: 0 2px 5px var(--shadow-color);
+            overflow: hidden; 
+        }
+        
+        .dark-mode-toggle:hover {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border-color: var(--primary-dark);
+        }
+        .dark-mode .dark-mode-toggle:hover {
+            color: #ffffff;
+        }
+
+        .icon-container {
+            position: relative;
+            width: 20px; 
+            height: 20px; 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .moon-icon, .sun-icon {
+            position: absolute;
+            transition: opacity 0.3s ease-in-out, transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); 
+            font-size: 1rem; 
+            line-height: 1;
+        }
+        .sun-icon {
+            opacity: 0;
+            transform: translateY(100%) rotate(90deg) scale(0.5); 
+        }
+        .moon-icon {
+            opacity: 1;
+            transform: translateY(0) rotate(0deg) scale(1);
+        }
+        .dark-mode .sun-icon {
+            opacity: 1;
+            transform: translateY(0) rotate(0deg) scale(1);
+        }
+        .dark-mode .moon-icon {
+            opacity: 0;
+            transform: translateY(-100%) rotate(-90deg) scale(0.5); 
+        }
+        
+
+        .question-container {
+            background: var(--bg-card);
+            border-radius: var(--border-radius-main);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            transition: border-color var(--transition-speed) ease, background-color var(--transition-speed) ease;
+        }
+
+        .question-container.correct {
+            border-left: 6px solid var(--accent-color);
+            background-color: var(--accent-light);
+        }
+        .dark-mode .question-container.correct {
+            background-color: rgba(0, 230, 118, 0.05);
+        }
+
+        .question-container.incorrect {
+            border-left: 6px solid var(--danger-color);
+            background-color: var(--danger-light);
+        }
+        .dark-mode .question-container.incorrect {
+            background-color: rgba(255, 82, 82, 0.05);
+        }
+
+        .question-number {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex; 
+            align-items: center; 
+        }
+        .mistake-stars-container { 
+            margin-left: 10px;
+            display: inline-flex;
+            align-items: center;
+        }
+        .mistake-stars { 
+            font-size: 0.9em; 
+            color: var(--purple-accent); 
+        }
+        .mistake-stars-label {
+            font-size: 0.8em;
+            color: var(--purple-accent);
+            font-weight: normal; 
+            margin-left: 4px;
+        }
+
+
+        .question-text {
+            margin-bottom: 20px;
+            white-space: pre-line;
+            font-family: var(--font-main);
+            line-height: 1.7;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .question-text .ascii-table {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            background-color: var(--bg-main);
+            padding: 1em;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-top: 1em;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .question-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: block;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: transparent;
+            cursor: pointer;
+            transition: border-color var(--transition-speed) ease, background-color var(--transition-speed) ease, transform 0.2s ease;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .option:hover {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light-translucent, rgba(58, 134, 255, 0.1));
+            transform: translateY(-2px);
+        }
+        .dark-mode .option:hover {
+            background-color: rgba(124, 77, 255, 0.15);
+        }
+
+        .option input[type="radio"] {
+            display: none;
+        }
+
+        .option-letter-styled {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-right: 10px;
+            line-height: 1.5; 
+        }
+
+        .option-actual-text {
+            flex: 1;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .correct-answer, .explanation {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .correct-answer {
+            color: var(--accent-color);
+            font-weight: 600;
+            background-color: var(--accent-light);
+            border-left: 4px solid var(--accent-color);
+            display: none;
+        }
+
+        .explanation {
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            display: none;
+        }
+
+        .navigation {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .nav-button, .action-button, .feedback-continue, .popup-button, .danger-button { 
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #ffffff;
+            cursor: pointer;
+            font-family: var(--font-main);
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all var(--transition-speed) ease;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            display: inline-flex; 
+            align-items: center;
+            justify-content: center;
+        }
+        .dark-mode .nav-button, .dark-mode .action-button, .dark-mode .feedback-continue, .dark-mode .popup-button, .dark-mode .danger-button {
+            color: #ffffff;
+        }
+
+        .nav-button:hover, .action-button:hover, .feedback-continue:hover, .popup-button:hover, .danger-button:hover {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px var(--shadow-color);
+        }
+        .danger-button {
+            background: linear-gradient(135deg, var(--danger-color), #c0392b ); 
+        }
+        .danger-button:hover {
+            background: linear-gradient(135deg, var(--danger-light), var(--danger-color));
+        }
+        .danger-button .icon, .action-button .icon { 
+             margin-right: 8px;
+        }
+        
+        .expand-button { 
+            padding: 10px 18px;
+            border: 1px solid var(--purple-accent); 
+            border-radius: 8px;
+            background: var(--text-secondary);
+            color: var(--bg-card);
+            cursor: pointer;
+            font-family: var(--font-main);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all var(--transition-speed) ease;
+            width: auto; 
+            display: inline-flex;
+            align-items: center;
+            margin: 0 auto 15px auto;
+            box-shadow: 0 2px 5px var(--shadow-color);
+        }
+        .dark-mode .expand-button {
+            background: var(--text-secondary); 
+            color: var(--bg-card);
+            border: 1px solid var(--primary-light); 
+        }
+        .expand-button:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color); 
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+        .expand-button .icon {
+            margin-right: 8px;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+        .expand-button.expanded .icon {
+            transform: rotate(180deg);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: var(--border-color);
+            color: var(--text-secondary);
+            box-shadow: none;
+        }
+
+        .instant-feedback {
+            padding: 12px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+            font-size: 1rem;
+            border-left-width: 6px;
+            border-left-style: solid;
+        }
+
+        .instant-feedback.correct {
+            background-color: var(--accent-light);
+            color: var(--accent-color);
+            border-left-color: var(--accent-color);
+        }
+
+        .instant-feedback.incorrect {
+            background-color: var(--danger-light);
+            color: var(--danger-color);
+            border-left-color: var(--danger-color);
+        }
+        
+        /* Estilos para o Popup de Congratulações (já presentes no seu CSS original) */
+        .congrats-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85); /* Fundo mais escuro para destaque */
+            display: flex;
+            flex-direction: column; /* Para alinhar o conteúdo verticalmente */
+            justify-content: center;
+            align-items: center;
+            z-index: 2000; /* Acima de outros popups */
+            padding: 15px; /* Espaçamento para telas menores */
+        }
+
+        .congrats-content {
+            background: var(--bg-card);
+            padding: 30px; /* Mais padding interno */
+            border-radius: var(--border-radius-main);
+            max-width: 90%; /* Responsividade */
+            width: 400px; /* Largura fixa para consistência */
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Sombra mais pronunciada */
+            border: 1px solid var(--primary-color); /* Borda temática */
+        }
+
+        .congrats-message {
+            font-size: 1.4rem; /* Tamanho da fonte da mensagem */
+            margin-bottom: 20px;
+            color: var(--primary-color); /* Cor temática */
+            font-weight: bold;
+        }
+        .random-iframe {
+            margin: 20px 0; /* Espaçamento para o iframe */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .random-iframe iframe {
+            border-radius: 8px; /* Bordas arredondadas para o iframe */
+        }
+
+        .close-popup-button { /* Reutilizando a classe para o botão de fechar */
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color var(--transition-speed) ease;
+        }
+        .dark-mode .close-popup-button {
+            color: #ffffff; /* Garante contraste no modo escuro */
+        }
+        .close-popup-button:hover {
+            background: var(--primary-dark);
+        }
+
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0s 0.3s;
+            padding: 20px;
+        }
+        .popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease, visibility 0s 0s;
+        }
+        .popup-content {
+            background-color: var(--bg-card);
+            padding: 25px;
+            border-radius: var(--border-radius-main);
+            box-shadow: 0 10px 30px var(--shadow-color);
+            width: 95%;
+            max-width: 450px;
+            max-height: 90vh;
+            overflow-y: auto;
+            text-align: center;
+            position: relative;
+            border: 1px solid var(--border-color);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        #questionDetailPopup .popup-content { 
+            max-width: 700px; 
+            text-align: left;
+        }
+        #questionDetailPopup .popup-close-button { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            background: transparent; 
+            color: var(--text-secondary); 
+            font-size: 1.75rem; 
+            border: none; 
+            padding: 5px;
+            line-height: 1;
+            cursor: pointer;
+        }
+        #questionDetailPopup .popup-close-button:hover {
+             color: var(--primary-color);
+             background: transparent; 
+        }
+
+
+        .popup-overlay.active .popup-content {
+            transform: scale(1);
+        }
+        .popup-close-button { /* Estilo geral para botões de fechar popup, se não for o do congrats */
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: var(--text-secondary);
+            color: var(--bg-card);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color var(--transition-speed) ease;
+            width: auto;
+            display: inline-block;
+        }
+        .dark-mode .popup-close-button {
+            background-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        .popup-close-button:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        #quizOptionsPopupTitle {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+        }
+        #quizOptionsPopupSubtitle {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        #quizOptionsPopupButtons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .feedback-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; 
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0s 0.3s;
+            padding: 20px;
+        }
+        .feedback-popup.active {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease, visibility 0s 0s;
+        }
+        .feedback-content {
+            background-color: var(--bg-card);
+            padding: 30px;
+            border-radius: var(--border-radius-main);
+            box-shadow: 0 10px 30px var(--shadow-color);
+            width: 95%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            text-align: center;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+        .feedback-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.75rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0;
+            line-height: 1;
+        }
+        .feedback-close:hover {
+            color: var(--primary-color);
+        }
+        .feedback-title {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .feedback-stats {
+            margin: 12px 0;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+        .feedback-stats span {
+            font-weight: 600;
+        }
+        .feedback-correct {
+            color: var(--accent-color);
+        }
+        .feedback-incorrect {
+            color: var(--danger-color);
+        }
+        .feedback-percentage {
+            font-size: 1.1rem;
+            margin: 15px 0 25px 0;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        #feedbackPercentageValue { 
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.6rem;
+            margin-left: 8px;
+        }
+        #feedbackMistakesList {
+            margin-top: 20px;
+            max-height: 35vh;
+            overflow-y: auto;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+            text-align: left;
+        }
+        #feedbackMistakesList h4 {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .feedback-mistake-item {
+            margin-bottom: 12px;
+            padding: 12px;
+            background-color: var(--bg-main);
+            border-radius: 6px;
+            border-left: 4px solid var(--danger-color);
+            font-size: 0.9rem;
+        }
+        .dark-mode .feedback-mistake-item {
+            background-color: rgba(255,255,255,0.03);
+        }
+        .feedback-mistake-question {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+        .feedback-mistake-option {
+            padding: 4px 0;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+        .feedback-mistake-option.feedback-mistake-correct {
+            color: var(--accent-color);
+            border-left: none;
+            background-color: transparent;
+        }
+        .feedback-mistake-option.feedback-mistake-selected {
+            color: var(--danger-color);
+            border-left: none;
+            background-color: transparent;
+        }
+        .feedback-continue {
+            margin-top: 30px;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: var(--bg-main);
+            border-radius: 8px;
+            margin: 20px 0;
+            height: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 0;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        #results-main-box {
+            background-color: var(--bg-card);
+            padding: 20px;
+            border-radius: var(--border-radius-main);
+            box-shadow: 0 6px 20px var(--shadow-color);
+            border-top: 5px solid transparent; 
+            margin-top: 25px; 
+            transition: border-color var(--transition-speed) ease;
+        }
+        .results-box-bad { border-top-color: var(--danger-color); }
+        .results-box-average { border-top-color: var(--warning-color); }
+        .results-box-good { border-top-color: var(--accent-color); }
+
+        .stat-card {
+            background: var(--bg-main); 
+            color: var(--text-primary);
+            border-radius: var(--border-radius-main);
+            padding: 20px;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px; 
+        }
+        .dark-mode .stat-card {
+            background: var(--bg-card); 
+        }
+        .dark-mode .stat-card h3, .dark-mode .stat-card h4 {
+            color: var(--primary-color); 
+        }
+        .stat-card h3, .stat-card h4 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        #main-performance-card .chart-container {
+            height: 280px; 
+            max-height: 40vh; 
+            position: relative; 
+        }
+        .stat-card .chart-container { 
+            height: 200px; 
+            position: relative;
+        }
+        .chart-container canvas { 
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        .final-score-container {
+            text-align: center;
+            margin-bottom: 20px; 
+        }
+        .final-score-label {
+            display: block;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .final-percentage { 
+            text-align: center;
+            margin-top: 10px; 
+            margin-bottom: 25px; 
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        .final-percentage strong {
+            color: var(--text-primary); 
+            font-weight: 600;
+        }
+        .dark-mode .final-percentage strong {
+            color: var(--text-primary);
+        }
+
+        .final-score-value-box {
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: var(--border-radius-main);
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+            border: 2px solid transparent;
+            min-width: 150px;
+        }
+        .final-score-value-box.score-bad {
+            background-color: var(--danger-light);
+            color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        .final-score-value-box.score-average {
+            background-color: var(--warning-light);
+            color: var(--warning-color);
+            border-color: var(--warning-color);
+        }
+        .final-score-value-box.score-good {
+            background-color: var(--accent-light);
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        
+        .stats-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: 1fr; 
+        }
+         .stats-grid > .stat-card {
+            margin-bottom: 0; 
+        }
+        .additional-stats, .questions-review {
+            margin-top: 25px; 
+        }
+
+        .questions-review {
+            text-align: center;
+        }
+        .analysis-content-box {
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-main);
+            padding: 20px;
+            margin-top: 15px;
+            text-align: left;
+        }
+        .dark-mode .analysis-content-box {
+            background-color: rgba(0,0,0,0.1);
+        }
+        
+        .analysis-correct-answer {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: var(--accent-light);
+            border-radius: 6px;
+            border-left: 4px solid var(--accent-color);
+            color: var(--accent-color); 
+            font-size: 0.95rem;
+        }
+        .dark-mode .analysis-correct-answer {
+             background-color: rgba(0, 230, 118, 0.1);
+        }
+        .analysis-correct-answer strong {
+            color: var(--accent-color); 
+            font-weight: bold;
+        }
+
+
+        #resultsPage .actions {
+            display: flex;
+            flex-direction: column; 
+            align-items: center; 
+            gap: 15px;
+            margin-top: 30px; 
+            width: 100%;
+        }
+        #resultsPage .actions .action-button {
+            width: 100%; 
+            max-width: 300px; 
+            flex-grow: 0;
+        }
+
+        .reset-stats-container { 
+            text-align: center;
+            margin-top: 25px; 
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+         #resetStatsBtn.small-reset-button { 
+            font-size: 0.85rem;  
+            padding: 8px 15px;   
+            max-width: 280px;   
+        }
+        #resetStatsBtn { 
+            background: linear-gradient(135deg, var(--danger-color), #c0392b);
+        }
+        #resetStatsBtn:hover {
+             background: linear-gradient(135deg, var(--danger-light), var(--danger-color));
+        }
+         #resetStatsBtn .icon {
+            margin-right: 6px;
+        }
+        #resetStatsBtn:disabled {
+            background: var(--border-color);
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+
+        @media (min-width: 768px) {
+            .container { padding: 35px; }
+            #main-performance-card .chart-container { height: 350px; }
+            .stat-card .chart-container { height: 250px; } 
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .additional-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+            .additional-charts .stat-card { margin-bottom: 0; }
+            .final-score-value-box { padding: 20px 40px; font-size: 3rem; }
+            
+            #resultsPage .actions {
+                 flex-direction: row;
+                 justify-content: center; 
+            }
+             #resultsPage .actions .action-button {
+                 width: auto; 
+                 flex-basis: 220px; 
+                 max-width: 250px;
+            }
+             #resetStatsBtn.small-reset-button { 
+                 width: auto;
+                 flex-basis: auto; 
+                 max-width: 300px;
+            }
+        }
+        @media (max-width: 600px) {
+            #quizPage .header { flex-direction: column; align-items: center; }
+            #quizPage .header h1#quizTitle { text-align: center; margin-bottom: 15px; }
+            #quizPage .header .dark-mode-toggle { width: 100%; }
+        }
+        @media (max-width: 350px) {
+            body { font-size: 14px; padding: 10px; }
+            h1 { font-size: 1.3rem; }
+            .question-container, .question-result { padding: 12px; }
+            .option { padding: 10px; font-size: 0.95rem; }
+            .nav-button, .action-button, .feedback-continue, .expand-button, .popup-button { padding: 10px; font-size: 0.95rem; }
+            .final-score-value-box { font-size: 2rem; padding: 10px 20px;}
+            #main-performance-card .chart-container { height: 250px; }
+            .stat-card .chart-container { height: 180px; } 
+            #resetStatsBtn.small-reset-button { font-size: 0.8rem; padding: 8px 12px; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="quizPage" style="display:none;"> 
+            <div class="header">
+                <h1 id="quizTitle">Simulador de Provas</h1> 
+                <button class="dark-mode-toggle" id="darkModeToggle">
+                    <span class="icon-container">
+                        <span class="moon-icon">🌙</span>
+                        <span class="sun-icon">☀️</span>
+                    </span>
+                    <span id="darkModeText">Modo Escuro</span>
+                </button>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div id="currentQuestion"></div>
+            <div class="instant-feedback" id="instantFeedback"></div>
+            <div class="navigation">
+                <button onclick="previousQuestion()" id="prevBtn" class="nav-button" disabled>Anterior</button>
+                <button onclick="nextQuestion()" id="nextBtn" class="nav-button">Próxima</button>
+                <button onclick="finishTest()" id="finishBtn" class="nav-button" style="display: none;">Finalizar Prova</button>
+            </div>
+        </div>
+
+        <div id="resultsPage" style="display: none;">
+            <div class="header"> 
+                <h1 id="resultsTitle">Resultados da Prova</h1>  
+                <button class="dark-mode-toggle" id="darkModeToggleResults">
+                     <span class="icon-container"> 
+                        <span class="moon-icon">🌙</span>
+                        <span class="sun-icon">☀️</span>
+                    </span>
+                    <span id="darkModeTextResults">Modo Escuro</span>
+                </button>
+            </div>
+
+            <div id="results-main-box"> 
+                <div class="results-header">
+                    <div class="final-score-container">
+                        <span class="final-score-label">Sua Nota Final:</span>
+                        <div id="finalScoreText" class="final-score-value-box"></div>
+                    </div>
+                    <div class="final-percentage" id="finalPercentageText"></div>
+                </div>
+
+                <div class="stat-card" id="main-performance-card">
+                    <h3>Desempenho Geral</h3>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card" id="areasChartCard">
+                        <h3>Acertos por Área</h3>
+                        <div class="chart-container">
+                            <canvas id="areasChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Progresso nas Tentativas</h3>
+                        <div class="chart-container">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+                    </div>
+                     <div class="stat-card">
+                        <h3>Questões com Erros</h3>
+                        <div class="chart-container">
+                            <canvas id="mistakesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="additional-stats stat-card"> 
+                    <h3>Estatísticas Adicionais</h3>
+                    <div class="additional-charts">
+                        <div class="stat-card">
+                            <h4 id="questionSizeChartTitle">Tamanho de Questão</h4>
+                            <div class="chart-container">
+                                <canvas id="questionSizeChart"></canvas> 
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>Tempo por Questão (Simulado)</h4>
+                            <div class="chart-container">
+                                <canvas id="timePerQuestionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="questions-review stat-card"> 
+                    <h3>Análise Detalhada por Questão</h3>
+                    <button class="expand-button" id="toggleAnalysisBtn">
+                        <span class="icon">&#x25BC;</span>Expandir Análise
+                    </button>
+                    <div class="analysis-content-box" id="analysisBox" style="display: none;">
+                        <div id="questionsAnalysis"></div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button onclick="startNewAttempt(false)" class="action-button">Nova Tentativa</button> <button onclick="startNewAttempt(true)" class="action-button">Revisar Erros</button> </div>
+                <div class="reset-stats-container">
+                    <button id="resetStatsBtn" class="action-button danger-button small-reset-button" disabled>
+                        <span class="icon">🗑️</span> Resetar Progresso
+                    </button>
+                </div>
+            </div> 
+        </div>
+    </div>
+
+    <div class="feedback-popup" id="feedbackPopup">
+        <div class="feedback-content">
+            <button class="feedback-close" id="closeFeedback">×</button>
+            <h3 class="feedback-title">Seu desempenho no bloco</h3>
+            <div class="feedback-stats">
+                Você respondeu <span id="feedbackTotal">0</span> questões neste bloco.
+            </div>
+            <div class="feedback-stats">
+                <span class="feedback-correct">Acertos: <span id="feedbackCorrect">0</span></span> | 
+                <span class="feedback-incorrect">Erros: <span id="feedbackIncorrect">0</span></span>
+            </div>
+            <div class="feedback-percentage">
+                Taxa de acertos: <span id="feedbackPercentageValue">0</span>%
+            </div>
+            <div id="feedbackMistakesList"></div>
+            <button class="feedback-continue" id="continueButton">Continuar</button>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="quizStartOptionsPopup">
+        <div class="popup-content">
+            <h3 id="quizOptionsPopupTitle">Iniciar Simulado</h3>
+            <p id="quizOptionsPopupSubtitle"></p>
+            <div id="quizOptionsPopupButtons">
+            </div>
+            <button class="popup-close-button" onclick="closeQuizOptionsPopup()">Cancelar</button>
+        </div>
+    </div>
+    
+    <div class="popup-overlay" id="questionDetailPopup">
+        <div class="popup-content" style="max-width: 700px; text-align: left;">
+            <button class="popup-close-button" onclick="closeQuestionDetailPopup()" >×</button>
+            <div id="questionDetailContent">
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // ID Fixo para o simulado embutido
+        const EMBEDDED_QUIZ_ID = 'simulado_principal_embutido';
+        let currentFileId = EMBEDDED_QUIZ_ID; // Usar o ID fixo globalmente
+
+        // Chave para estatísticas no localStorage (mantida)
+        const LOCAL_STORAGE_STATS_PREFIX = 'quizApp_stats_';
+
+        // Questões embutidas diretamente no código
+        const embeddedQuestionsSource = [
+  {
+    "enunciado": "Traqueia, esôfago e arco da artéria aorta estão localizados em qual região do tórax.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Mediastino Inferior",
+      "b": "Mediastino Posterior",
+      "c": "Mediastino Superior",
+      "d": "Mediastino Médio"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Sobre o aparelho justaglomerular é correto afirmar que:",
+    "imagem": null,
+    "alternativas": {
+      "a": "As células da mácula densa são células modificadas que tem função de secreção e as células justaglomerulares são encontradas na parede dos túbulos contorcidos distais, quando se aproximam dos glomérulos renais.",
+      "b": "As células justaglomerulares são células musculares lisas modificadas encontradas na parede da arteríola aferente e possuem a função de secreção, já as células da mácula densa são encontradas na parede dos túbulos contorcidos distais, quando se aproximam dos glomérulos renais.",
+      "c": "O aparelho justaglomerular se refere a associação entre as células justaglomerulares, que são células musculares lisas modificadas encontradas na parede da arteríola aferente e produtoras de renina, e capilares sanguíneos. As células da mácula densa podem, ou não, estar presentes.",
+      "d": "O aparelho justaglomerular se refere a associação entre as células da mácula densa, produtoras de renina, e capilares sanguíneos. As células justaglomerulares que são encontradas na parede das arteríolas aferentes podem, ou não, estar presentes."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Quanto a histologia dos rins, é correto afirmar que:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Os túbulos coletores fazem parte do néfron e coletam filtrado do túbulo contorcido distal, sendo revestido por epitélio cúbico simples, com fácil identificação da delimitação lateral dessas células na microscopia óptica.",
+      "b": "O túbulo contorcido proximal representa a continuação da cápsula de Bowman, é revestido por epitélio cúbico simples, possui células largas, com citoplasma acidófilo e bordas em escova.",
+      "c": "Os túbulos contorcidos distais nunca se aproximam do glomérulo renal e são revestidos por epitélio cúbico simples, com citoplasma menos acidófilo e o limite entre as células é facilmente visto na microscopia óptica.",
+      "d": "A alça de Henle apresenta segmentos histologicamente iguais, porem apresenta funções diferentes."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Sobre a histologia do coração, indique a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "O miocárdio é constituído por células musculares estriadas cardíacas que se unem uma as outras por complexos juncionais denominados discos intercalares.",
+      "b": "O epicárdio se refere ao pericárdio parietal, que é constituído por um único folheto formado por mesotélio e tecido conjuntivo.",
+      "c": "É um órgão que apresenta duas túnicas, o endocárdio e o miocárdio.",
+      "d": "O endocárdio esta ligado diretamente ao miocárdio, através do tecido epitelial, onde estão as fibras condutoras de impulso do coração."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Quanto ao epitélio respiratório é correto afirmar que:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Reveste apenas a traqueia e os brônquios.",
+      "b": "É recoberto por muco secretado pelas células caliciformes e glândulas mistas presentes na lâmina própria.",
+      "c": "Apenas na traqueia é recoberto por muco secretado pelas células caliciformes.",
+      "d": "É um epitélio pseudoestratificado cúbico ciliado, com células caliciformes."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Existem três grandes grupos de capilares: contínuos, fenestrados (com ou sem diafragma) e sinusoides. Quanto aos capilares, é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A continuidade da camada endotelial e da lâmina basal determinam o tipo de capilar.",
+      "b": "Nos três tipos de capilares a camada endotelial é sempre contínua, enquanto a lâmina basal pode ser interrompida.",
+      "c": "Os capilares fenestrados são encontrados em tecidos onde a troca de substância ocorre lentamente.",
+      "d": "Os capilares sinusoides são importantes nos tecidos onde o contato entre o sangue e o tecido é mínimo."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "A uretra é um tubo muscular que transporta urina para o meio externo.  Nos homens, também conduz o sêmen.  Assim sendo, avalie as afirmativas a seguir relativas à uretra: I- No homem, sua porção cavernosa acompanha o trajeto do corpo cavernoso, terminando no meato urinário externo do pênis; II - A mulher e o homem apresentam uretra membranácea; III- No homem, é mais longa que na mulher; IV- No homem, juntamente com epididimo e o testículo, se localiza no escroto. Sobre o texto acima assinale a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "I e IV estão corretas",
+      "b": "II e III estão corretas",
+      "c": "I, II e IV estão corretas",
+      "d": "Apenas a I está correta"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "A imagem microscópica abaixo mostra a túnica adventícia de um vaso sanguíneo em maior aumento. Observe e identifique as estruturas marcadas com * e #.",
+    "imagem": "https://i.imgur.com/a/dljioj4.png",
+    "alternativas": {
+      "a": "# é uma vênula / * é uma arteríola.",
+      "b": "* e # são uma arteríola.",
+      "c": "* é uma arteríola / # é uma vênula.",
+      "d": "* e # são uma vênula."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "O espaço interno da caixa torácica e a posição do coração provocam alterações morfológicas nos pulmões e o desenvolvimento de regiões específicas. Qual a região encontrada apenas no pulmão esquerdo:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Hilo Pulmonar",
+      "b": "Língula",
+      "c": "Mediastino",
+      "d": "Fissura oblíqua"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Considerando-se o sistema cardiovascular (coração), marcar C para as afirmativas Certas, E para as Erradas e, após, assinalar a alternativa que apresenta a sequência CORRETA: ( ) O átrio direito recebe o sangue rico em gás carbônico. ( ) A veia cava inferior traz sangue para o átrio esquerdo. cite_start As artérias coronárias levam o sangue oxigenado para o miocárdio.",
+    "imagem": null,
+    "alternativas": {
+      "a": "E-C-E",
+      "b": "C-E-C",
+      "c": "C-E-E",
+      "d": "E-C-C"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "A pielonefrite é uma infecção do trato urinário ascendente que atinge a pelve renal, afetando quase todas as estruturas do rim, exceto o glomérulo inicialmente.  Com base nas aulas ministradas, escolha a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "O rim direito na cavidade abdominal ocupa uma posição superior ao rim esquerdo devido à presença do fígado.",
+      "b": "O rim direito na cavidade abdominal ocupa uma posição inferior ao rim esquerdo devido à presença do fígado.",
+      "c": "O rim esquerdo na cavidade pélvica ocupa uma posição inferior ao rim esquerdo devido à presença do estômago.",
+      "d": "O rim direito na cavidade pélvica ocupa uma posição inferior ao rim esquerdo devido à presença do estômago."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Uma mulher de 22 anos de idade inala o máximo de ar possível e exala o máximo de ar que consegue, produzindo o espirograma mostrado na imagem.  Um volume residual de 1,0 L foi determinado. Qual é a sua capacidade residual funcional (em litros)?",
+    "imagem": "https://i.imgur.com/a/3wCCf7c.png",
+    "alternativas": {
+      "a": "2,5.",
+      "b": "3,0.",
+      "c": "2,0.",
+      "d": "3,5."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "O gráfico representa um espirograma com os volumes e capacidades pulmonares. Com relação às capacidades pulmonares, assinale a alternativa correta.",
+    "imagem": "https://i.imgur.com/a/5LbCPv1.png",
+    "alternativas": {
+      "a": "A letra A indica a capacidade inspiratória, que mede cerca de 3000mL.",
+      "b": "A letra H indica a capacidade vital, que mede cerca de 5900 mL.",
+      "c": "A letra D indica a capacidade residual funcional, que mede cerca de 1200mL.",
+      "d": "A letra E indica a capacidade vital, que mede cerca de 4700mL."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Assinale a alternativa que indica corretamente a qual volume ou capacidade pulmonar se relaciona a seguinte descrição: \"volume de ar que permanece nos pulmões ao final da expiração normal\":",
+    "imagem": null,
+    "alternativas": {
+      "a": "Volume residual.",
+      "b": "Capacidade residual funcional.",
+      "c": "Capacidade inspiratória.",
+      "d": "Volume de reserva expiratória."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "C.M.S. do sexo feminino, com 62 anos de idade, foi admitida no pronto atendimento com forte estresse emocional.  Foi realizado uma espirometria e o resultado encontra-se na imagem. A partir da observação do espirograma, podemos dizer que a letra A representa:",
+    "imagem": "https://i.imgur.com/a/iFKSZPW.png",
+    "alternativas": {
+      "a": "Volume de reserva expiratório, no valor de 5000 mL.",
+      "b": "Volume de reserva expiratório, no valor de 2100 mL.",
+      "c": "Volume de reserva inspiratório, no valor de 2100 mL.",
+      "d": "Volume de reserva inspiratório, no valor de 5000 mL."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Um paciente apresenta um padrão respiratório hipotético em que a sua ventilação pulmonar é constante, entretanto há uma crescente perda na sua ventilação alveolar. Observando a figura que identifica com letras as estruturas pulmonares, assinale a alternativa que descreva a(s) estrutura(s) que apresenta(m) a perda funcional associada a redução da ventilação alveolar.",
+    "imagem": "https://i.imgur.com/a/uu6hPI0.png",
+    "alternativas": {
+      "a": "Apenas a estrutura identificada em B está apresentando comprometimento.",
+      "b": "Apenas a estrutura identificada em A está apresentando comprometimento.",
+      "c": "As estruturas A e B estão preservadas e a perda observada é decorrente de danos circulatórios.",
+      "d": "As estruturas A e B apresentam comprometimento."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Você estava ansioso para iniciar a prova do Morfofuncional e permanece até agora.  A tendência é que ocorra alteração do pH sanguíneo. Assinale a alternativa que indique o provável mecanismo de compensação que ocorre no seu organismo para manutenção do pH.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Diminuição da frequência respiratória e consequente diminuição da pCO_2.",
+      "b": "Aumento na reabsorção de bicarbonato nos túbulos dos néfrons.",
+      "c": "Aumento da frequência respiratória e consequente diminuição da pCO_2.",
+      "d": "Diminuição na reabsorção de bicarbonato nos túbulos dos néfrons."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Um homem é encontrado em estado comatoso após ter ingerido quantidade desconhecida de pílulas para dormir.  Uma amostra de sangue arterial fornece os seguintes valores: pH=7,02 (Referência: 7,35 a 7,45); pCO2 = 68 mmHg (Referência: 35 a 45 mmHg);\n[HCO3\" ] = 30 mEq/L (Referência: 23 a 28 mEq/L). A condição acidobásica\ndesse paciente e mais bem descrita como:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Alcalose respiratória com compensação metabólica.",
+      "b": "Acidose respiratória com compensação metabólica.",
+      "c": "Acidose metabólica com compensação respiratória.",
+      "d": "Alcalose metabólica com compensação respiratória."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta que indica o distúrbio e o mecanismo de compensação fisiológica para um indivíduo com cetoacidose diabética:",
+    "imagem": null,
+    "alternativas": {
+      "a": "O distúrbio é respiratório sendo compensado por via metabólica a partir do aumento de HCO_3",
+      "b": "O distúrbio é metabólico sendo compensado por via respiratória a partir do aumento de pCO_2.",
+      "c": "O distúrbio é metabólico sendo compensado por via respiratória a partir da diminuição de pCO_2.",
+      "d": "O distúrbio é respiratório sendo compensado por via metabólica a partir da diminuição de HCO_3"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Um laboratório de análises clínicas apresentou os seguintes valores para sangue arterial obtido de um paciente: pH do plasma =7,28 (Referência: 7,35 a 7,45); pCO_2 do plasma =30 mmHg (Referência: 35 a 45 mmHg); [HCO_3\n−\n] no plasma = 20 mEq/L (Referência: 23 a 28 mEq/L). Qual é o distúrbio acidobásico desse paciente?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Alcalose respiratória com compensação metabólica.",
+      "b": "Alcalose metabólica com compensação respiratória.",
+      "c": "Acidose metabólica com compensação respiratória.",
+      "d": "Acidose respiratória com compensação metabólica."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Um paciente apresenta os seguintes valores laboratoriais: pH arterial =7,13 (Referência: 7,35 a 7,45); pCO_2 do plasma =28 mmHg (Referência: 35 a 45 mmHg); [HCO_3\n−\n] plasmático =15\nm\n˜\nEq/L (Referência: 23 a 28 mEq/L). Qual a causa mais provável da acidose desse paciente?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Vômito.",
+      "b": "Crise de ansiedade.",
+      "c": "Apneia.",
+      "d": "Diarreia."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Observe a imagem microscópica abaixo. Observe o epitélio e as células circundadas. O epitélio observado e as células circundadas são, respectivamente:",
+    "imagem": "https://i.imgur.com/a/kOgQMaD.png",
+    "alternativas": {
+      "a": "Epitélio de transição / célula basal.",
+      "b": "Epitélio respiratório / célula caliciforme.",
+      "c": "Epitélio respiratório / célula basal.",
+      "d": "Epitélio de transição / célula caliciforme."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "As valvas (válvulas) do coração controlam a direção do fluxo sanguíneo.  Considerando o texto, avalie as seguintes afirmativas: I-As valvas atrioventriculares mantêm o fluxo sanguíneo unidirecional por impedirem o refluxo de sangue dos ventrículos para os átrios.  II-A valva semilunar aórtica impede o refluxo de sangue da artéria aorta para o ventrículo esquerdo.  III - A valva bicúspide impede o refluxo de sangue entre o ventrículo e o átrio direito.  IV-A valva semilunar pulmonar impede o refluxo de sangue das veias pulmonares para o átrio direito.  É correto apenas o que se afirmar em:",
+    "imagem": null,
+    "alternativas": {
+      "a": "I, III e IV",
+      "b": "I e III",
+      "c": "I e II",
+      "d": "III e IV"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta que contenha marcadores da função renal.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Ácido úrico e creatinina,",
+      "b": "Creatinina e ureia.",
+      "c": "Ácido úrico e ureia.",
+      "d": "Ureia e creatina."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Quanto a filtração e secreção da ureia e da creatinina no néfron é correto afirmar que:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A creatinina é uma substância que é filtrada e não secretada.",
+      "b": "A ureia é uma substância que não é filtrada, mas é secretada.",
+      "c": "A creatinina é uma substância que não é filtrada, mas é secretada.",
+      "d": "A ureia é uma substância que é filtrada e não secretada."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "No Pronto atendimento de uma UPA o exame de creatinina de um senhor de 88 anos sem histórico de doenças renais deu 2,3mg/dL. Valores de referência: Mulheres: 0,6 a 1,2 mg/dL. Homens: 0,7 a 1,3 mg/dL. Com base neste resultado, assinale a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Diminuição da creatinina com indicação de insuficiência renal aguda.",
+      "b": "Aumento da creatinina com indicação de insuficiência renal aguda.",
+      "c": "Aumento da creatinina com indicação de insuficiência renal crônica.",
+      "d": "Diminuição da creatinina com indicação de insuficiência renal crônica."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "O melhor parâmetro para avaliação da função renal é medir a depuração de uma substância filtrada livremente pelos glomérulos que apresenta como característica não sofrer reabsorção ou secreção tubular calculando, dessa forma, a taxa de filtração glomerular (TFG). Sabendo disso, aponte a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "O melhor marcador existente para determinação da TFG é a determinação da depuração de substância exógena, como o ácido úrico.",
+      "b": "O melhor marcador existente para determinação da TFG é a determinação da depuração de substância endógena, como o ácido úrico.",
+      "c": "O melhor marcador existente para determinação da TFG e a determinação da depuração de substância endógena, como a Inulina.",
+      "d": "O melhor marcador existente para determinação da TFG é a determinação da depuração de substância exógena, como a Inulina."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Atualmente, o \"padrão ouro\" para análise da taxa de filtração glomerular (TFG) é utilizar a depuração de um marcador exógeno. Desta forma, aponte qual alternativa contém apenas esse tipo de marcador que pode ser utilizado para analisar a TFG.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Ureia.",
+      "b": "Creatina.",
+      "c": "Ácido Úrico.",
+      "d": "Inulina."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "As partes nasal, oral e laringea são divisões da:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Cavidade Nasal",
+      "b": "Traquéia",
+      "c": "Faringe",
+      "d": "Laringe"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta sobre a bexiga.",
+    "imagem": null,
+    "alternativas": {
+      "a": "O músculo detrusor constitui a parede da bexiga, ele forma o esfíncter interno da uretra em torno do colo da bexiga.",
+      "b": "A divisão da uretra relacionada a bexiga é chamada membranacea.",
+      "c": "Nos homens, a superfície superior da bexiga tem contato com a sínfise púbica e a próstata, posteriormente está o terço distal do reto.",
+      "d": "O fundo da bexiga contém três aberturas que formam o trigono da bexiga: dois óstios internos da uretra e o um óstio do ureter."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Qual a cartilagem da laringe controla a entrada de ar se fechando durante a passagem do alimento:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Epiglótica",
+      "b": "Tireóidea",
+      "c": "Cricóidea",
+      "d": "Aritenóidea"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "A parte abdominal do ureter atravessa posteriormente qual ramo da artéria aorta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Mesentérica Inferior",
+      "b": "Artéria Renal",
+      "c": "Tronco Celíaco",
+      "d": "Mesentérica Superior"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Na imagem microscópica em maior aumento, esta um órgão que voce estudou nesse modulo. Assinale a alternativa correta.\n",
+    "imagem": "https://i.imgur.com/a/pRsrxHd.png",
+    "alternativas": {
+      "a": "O orgao e o coraçao. O numero 1 se refere ao epicardio que é uma camada mais espessa que o endocárdio, indicado pelo número 3.",
+      "b": "O órgão é bronquio. O número 1 se refere a camada de músculo liso, bastante desenvolvida para manter a luz do órgão aberta.",
+      "c": "O órgao é bronquio. O número 3 se refere a sua camada mucosa, onde encontramos o epitélio respiratorio apoiado na lāmina basal.",
+      "d": "O órgão é o coração. O número 3 se refere ao epicárdio que é uma camada mais espessa que o endocárdio, indicado pelo número 1."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "A partir da observação do espirrograma abaixo e com base em seus conhecimentos, assinale a alternativa correta: \n",
+    "imagem": "https://i.imgur.com/a/fvVJBbL.png",
+    "alternativas": {
+      "a": "O espirograma indica uma hipoventilacao e o paciente pode estar em acidose respiratória.",
+      "b": "O espirograma indica uma hiperventilação e o paciente pode estar em alcaļose respiratória.",
+      "c": "O espirograma indica uma hipoventilação e o paciente pode estar em alcalose respiratória.",
+      "d": "O espirograma indica uma hiperventilação e o paciente pode estar em acidose respiratória."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Na alcalose respoiratoria com compensão renal quais alterações voce esperaria encontrar no sangue arterial, em comparação com o normal:",
+    "imagem": null,
+    "alternativas": {
+      "a": "pH do plasma diminuido, HCO3\" aumentado, pCO2 no plasma diminuido.",
+      "b": "pH do plasma aumentado, HCO3\" aumentado, pCO2 no plasma diminuido.",
+      "c": "pH do plasma aumentado, HCO3\" diminuido, pCO2 no plasma diminuido.",
+      "d": "pH do plasma diminuido, HCO3\" diminuído, pCO2 no plasma diminuido."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Um individuo apresentou pH = 7,56 (7,35 - 7,45), pCO2 = 25 mmHg (35 - 45 mmHg) e HCO3\" = 24 mM/L (23 - 28 mM/L), a compensação fisiológica para este distúrbio será:\n",
+    "imagem": null,
+    "alternativas": {
+      "a": "Respiratória, resultando no aumento do HCO3\", aumento da concentracao de H+ e aumento da pCO2.",
+      "b": "Metabólica, resultando no aumento do HCO3\", aumento da concentração de H* e aumento da pCO2.",
+      "c": "Metabólica, resultando na diminuição do HCO3\", aumento da concentração de H* e manutençao da pCO2.",
+      "d": "Respiratória, resultando na diminuição do HCO3\", aumento da concentração de H* e manutenção da pCO2."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Observe a imagem microscópica, identifique as regiões numeradas e assinale a alternativa correta.\n\n",
+    "imagem": "https://i.imgur.com/a/DsJWyxc.png",
+    "alternativas": {
+      "a": "A regiao 3 se refere ao meato inferior onde encontramos o epitélio respiratório sem celulas caliciformes.",
+      "b": "A regiao 1 se refere ao meato superior onde encontramos, além do epitélio respiratório, o epitélio olfatório.",
+      "c": "A região 2 se refere ao meato médio, local onde encontra-se a maior parte do epitélio olfatório.",
+      "d": "As regiões 1,2 e 3 são os meatos que estão envolvidos pelas conchas. Na mucosa das conchas a vascularização é mínima."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Observe a imagem microscópica abaixo: \n",
+    "imagem": "https://i.imgur.com/a/ggM5eHz.png",
+    "alternativas": {
+      "a": "Tubulo contorcido distal / Tubulo contorcido proximal.",
+      "b": "Ramo largo da alça de Henle / Tubulo coletor.",
+      "c": "Tubulo coletor / Ramo largo da alça de Henle.",
+      "d": "Tubulo contorcido proximal / Tubulo contorcido distal."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "O teste de depuração de creatinina e util para determinar:\n",
+    "imagem": null,
+    "alternativas": {
+      "a": " Capacidade de filtração glomerular.",
+      "b": "Diminuição da secreção tubular.",
+      "c": " Capacidade de concentração renal.",
+      "d": " O fluxo sanguíneo renal."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Com relaçao as dosagens de ureia e creatinina, assinale a alternativa correta:\n",
+    "imagem": null,
+    "alternativas": {
+      "a": "Somente a depuração da creatinina na urina recem coletada isolada e que determina o diagnostico de doença renal cronica",
+      "b": "A ureia e a creatinina são importantes, uma vez que ambas possuem a mesma forma de excreção renal.",
+      "c": "A análise da creatinina tem vantagem sobre a ureia por ser metabólito de menor nivel de reabsorção renal.",
+      "d": "A dosagem da ureia é mais sensível para detectar mudanças na função renal"
+    },
+    "correta": "c"
+  },
+{
+    "enunciado": "A maior parte da porção condutora do sistema respiratório é revestida internamente por um epitélio respiratório. Observe as duas imagens microscópicas, identifique qual mostra o epitélio respiratório e assinale a alternativa correta.",
+    "imagem": "https://i.imgur.com/a/DOaYfUE.png",
+    "alternativas": {
+      "a": "A imagem A mostra o epitélio respiratório, que é um epitélio pseudoestratificado colunar com microvilos e poucas células caliciformes.",
+      "b": "A imagem B mostra o epitélio respiratório, que é um epitélio pseudoestratificado colunar ciliado com muitas células caliciformes.",
+      "c": "A imagem A mostra o epitélio respiratório, que é um epitélio pseudoestratificado colunar ciliado com muitas células caliciformes.",
+      "d": "A imagem B mostra o epitélio respiratório, que é um epitélio colunar estratificado ciliado com poucas células caliciformes."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "A parede de um brônquio é mostrada em maior aumento em uma das imagens microscópicas abaixo. Observe as imagens, identifique o brônquio e assinale a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Nos ramos finais dos brônquios, como mostrado na imagem B, a mucosa é revestida por epitélio cilindrico simples com cilios e células caliciformes, externamente a mucosa segue-se uma camada de músculo liso e peças cartilaginosas dos brônquios.",
+      "b": "Nos ramos maiores dos brônquios, como mostrado na imagem B, a mucosa é semelhante à da traqueia sendo revestida por epitélio respiratório, externamente à mucosa segue-se uma camada de músculo liso e não há peças cartilaginosas nos brônquios.",
+      "c": "Nos ramos maiores dos brônquios, como mostrado na imagem A, a mucosa é semelhante à da traqueia sendo revestida por epitélio respiratório, externamente à mucosa segue-se uma camada de músculo liso e as peças cartilaginosas dos brônquios.",
+      "d": "Nos ramos finais dos brônquios, como mostrado na imagem A, a mucosa é revestida por epítélio cúbico simples, com poucas ou nenhuma célula caliciforme, externamente à mucosa segue-se uma camada de músculo liso e não há presença de cartilagem."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Assinale a alternativa que contenha somente granulócitos polimorfonucleares:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Linfócitos, eosinófilos e monócitos.",
+      "b": "Basófilos, neutrófilos e eosinófilos.",
+      "c": "Monócitos, linfócitos e basófilos.",
+      "d": "Linfócitos, neutrófilos e eosinófilos."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Assinale a alternativa correta que indica os elementos figurados que podemos observar em uma lâmina de extensão sanguínea de um indivíduo fisiologicamente normal:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Eosinófilo, células dendríticas e plaquetas.",
+      "b": "Eritrócito, macrófago e plaquetas.",
+      "c": "Eosinófilo, eritrócito e macrófago.",
+      "d": "Eosinófilo, monócito e eritrócito."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "A imagem abaixo mostra os elementos figurados maduros produzidos pela medula óssea. Assinale a alternativa que identifca os elementos figurados numerados 2 e 5.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Basófilo e plaquetas.",
+      "b": "Plaquetas e macrófagos.",
+      "c": "Eosinófilo e eritrócito.",
+      "d": "Neutrófilo e linfócitos."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "A imagem abaixo mostra os elementos figurados maduros produzidos pela medula óssea. Assinale a alternativa que identifica os elementos numerados 3 e 4 suas respectivas linhagens.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Basófilo e plaquetas ambos da linhagem mieloide.",
+      "b": "Neutrófilo - linhagem mieloide e linfócitos - linhagem linfoide.",
+      "c": "Plaquetas - linhagem mieloide e macrófagos - linhagem linfoide.",
+      "d": "Eosinófilo e eritrócito ambas da linhagem mielóide."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Homem, 45 anos, chega na emergência de um hospital com histórico de diarreia por duas semanas, com piora progressiva ao longo dos últimos dias. Ele tem produzido o mínimo de urina e foi internado no hospital por desidratação. Foi realizado exame de fezes que resultou positivo para ovos de parasitas. Que tipo de célula sanguínea teria um número elevado?",
+    "imagem": null,
+    "alternativas": {
+      "a": "Linfócitos.",
+      "b": "Eosinófilos.",
+      "c": "Monócitos.",
+      "d": "Neutrófilos."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Um paciente apresenta um padrão respiratório hipotético em que a sua ventilação pulmonar é constante, entretanto há uma crescente perda na sua capacidade em realizar hematose. Assinale a alternativa que melhor descreva o processo que este paciente está passando.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Aumento do espaço morto anatômico, ou seja, aumento da região alveolar que entra em contato com o ar, mas não realiza hematose.",
+      "b": "Aumento do espaço morto fisiológico, ou seja, aumento da região alveolar que entra em contato com o ar, mas não realiza hematose.",
+      "c": "Aumento do espaço morto fisiológico, como exemplo, a constrição de estruturas respiratórias, como traqueia, brônquios e bronquíolos.",
+      "d": "Perda de complacência pulmonar que leva ao aumento do volume residual e do espaço morto fisiológico."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Assinale a alternativa que indica corretamente a qual volume ou capacidade pulmonar se relaciona a seguinte descrição: \"volume de ar que permanece nos pulmões ao final da expiração normal\":",
+    "imagem": null,
+    "alternativas": {
+      "a": "Volume residual.",
+      "b": "Volume de reserva expiratória.",
+      "c": "Capacidade residual funcional.",
+      "d": "Capacidade inspiratória."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "O gráfico abaixo representa um espirograma com os volumes e capacidades pulmonares. Com relação aos volumes pulmonares, assinale a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "A letra F indica o volume de reserva inspiratório, que mede cerca de 3500mL.",
+      "b": "A letra C indica o volume residual, que mede cerca de 1200mL.",
+      "c": "A letra B indica o volume de reserva inspiratório, que mede cerca de 500mL.",
+      "d": "A letra G indica o volume de reserva expiratório, que mede cerca de 2400mL."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "C.M.S. do sexo feminino, com 62 anos de idade, foi admitida no pronto atendimento com forte estresse emocional, pálida e hipertensa. Foi realizado uma espirometria e o resultado encontra-se abaixo. A partir da observação do espirograma, podemos dizer que a letra B representa:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A capacidade inspiratória, que é o máximo volume de ar que o pode ser inspirado após uma expiração normal.",
+      "b": "O volume de reserva inspiratória, que é o volume de ar que pode ser forçadamente inspirado após o final de uma inspiração normal.",
+      "c": "O volume de reserva expiratória, que é o volume de ar que ainda pode-se expirar forçadamente ao final de expiração normal.",
+      "d": "A capacidade residual funcional, que é o volume de ar que permanece nos pulmões após uma expiração normal."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Uma mulher de 22 anos de idade inala o máximo de ar possível e exala o máximo de ar que consegue, produzindo o espirograma mostrado abaixo. Um volume residual de 1,0 L foi determinado. Qual é a sua capacidade residual funcional (em litros)?",
+    "imagem": null,
+    "alternativas": {
+      "a": "2,0.",
+      "b": "2,5.",
+      "c": "3,5.",
+      "d": "3,0."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Indique a partir de qual parte do tubo endocárdico a parte ascendente da aorta e o tronco pulmonar se originam.",
+    "imagem": null,
+    "alternativas": {
+      "a": "Tronco arterial.",
+      "b": "Átrio.",
+      "c": "Ventrículo.",
+      "d": "Bulbo cardíaco."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Quanto a embriologia dos vasos sanguíneos é correto afirmar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "As veias primitivas se abrem no tronco arterioso.",
+      "b": "O tronco celíaco se forma a partir de uma ramificação das artérias vitelínicas e irá irrigar as estruturas formadas a partir do intestino posterior.",
+      "c": "A artéria mesentérica superior se forma a partir de uma ramificação das artérias vitelínicas e irá irrigar as estruturas formadas a partir do intestino médio.",
+      "d": "Os arcos aórticos se formam a partir de uma ramificação da aorta dorsal."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Na imagem microscópica, a estrutura circundada é o tubo endocárdico. Identifique as estruturas apontadas.",
+    "imagem": null,
+    "alternativas": {
+      "a": "I - mesocárdio dorsal; II - epicárdio; III - miocárdio.",
+      "b": "I-mesocárdio ventral; II - epicárdio; III - miocárdio.",
+      "c": "I-mesocárdio ventral; II - miocárdio; III - endocárdio.",
+      "d": "I-mesocárdio dorsal; II - miocárdio; III - geléia cardíaca."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Com relação às dosagens de ureia e creatinina, assinale a alternativa correta:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A análise da creatinina tem vantagem sobre a ureia por ser metabólito de menor nível de reabsorção renal.",
+      "b": "Somente a depuração da creatinina na urina recém coletada isolada é que determina o diagnóstico de doença renal crônica.",
+      "c": "A dosagem da ureia é mais sensível para detectar mudanças na função renal",
+      "d": "A ureia e a creatinina são importantes, uma vez que ambas possuem a mesma forma de excreção renal."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "O melhor parâmetro para avaliação da função renal é medir a depuração de uma substância filtrada livremente pelos glomérulos que apresenta como característica não sofrer reabsorção ou secreção tubular calculando, dessa forma, a taxa de filtração glomerular (TFG). Sabendo disso, aponte a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "O melhor marcador existente para determinação da TFG é a determinação da depuração de substância exógena, como o ácido úrico.",
+      "b": "O melhor marcador existente para determinação da TFG é a determinação da depuração de substância endógena, como a Inulina.",
+      "c": "O melhor marcador existente para determinação da TFG é a determinação da depuração de substância exógena, como a Inulina.",
+      "d": "O melhor marcador existente para determinação da TFG é a determinação da depuração de substância endógena, como o ácido úrico."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Mulher, 58 anos, apresentando redução significativa na diurese, compareceu a UBS da sua região, para consulta médica. Foi solicitado exames de Urina I, Uréia e Creatinina que mostraram os seguintes resultados: Uréia: 50,4 mg/dl (Referência: 15 a 45 mg/dL) Creatinina: 4,2 mg/dL (Referência mulher: 0,6 a 1,2 mg/dL) Com base nestes resultados, assinale a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "A paciente apresenta provavelmente uma insuficiência pré renal aguda.",
+      "b": "A paciente apresenta provavelmente uma insuficiência renal intrínseca aguda.",
+      "c": "Nada é possivel afirmar sem os resultados do exame de Urina I.",
+      "d": "A paciente apresenta provavelmente uma insuficiência pré renal crônica."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Quando o rim entra em falência, podem ocorrer distúrbios e intercorrências de menores a maiores repercussões. Neste caso podemos verificar:",
+    "imagem": null,
+    "alternativas": {
+      "a": "A alteração somente na dosagem de creatinina.",
+      "b": "A alteração da depuração de creatinina apenas.",
+      "c": "A alteração somente na dosagem de ureia.",
+      "d": "A alteração na relação ureia/creatinina para < 15."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Uma parte da amônia (processo 1), oriunda do metabolismo dos aminoácidos, é usada para a formação de compostos nitrogenados biologicamente úteis e o restante precisa ser convertido a uma forma menos tóxica para ser excretada (2). Assinale a alternativa correta relacionada ao (processo 1) e ao metabólito indicado em (2), respectivamente:",
+    "imagem": null,
+    "alternativas": {
+      "a": "(1) Desaminação e (2) ciclo da uréia.",
+      "b": "(1) Transaminação e (2) ureia.",
+      "c": "(1) Ciclo da uréia e (2) creatinina.",
+      "d": "(1) Desaminação e (2) ureia."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "A parede das grandes artérias elásticas tem cor amarelada decorrente ao acúmulo de:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Elastina na túnica média.",
+      "b": "Elastina na túnica adventícia.",
+      "c": "Colágeno na túnica média.",
+      "d": "Colágeno na túnica adventícia."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Quanto ao trajeto das fibras atrioventriculares (de purkinje), é correto afirmar:",
+    "imagem": "(opcional - deixe vazio se não tiver)",
+    "alternativas": {
+      "a": "Todo trajeto das fibras atrioventriculares ocorre no miocárdio.",
+      "b": "Após certo trajeto no tecido subendocárdico, os ramos do feixe atrioventricular subdividem-se e penetram na espessura do ventrículo, tornando-se intramiocárdicos.",
+      "c": "Todo trajeto das fibras atrioventriculares ocorre no tecido subendocárdico.",
+      "d": "Após certo trajeto no miocárdio, os ramos do feixe atrioventricular subdividem-se e penetram no tecido subendocárdico."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "Um médico anestesista durante uma cirurgia, observou os seguintes parâmetros no paciente pH=7,30(7,35−7,45), PCO2=60 mmHg (35-45 mmHg) e HCO3−=33 mM/L (23−28 mM/L). Assinale a alternativa correta que indica o estado ácido básico do paciente:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Acidose respiratória sem compensação.",
+      "b": "Acidose metabólica com compensação respiratória.",
+      "c": "Acidose metabólica sem compensação.",
+      "d": "Acidose respiratória com compensação metabólica."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "A concentração de íons H+ é uma importante característica química do sangue e de outros fluídos corporais. Com relação ao pH e sua importância, assinale a alternativa correta.",
+    "imagem": null,
+    "alternativas": {
+      "a": "O aumento da atividade enzimática ocorre nos casos de alcalose e a diminuição da atividade enzimática nos casos de acidose.",
+      "b": "O comprometimento da atividade enzimática pode ser causado por elevadas alterações do pH sanguíneo.",
+      "c": "A concentração hidrogeniônica está relacionada de modo inversamente proporcional em relação ao valor do pH.",
+      "d": "A faixa fisiológica de pH exclui alterações do equilíbrio ácido básico denominadas acidose e alcalose."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "O pH do sangue é finamente regulado, pois sofre alterações constantes ao longo do dia. Assinale a alternativa que identifica o principal fator que contribui para as oscilações do pH sanguíneo em um indivíduo saudável.",
+    "imagem": null,
+    "alternativas": {
+      "a": "A liberação de CO2 pelo metabolismo celular.",
+      "b": "O consumo de oxigênio na respiração mitocondrial.",
+      "c": "Aumento do espaço morto fisiológico.",
+      "d": "Inspiração de CO2 atmosférico."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Uma amostra de urina coletada de um indivíduo hospitalizado com alteração do estado ácido básico, apresentou um pH=7,0 Assinale a alternativa que apresenta o resultado mais compatível com a gasometria deste paciente.",
+    "imagem": null,
+    "alternativas": {
+      "a": "pH=7,47 pCO2 = 30 mmHg, HCO3 - = 30 mM/L.",
+      "b": "pH=7,47, pCO2 = 30 mmHg, HCO3 - = 22 mM/L",
+      "c": "pH= 7,33, pCO2 = 48 mmHg, HCO3 - = 22 mM/L.",
+      "d": "pH= 7,33, pCO2 = 48 mmHg, HCO3 - = 40 mM/L."
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "No septo interatrial é possível observar uma estrutura que representa um vestígio da circulação fetal. Assinale a alternativa que aponta qual é essa estrutura:",
+    "imagem": "(opcional - deixe vazio se não tiver)",
+    "alternativas": {
+      "a": "Ligamento redondo.",
+      "b": "Fossa oval.",
+      "c": "Seio coronário.",
+      "d": "Ducto arterioso."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Como é constituído o septo nasal?",
+    "imagem": "(opcional - deixe vazio se não tiver)",
+    "alternativas": {
+      "a": "Apresenta uma parte óssea, formada pela lâmina perpendicular do osso etmóide e pelo osso võmer, e uma parte cartilaginosa posterior formada pela cartilagem do septo nasal.",
+      "b": "Apresenta uma parte óssea, formada pela lâmina perpendicular do osso esfenóide e pelo osso võmer, e uma parte cartilaginosa anterior formada pela cartilagem do septo nasal.",
+      "c": "Apresenta uma parte óssea, formada pela lâmina perpendicular do osso etmóide e pelo osso võmer, e uma parte cartilaginosa anterior formada pela cartilagem do septo nasal e superiormente o osso nasal.",
+      "d": "Apresenta uma parte óssea, formada pelo osso võmer, e uma parte cartilaginosa anterior formada pela cartilagem do septo nasal e osso nasal superiormente"
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Especificamente, a principal função desse musculo apontado é ajudar na produção do som por aduzir as pregas vocais. Assinale a alternativa que corresponde ao nome desse musculo.",
+    "imagem": "(opcional - deixe vazio se não tiver)",
+    "alternativas": {
+      "a": "m. Tireoaritenoideo",
+      "b": "m.Cricoaritenoideo lateral",
+      "c": "m. vocal",
+      "d": "m. Aritenoideo transverso"
+    },
+    "correta": "b"
+  },
+  {
+    "enunciado": "O ligamento que se estende do ápice da bexiga é o:",
+    "imagem": null,
+    "alternativas": {
+      "a": "Ligamento umbilical mediano.",
+      "b": "Ligamento umbilical lateral.",
+      "c": "Ligamento umbilical medial.",
+      "d": "Ligamento redondo da bexiga."
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "O coração é um órgão oco, muscular, que funciona como uma bomba contrátil-propulsora. Para que sua função seja contemplada tem elementos musculares diferenciados constituídos por miocárdio. Selecione a questão correta sobre a morfologia do coração:",
+    "imagem": "(opcional - deixe vazio se não tiver)",
+    "alternativas": {
+      "a": "A fossa oval é um resquício do forame oval, encontrado no septo interventricular, melhor observado do lado esquerdo do coração.",
+      "b": "Os músculos papilares, em forma de cone, são presos por meio das cordas tendíneas as valvas atrioventriculares e tem como função impedir a passagem do sangue pelo cone arterial.",
+      "c": "Os músculos pectíneos são formações colunares observadas principalmente no átrio direito e nas aurículas de ambos os lados.",
+      "d": "As trabéculas cárneas são traves musculares que impulsionam o sangue dos ventrículos para os átrios."
+    },
+    "correta": "c"
+  },
+  {
+    "enunciado": "Referente ao retorno venoso abdominal, qual a principal veia responsável pela veia porta. Assinale a alternativa correta, observando a figura abaixo.",
+    "imagem": "(opcional - deixe vazio se não tiver)",
+    "alternativas": {
+      "a": "v. Tronco celiaco",
+      "b": "v. Mesentérica inferior",
+      "c": "v. Esplênica",
+      "d": "V. Mesentérica superior"
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Abaixo temos um esquema de estimulação do coração. Assinale a alternativa abaixo que corresponde a região apontada e a ordem correta das estruturas do complexo estimulante do coração:",
+    "imagem": "(opcional - deixe vazio se não tiver)",
+    "alternativas": {
+      "a": "Ramos subendocárdio (purkinje); Nó sinoatrial, feixes atrioventriculares, nó atrioventricular, fibras de Purkinje, feixe de His.",
+      "b": "Nó atrioventricular (nó de aschoff- tawara); Nó sinoatrial, feixe de His, nó atrioventricular, fibras atrioventriculares, fibras de Purkinje.",
+      "c": "Nó sinoatrial (nó de Koch); Nó atrioventricular, feixes atrioventriculares, nó atrioventricular, feixe de His, fibras de Purkinje.",
+      "d": "Fascículo atrioventricular (feixe de His); Nó sinoatrial, feixes atrioventriculares, nó atrioventricular, feixe de His, fibras de Purkinje."
+    },
+    "correta": "d"
+  },
+  {
+    "enunciado": "Observando as figuras abaixo qual alternativa corresponde a artéria que irriga a região apontada? Correlacione a região da figura 1 com a artéria da figura 2 e assinale a alternativa correta.",
+    "imagem": "(opcional - deixe vazio se não tiver)",
+    "alternativas": {
+      "a": "Artéria segmentar posterior",
+      "b": "Artéria segmentar superior",
+      "c": "Artéria segmentar supero anterior",
+      "d": "Artéria segmentar inferior"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "Assinale a alternativa abaixo que corresponde as artérias que dão ramo para irrigação superior, media e inferior do órgão apontado.",
+    "imagem": "(opcional - deixe vazio se não tiver)",
+    "alternativas": {
+      "a": "a.frênica, a. aorta abdominal, a. renal",
+      "b": "a.Aorta abdominal, a. renal superior e inferior",
+      "c": "a. Segmentar renal superior, a.esplênica, a. gástrica direita",
+      "d": "a.tronco celíaco, a. mesentérica superior e a. mesentérica inferior"
+    },
+    "correta": "a"
+  },
+  {
+    "enunciado": "As artérias coronárias são responsáveis pela irrigação sanguínea cardíaca. Assinale a alternativa que corresponde a região de origem das artérias coronárias.",
+    "imagem": "(opcional - deixe vazio se não tiver)",
+    "alternativas": {
+      "a": "Seios pulmonares nas válvulas semilunares anterior e esquerda.",
+      "b": "Seios aórticos nas válvulas semilunares direita e esquerda.",
+      "c": "Seios aórticos nas válvulas semilunares posterior e esquerda.",
+      "d": "Seios pulmonares nas válvulas semilunares direita e esquerda."
+    },
+    "correta": "b"
+  },      
+];
+
+        // --- FIM DAS MODIFICAÇÕES PRINCIPAIS ---
+
+        // Variáveis globais (algumas mantidas, outras adaptadas)
+        let allQuestions = []; 
+        let currentTestQuestions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+        let testStatistics = { 
+            correct: [],
+            incorrect: [],
+            attemptsHistory: [],
+            performanceByArea: {},
+            questionMistakes: {} 
+        };
+        let answeredQuestions = 0;
+        let answeredInBlock = 0;
+        let correctInBlock = 0;
+        let showFeedbackOnNext = false;
+        let currentAttempt = 0; 
+        let currentQuizIsReviewMode = false; 
+        let hasFinishedCurrentTestProcessing = false;
+        let charts = {
+            performance: null, progress: null, areas: null, mistakes: null,
+            questionSizeChart: null, timePerQuestion: null 
+        };
+
+        // Constantes de elementos do DOM
+        const quizPage = document.getElementById('quizPage');
+        const resultsPage = document.getElementById('resultsPage');
+        const currentQuestionDiv = document.getElementById('currentQuestion');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const finishBtn = document.getElementById('finishBtn');
+        // const jsonInput = document.getElementById('jsonInput'); // REMOVIDO
+        const finalScoreText = document.getElementById('finalScoreText');
+        const finalPercentageText = document.getElementById('finalPercentageText');
+        const questionsAnalysis = document.getElementById('questionsAnalysis');
+        const progressBar = document.getElementById('progressBar');
+        const instantFeedback = document.getElementById('instantFeedback');
+        
+        const feedbackPopup = document.getElementById('feedbackPopup');
+        const closeFeedback = document.getElementById('closeFeedback');
+        const continueButton = document.getElementById('continueButton');
+        const feedbackTotal = document.getElementById('feedbackTotal');
+        const feedbackCorrect = document.getElementById('feedbackCorrect');
+        const feedbackIncorrect = document.getElementById('feedbackIncorrect');
+        const feedbackPercentageValue = document.getElementById('feedbackPercentageValue');
+        const feedbackMistakesList = document.getElementById('feedbackMistakesList');
+        
+        const quizStartOptionsPopup = document.getElementById('quizStartOptionsPopup');
+        const quizOptionsPopupTitle = document.getElementById('quizOptionsPopupTitle');
+        const quizOptionsPopupSubtitle = document.getElementById('quizOptionsPopupSubtitle');
+        const quizOptionsPopupButtons = document.getElementById('quizOptionsPopupButtons');
+        
+        const questionDetailPopup = document.getElementById('questionDetailPopup');
+        const questionDetailContent = document.getElementById('questionDetailContent');
+
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const darkModeText = document.getElementById('darkModeText');
+        const darkModeToggleResults = document.getElementById('darkModeToggleResults');
+        const darkModeTextResults = document.getElementById('darkModeTextResults');
+        
+        const toggleAnalysisBtn = document.getElementById('toggleAnalysisBtn');
+        const analysisBox = document.getElementById('analysisBox');
+        const correctSound = document.getElementById('correctSound');
+        const wrongSound = document.getElementById('wrongSound');
+        // const jsonFileListElement = document.getElementById('jsonFileList'); // REMOVIDO
+        const quizTitleElement = document.getElementById('quizTitle'); 
+        const resultsTitleElement = document.getElementById('resultsTitle');
+        const resetStatsBtn = document.getElementById('resetStatsBtn');
+
+
+       const iframes = [
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lista-mais-g-y-do-planeta-terra-2-0-1308/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eu-quero-comer-voce-99397/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/rat-dance-music-93451/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/pou-estourado-48183/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/sua-mae-sabe-que-voce-gosta-de-rapazes-80078/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/toma-milk-shake-de-morango-59364/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/rojao-super-estourado-44057/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-da-minha-foia-19424/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vai-tomar-no-c-pir4nh444-34654/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-e-neymar-47-40647/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/e-agora-vai-entra-o-grosso-75362/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/caramba-que-p1nto-enorme-42382/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/o-homem-uma-maquina-uma-besta-enjaulada-66045/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/manda-foto-pivete-4508/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/som-do-zap-zap-estourado-15594/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-empurra-mole-59742/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/foi-quando-gyro-finalmente-entendeu-41342/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/uicideboy-intro-gmi2-36329/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/abc-da-amazonia-61531/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/corinthians-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cruzeiro-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eae-mane-cade-o-pix-mwahahaha-8598/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/posso-te-ligar-agora-ou-tua-mulher-54107/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/para-de-mandar-audio-to-na-ucrania-47141/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ponte-preta-radio-globo-91750/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/coritiba-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/dolly-estourado-50496/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/imbroxavel-44092/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-ze-gotinha-26753/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/hino-da-urss-53471/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lobo-pidao-50489/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/voce-vem-almocar-23752/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vinheta-ifood/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/spongebob-fail-11236/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/botao-do-whatsapp-97196/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/1-2-3-4-flamengo-18569/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ai-chavinho-25347/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/tralalero-funk-20181/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/indian-song-7sek-58379/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/hello-moto-estourado-73372/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/plantao-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/aw-shit-here-go-again-cj-from-gta-sa-97151/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cala-a-boca-e-escuta-o-som-da-minha-kombi-ai-2767/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/qui-fase-que-ta-o-curintia-43357/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/musica-triste-meme-41946/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/pare/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-ferrei-amigos-estevao-31478/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ele-ta-pedindo-pra-ser-empurrado-4066/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/papu-papu-papu-58837/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/biometria-13888/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/brasil-radio-globo/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/agostinho-carrara-autonomo-28476/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/freddie/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bem-te-vi-passaro-58874/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/grito-do-tom-35478/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/what-bottom-text-meme-sanctuary-guardian-s-24591/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/acorda-monark-17462/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-mata-de-uma-vez-trio-parada-dura-572/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/me-mata-de-uma-vez-31687/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/aumenta-o-som-marcelo-dig-dig-dig-74686/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vinheta-jornal-nacional/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cr7-bom-dia-34785/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bad-to-the-bone-meme-22189/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/ai-programa-hora-do-faro-melhor-qualidade-5308/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/donald-trump-build-a-wall/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/quien-estaba-hablando-contigo-73597/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bom-dia-sao-10h-silvio-santos/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-de-xampu-de-mulher/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/avocados-fron-mexico-5538/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-globo-1-621/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/comercial-globo-2-83971/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/e-o-pintinho-piu-26037/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/bilu-o-et-brasileiro/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/som-motor-f1-51289/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/buzina-de-caminhao-byrm-17163/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/caminhao-de-gas/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/re-caminhao-67082/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/o-moco-o-caminhao-tombou-35530/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/toque-do-motorola-28486/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/encara-messi-23845/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/cr7-vou-ao-u-ao-messi-36080/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/linkin-park-in-the-end-versao-forro-brazil-79061/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/vx-without-me-forro-estourado-27992/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/minha-pomba-forro-21153/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/champions-league-forro-42023/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/tu-conhece-a-paola-63959/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/lula-feijao-puro-34490/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/chora-viola/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/sinonimos-chitaozinho-xororo-brasil-27832/embed/" frameborder="0" scrolling="no"></iframe>',
+    '<iframe width="110" height="200" src="https://www.myinstants.com/instant/eu-to-maluco-to-doente-to-doidao-14644/embed/" frameborder="0" scrolling="no"></iframe>'
+];
+
+        // FUNÇÕES REMOVIDAS: sanitizeFileName, getFileList, saveFileList, renderFileList, deleteFile (relacionadas a múltiplos arquivos)
+
+        /**
+         * Salva apenas as estatísticas do simulado embutido no localStorage.
+         * @param {object} statsObject - O objeto de estatísticas a ser salvo.
+         */
+        function saveStats(statsObject) {
+            localStorage.setItem(LOCAL_STORAGE_STATS_PREFIX + EMBEDDED_QUIZ_ID, JSON.stringify(statsObject));
+        }
+
+        /**
+         * Carrega o simulado embutido (questões e estatísticas) e prepara para iniciar.
+         */
+        function loadEmbeddedQuizAndShowOptions() {
+            const displayName = "Simulado Principal"; // Nome fixo para o simulado embutido
+            const statsString = localStorage.getItem(LOCAL_STORAGE_STATS_PREFIX + EMBEDDED_QUIZ_ID);
+
+            // Processa as questões embutidas para garantir IDs únicos
+            allQuestions = embeddedQuestionsSource.map((q, index) => ({
+                ...q,
+                id: q.id || `${EMBEDDED_QUIZ_ID}-q-${index}` // Garante um ID para cada questão
+            }));
+
+            if (allQuestions.length === 0) {
+                currentQuestionDiv.innerHTML = "<p>Erro: Nenhuma questão embutida configurada.</p>";
+                alert('Erro: Nenhuma questão embutida encontrada ou formato inválido.');
+                resetStatsBtn.disabled = true;
+                return;
+            }
+
+            quizTitleElement.textContent = `Simulado: ${displayName}`;
+            resultsTitleElement.textContent = `Resultados: ${displayName}`;
+
+            if (statsString) {
+                testStatistics = JSON.parse(statsString);
+                testStatistics.questionMistakes = testStatistics.questionMistakes || {};
+                allQuestions.forEach(q => { // Garante que todas as questões atuais tenham uma entrada em questionMistakes
+                    if (testStatistics.questionMistakes[q.id] === undefined) {
+                        testStatistics.questionMistakes[q.id] = 0;
+                    }
+                });
+                currentAttempt = testStatistics.attemptCount || 0;
+            } else { // Se não há estatísticas salvas, inicializa
+                testStatistics = { 
+                    correct: [], 
+                    incorrect: [], 
+                    attemptsHistory: [], 
+                    performanceByArea: {}, 
+                    questionMistakes: {}, 
+                    attemptCount: 0 
+                };
+                allQuestions.forEach(q => { testStatistics.questionMistakes[q.id] = 0; });
+                currentAttempt = 0;
+            }
+            
+            resultsPage.style.display = 'none'; 
+            quizPage.style.display = 'none'; 
+            showQuizStartOptionsPopup(displayName);
+            resetStatsBtn.disabled = !statsString; // Habilita se houver estatísticas salvas
+        }
+        
+        /**
+         * Exibe o popup com opções para iniciar o simulado.
+         * @param {string} displayName - O nome de exibição do simulado.
+         */
+        function showQuizStartOptionsPopup(displayName) {
+            quizOptionsPopupSubtitle.textContent = `Simulado: ${displayName}`;
+            quizOptionsPopupButtons.innerHTML = ''; 
+
+            const normalTestButton = document.createElement('button');
+            normalTestButton.textContent = 'Prova Normal (40Q)'; // Ou o número de questões embutidas se for menor
+            normalTestButton.className = 'popup-button'; 
+            normalTestButton.onclick = () => {
+                initializeTest(false, Math.min(40, allQuestions.length)); // Ajusta o número de questões se necessário
+                closeQuizOptionsPopup();
+            };
+            quizOptionsPopupButtons.appendChild(normalTestButton);
+
+            const distinctMistakesCount = Object.values(testStatistics.questionMistakes || {}).filter(count => count > 0).length;
+            
+            // Mostra opção de revisar erros apenas se houver erros registrados
+            if (distinctMistakesCount > 0) { 
+                const reviewMistakesButton = document.createElement('button');
+                const reviewQuizLength = Math.min(10, distinctMistakesCount); 
+                reviewMistakesButton.textContent = `Revisar Erros (${reviewQuizLength}Q)`;
+                reviewMistakesButton.className = 'popup-button';
+                reviewMistakesButton.onclick = () => {
+                    initializeTest(true, 10); 
+                    closeQuizOptionsPopup();
+                };
+                quizOptionsPopupButtons.appendChild(reviewMistakesButton);
+            }
+            
+            quizStartOptionsPopup.classList.add('active');
+        }
+
+        function closeQuizOptionsPopup() {
+            quizStartOptionsPopup.classList.remove('active');
+        }
+        
+        resetStatsBtn.addEventListener('click', () => {
+            const currentFileNameForAlert = "Simulado Principal";
+
+            if (confirm(`Tem a certeza que quer resetar todas as estatísticas (histórico de tentativas, erros, etc.) do "${currentFileNameForAlert}"? As questões em si NÃO serão apagadas.`)) {
+                testStatistics = { 
+                    correct: [],
+                    incorrect: [],
+                    attemptsHistory: [],
+                    performanceByArea: {},
+                    questionMistakes: {}, 
+                    attemptCount: 0 
+                };
+                // Re-inicializa a contagem de erros para todas as questões embutidas
+                allQuestions.forEach(q => { 
+                    testStatistics.questionMistakes[q.id] = 0;
+                });
+
+                saveStats(testStatistics); // Salva as estatísticas resetadas
+                
+                alert("Estatísticas resetadas com sucesso!");
+                
+                if(resultsPage.style.display === 'block'){
+                    resultsPage.style.display = 'none';
+                }
+                if(quizPage.style.display === 'block'){
+                     quizPage.style.display = 'none';
+                }
+                currentQuestionDiv.innerHTML = ""; // Limpa a área de questão
+                
+                // Recarrega as opções de início, já que as estatísticas foram alteradas
+                loadEmbeddedQuizAndShowOptions();
+            }
+        });
+
+
+        function playSound(soundElement) {
+            if (soundElement) {
+                soundElement.currentTime = 0;
+                soundElement.play().catch(e => console.error("Erro ao tocar som:", e));
+            }
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkModeGlobalSetting', isDark ? 'enabled' : 'disabled'); 
+            const text = isDark ? 'Modo Claro' : 'Modo Escuro';
+            darkModeText.textContent = text;
+            darkModeTextResults.textContent = text;
+            if (resultsPage.style.display === 'block' && currentFileId) updateCharts(); 
+        }
+
+        if (localStorage.getItem('darkModeGlobalSetting') === 'enabled') {
+            document.body.classList.add('dark-mode');
+            darkModeText.textContent = 'Modo Claro';
+            darkModeTextResults.textContent = 'Modo Claro';
+        } else {
+             darkModeText.textContent = 'Modo Escuro';
+            darkModeTextResults.textContent = 'Modo Escuro';
+        }
+
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+        darkModeToggleResults.addEventListener('click', toggleDarkMode);
+        closeFeedback.addEventListener('click', () => feedbackPopup.classList.remove('active'));
+        
+        toggleAnalysisBtn.addEventListener('click', () => {
+            const isHidden = analysisBox.style.display === 'none' || analysisBox.style.display === '';
+            analysisBox.style.display = isHidden ? 'block' : 'none';
+            if (isHidden) {
+                toggleAnalysisBtn.innerHTML = '<span class="icon">&#x25B2;</span>Recolher Análise';
+                toggleAnalysisBtn.classList.add('expanded');
+            } else {
+                toggleAnalysisBtn.innerHTML = '<span class="icon">&#x25BC;</span>Expandir Análise';
+                toggleAnalysisBtn.classList.remove('expanded');
+            }
+        });
+        
+        continueButton.addEventListener('click', () => {
+            feedbackPopup.classList.remove('active');
+            if (currentQuestionIndex < currentTestQuestions.length - 1) { 
+                currentQuestionIndex++;
+                displayCurrentQuestion(); 
+            } else { // Se era o feedback do último bloco da última questão
+                actuallyFinishTest();
+            }
+        });
+
+        // REMOVIDO: jsonInput.addEventListener('change', ...)
+
+        function initializeTest(isMistakesQuiz = false, numQuestions = 40) {
+            instantFeedback.style.display = 'none'; 
+            instantFeedback.textContent = '';
+            currentQuizIsReviewMode = isMistakesQuiz; 
+            hasFinishedCurrentTestProcessing = false; 
+
+            // A verificação de currentFileId não é mais crítica aqui, pois é fixo.
+            // allQuestions é preenchido por loadEmbeddedQuizAndShowOptions
+            if (allQuestions.length === 0) {
+                currentQuestionDiv.innerHTML = "<p>Nenhuma questão carregada. Verifique a configuração das questões embutidas.</p>";
+                quizPage.style.display = 'block'; 
+                return;
+            }
+            userAnswers = {}; 
+            currentQuestionIndex = 0;
+            answeredQuestions = 0;
+            answeredInBlock = 0;
+            correctInBlock = 0;
+            showFeedbackOnNext = false;
+            testStatistics.correct = []; 
+            testStatistics.incorrect = []; 
+            testStatistics.performanceByArea = {}; 
+            
+            // Incrementa o contador de tentativas apenas para provas normais
+            if (!isMistakesQuiz) {
+                testStatistics.attemptCount = (testStatistics.attemptCount || 0) + 1;
+                currentAttempt = testStatistics.attemptCount; 
+                saveStats(testStatistics); // Salva o contador de tentativas atualizado
+            }
+
+
+            if (isMistakesQuiz) {
+                currentTestQuestions = getMostMistakenQuestions(allQuestions, numQuestions); 
+                if (currentTestQuestions.length === 0 ) {
+                    alert("Não há questões erradas para revisar ou elas já foram vistas. Iniciando prova normal.");
+                    currentTestQuestions = getRandomQuestions(allQuestions, Math.min(40, allQuestions.length)); 
+                    numQuestions = currentTestQuestions.length; // Ajusta numQuestions para o tamanho real
+                    currentQuizIsReviewMode = false; 
+                } else if (currentTestQuestions.length < numQuestions) {
+                    numQuestions = currentTestQuestions.length;
+                }
+            } else { 
+                // Lógica para alternar para revisão de erros a cada X tentativas (ex: 6)
+                if (testStatistics.attemptCount > 0 && testStatistics.attemptCount % 6 === 0) { 
+                    const mistakenForReview = getMostMistakenQuestions(allQuestions, numQuestions);
+                    if (mistakenForReview.length > 0) {
+                        currentTestQuestions = mistakenForReview;
+                        currentQuizIsReviewMode = true; 
+                         if (currentTestQuestions.length < numQuestions) numQuestions = currentTestQuestions.length;
+                        alert("Esta é uma rodada de revisão das questões mais erradas!");
+                    } else { // Se não há erros para revisar, faz uma prova normal
+                        currentTestQuestions = getRandomQuestions(allQuestions, Math.min(numQuestions, allQuestions.length));
+                        currentQuizIsReviewMode = false;
+                         if (currentTestQuestions.length < numQuestions) numQuestions = currentTestQuestions.length;
+                    }
+                } else { // Prova normal padrão
+                    currentTestQuestions = getRandomQuestions(allQuestions, Math.min(numQuestions, allQuestions.length));
+                    currentQuizIsReviewMode = false;
+                     if (currentTestQuestions.length < numQuestions) numQuestions = currentTestQuestions.length;
+                }
+            }
+            
+            // Garante que não tentaremos exibir mais questões do que temos
+            if (currentTestQuestions.length > numQuestions) {
+                 currentTestQuestions = currentTestQuestions.slice(0, numQuestions);
+            } else {
+                numQuestions = currentTestQuestions.length; // Ajusta numQuestions para o número real de questões selecionadas
+            }
+
+            if (currentTestQuestions.length === 0 && allQuestions.length > 0) { // Fallback se a seleção de erros não retornar nada
+                currentTestQuestions = getRandomQuestions(allQuestions, Math.min(numQuestions, allQuestions.length));
+                currentQuizIsReviewMode = false; 
+            }
+
+
+            quizPage.style.display = 'block'; 
+            resultsPage.style.display = 'none';
+            analysisBox.style.display = 'none'; 
+            toggleAnalysisBtn.innerHTML = '<span class="icon">&#x25BC;</span>Expandir Análise';
+            toggleAnalysisBtn.classList.remove('expanded');
+
+            if (currentTestQuestions.length > 0) {
+                displayCurrentQuestion();
+            } else {
+                currentQuestionDiv.innerHTML = "<p>Nenhuma questão disponível para este modo de prova.</p>";
+                nextBtn.disabled = true;
+                finishBtn.style.display = 'none';
+            }
+            updateProgressBar();
+            updateNavigationButtons();
+        }
+
+        function getRandomQuestions(questions, count) {
+            if (questions.length === 0) return [];
+            const availableQuestions = questions.length;
+            const numToSelect = Math.min(count, availableQuestions);
+            const shuffled = [...questions].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, numToSelect);
+        }
+
+        function getMostMistakenQuestions(questions, count) {
+            if (questions.length === 0 || !testStatistics.questionMistakes) return [];
+            const questionsWithMistakes = questions
+                .map(q => ({ ...q, mistakes: testStatistics.questionMistakes[q.id] || 0 }))
+                .filter(q => q.mistakes > 0);
+
+            questionsWithMistakes.sort((a, b) => b.mistakes - a.mistakes); // Mais erradas primeiro
+            
+            const numToSelect = Math.min(count, questionsWithMistakes.length);
+            const selected = questionsWithMistakes.slice(0, numToSelect);
+            return shuffleArray(selected); // Embaralha as selecionadas para não virem sempre na mesma ordem de erro
+        }
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function formatEnunciado(text) {
+            if (!text) return '';
+            const tableRegex = /(\+[-]+\+[\s\S]*\+[-]+\+)/g; 
+            return text.replace(tableRegex, '<pre class="ascii-table">$&</pre>');
+        }
+
+        function displayCurrentQuestion() {
+            instantFeedback.style.display = 'none'; 
+
+            if (currentTestQuestions.length === 0 || currentQuestionIndex >= currentTestQuestions.length) {
+                if (answeredQuestions > 0) actuallyFinishTest(); 
+                else currentQuestionDiv.innerHTML = "<p>Fim das questões ou nenhuma questão carregada.</p>";
+                return;
+            }
+            const question = currentTestQuestions[currentQuestionIndex];
+            let imageHtml = '';
+            if (question.imagem && question.imagem !== 'null') {
+                imageHtml = `<img src="${question.imagem}" alt="Imagem da questão" class="question-image">`;
+            }
+            const formattedEnunciado = formatEnunciado(question.enunciado);
+
+            let starsHtml = '';
+            if (currentQuizIsReviewMode && testStatistics.questionMistakes && testStatistics.questionMistakes[question.id]) {
+                const errorCount = testStatistics.questionMistakes[question.id];
+                if (errorCount > 0) { 
+                    let starCount = 0;
+                    // Lógica de estrelas: 1 estrela para 1-2 erros, 2 estrelas para 3-4 erros, etc.
+                    // Ajuste esta lógica conforme necessário.
+                    if (errorCount >= 1 && errorCount <=2) starCount = 1;
+                    else if (errorCount >= 3 && errorCount <=4) starCount = 2;
+                    else if (errorCount >= 5) starCount = 3; // Máximo de 3 estrelas, por exemplo
+
+                    starCount = Math.min(3, starCount); // Limita o número de estrelas
+
+                    if (starCount > 0) {
+                        starsHtml = `<span class="mistake-stars-container">${'⭐'.repeat(starCount)} <span class="mistake-stars-label">(Nível de Erro)</span></span>`;
+                    }
+                }
+            }
+
+
+            currentQuestionDiv.innerHTML = `
+                <div class="question-container" id="questionContainer">
+                    <div class="question-number">Questão ${currentQuestionIndex + 1} de ${currentTestQuestions.length} ${starsHtml}</div>
+                    <div class="question-text">${formattedEnunciado}</div>
+                    ${imageHtml}
+                    <div class="options" id="optionsContainer"></div>
+                    <div class="correct-answer" id="correctAnswer" style="display:none;">Resposta correta: ${question.correta.toUpperCase()}</div>
+                    ${question.explicacao ? `<div class="explanation" id="explanation" style="display:none;">${formatEnunciado(question.explicacao)}</div>` : ''}
+                </div>`;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = ''; 
+            
+            Object.entries(question.alternativas).forEach(([letter, text]) => {
+                const optionId = `q${currentQuestionIndex}-opt-${letter}-${Date.now()}`;
+                const label = document.createElement('label');
+                label.className = 'option';
+                label.htmlFor = optionId;
+
+                const radioInput = document.createElement('input');
+                radioInput.type = 'radio';
+                radioInput.id = optionId;
+                radioInput.name = `question-${question.id}`; 
+                radioInput.value = letter;
+
+                if (userAnswers[question.id] !== undefined) { // Se a questão já foi respondida nesta tentativa
+                    radioInput.checked = (userAnswers[question.id] === letter);
+                    radioInput.disabled = true; 
+                     if (userAnswers[question.id] === letter) { 
+                        label.classList.add(userAnswers[question.id] === question.correta ? 'correct' : 'incorrect', 'selected');
+                    } else if (letter === question.correta) { 
+                        label.classList.add('correct');
+                    }
+                }
+                
+                const letterSpan = document.createElement('span');
+                letterSpan.className = 'option-letter-styled';
+                letterSpan.textContent = `${letter.toUpperCase()})`;
+
+                const textSpan = document.createElement('span');
+                textSpan.className = 'option-actual-text';
+                textSpan.textContent = text;
+
+                label.appendChild(radioInput);
+                label.appendChild(letterSpan);
+                label.appendChild(textSpan);
+                optionsContainer.appendChild(label);
+
+                if (!radioInput.disabled) { 
+                    label.addEventListener('click', function() {
+                        if (userAnswers[question.id] !== undefined) return; 
+
+                        userAnswers[question.id] = radioInput.value;
+                        radioInput.checked = true;
+
+                        const isCorrect = radioInput.value === question.correta;
+                        playSound(isCorrect ? correctSound : wrongSound);
+
+                        optionsContainer.querySelectorAll('label.option').forEach(optLabel => {
+                            const optRadio = optLabel.querySelector('input[type="radio"]');
+                            optRadio.disabled = true;
+                            optLabel.classList.remove('selected', 'correct', 'incorrect');
+                            if (optRadio.value === question.correta) {
+                                optLabel.classList.add('correct');
+                            }
+                            if (optRadio.value === radioInput.value) { 
+                                optLabel.classList.add('selected');
+                                if (!isCorrect) {
+                                    optLabel.classList.add('incorrect');
+                                }
+                            }
+                        });
+                        
+                        const qContainer = document.getElementById('questionContainer');
+                        qContainer.classList.remove('correct', 'incorrect');
+                        qContainer.classList.add(isCorrect ? 'correct' : 'incorrect');
+                        
+                        document.getElementById('correctAnswer').style.display = 'block';
+                        const explanationDiv = document.getElementById('explanation');
+                        if (explanationDiv) explanationDiv.style.display = 'block';
+
+                        answeredQuestions++;
+                        answeredInBlock++;
+                        if (isCorrect) correctInBlock++;
+                        
+                        updateProgressBar();
+                        // MODIFICAÇÃO: Mudar bloco de 5 para 10
+                        if (answeredInBlock > 0 && answeredInBlock % 10 === 0) { 
+                            showFeedbackOnNext = true;
+                        }
+                        updateNavigationButtons();
+                    });
+                }
+            });
+
+            const qContainer = document.getElementById('questionContainer');
+            if (userAnswers[question.id] !== undefined) { // Se já respondida, mostrar estado correto/incorreto
+                 document.getElementById('correctAnswer').style.display = 'block';
+                 const explanationDiv = document.getElementById('explanation');
+                 if (explanationDiv) explanationDiv.style.display = 'block';
+                 qContainer.classList.toggle('correct', userAnswers[question.id] === question.correta);
+                 qContainer.classList.toggle('incorrect', userAnswers[question.id] !== question.correta);
+            }
+            
+            updateNavigationButtons();
+            currentQuestionDiv.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
+        }
+
+        function showCongratsPopupWithRandomIframe() {
+            const existingPopup = document.querySelector('.congrats-popup');
+            if (existingPopup) existingPopup.remove();
+
+            // MODIFICAÇÃO: Usar a variável global 'iframes'
+            const randomIframeHtml = iframes[Math.floor(Math.random() * iframes.length)];
+            const popup = document.createElement('div');
+            popup.className = 'congrats-popup';
+            popup.innerHTML = `
+                <div class="congrats-content">
+                    <p class="congrats-message">Parabéns! Você tirou 7+! (áudios 100% aleatório de um site de áudio, CUIDADO!!) </p>
+                    <div class="random-iframe">${randomIframeHtml}</div>
+                    <button class="close-popup-button" onclick="this.closest('.congrats-popup').remove()">Fechar</button>
+                </div>`;
+            document.body.appendChild(popup);
+        }
+        
+        function showBlockFeedback() {
+            const totalInBlock = answeredInBlock;
+            if (totalInBlock === 0 && !showFeedbackOnNext) { 
+                 if (currentQuestionIndex < currentTestQuestions.length - 1) {
+                     currentQuestionIndex++; 
+                     displayCurrentQuestion(); 
+                 } else { 
+                     actuallyFinishTest(); 
+                 }
+                return;
+            }
+            showFeedbackOnNext = false; 
+
+            const incorrectInBlock = totalInBlock - correctInBlock;
+            const percentage = totalInBlock > 0 ? Math.round((correctInBlock / totalInBlock) * 100) : 0;
+            
+            feedbackTotal.textContent = totalInBlock;
+            feedbackCorrect.textContent = correctInBlock;
+            feedbackIncorrect.textContent = incorrectInBlock;
+            feedbackPercentageValue.textContent = percentage;
+            
+            feedbackMistakesList.innerHTML = '<h4>Resumo dos erros neste bloco:</h4>';
+            let mistakesContent = '';
+            
+            const blockStartIndex = Math.max(0, (currentQuestionIndex +1) - totalInBlock);
+
+
+            for(let i = 0; i < totalInBlock; i++) {
+                const qIdxInTest = blockStartIndex + i;
+                 if (qIdxInTest >= currentTestQuestions.length) continue;
+
+                const question = currentTestQuestions[qIdxInTest];
+                const userAnswer = userAnswers[question.id];
+
+                if(userAnswer !== undefined && userAnswer !== question.correta) {
+                    mistakesContent += `<div class="feedback-mistake-item">
+                        <div class="feedback-mistake-question">Q${qIdxInTest + 1}: ${question.enunciado.substring(0,50)}...</div>
+                        <div class="feedback-mistake-option feedback-mistake-selected">Sua Resposta: ${userAnswer.toUpperCase()}) ${question.alternativas[userAnswer]}</div>
+                        <div class="feedback-mistake-option feedback-mistake-correct">Correta: ${question.correta.toUpperCase()}) ${question.alternativas[question.correta]}</div>
+                    </div>`;
+                }
+            }
+            if(mistakesContent === '') mistakesContent = "<p>Nenhum erro neste bloco. Ótimo!</p>";
+            feedbackMistakesList.innerHTML += mistakesContent;
+            
+            feedbackPopup.classList.add('active');
+
+            if (percentage >= 70) {
+                setTimeout(showCongratsPopupWithRandomIframe, 300);
+            }
+            
+            answeredInBlock = 0; 
+            correctInBlock = 0;  
+        }
+
+        function showInstantFeedback() {
+            if (currentTestQuestions.length === 0 || currentQuestionIndex >= currentTestQuestions.length) return;
+            const question = currentTestQuestions[currentQuestionIndex];
+            const userAnswer = userAnswers[question.id];
+            if (userAnswer === undefined) { instantFeedback.style.display = 'none'; return; }
+            const isCorrect = userAnswer === question.correta;
+            instantFeedback.textContent = isCorrect ? `✅ Resposta correta! (${question.correta.toUpperCase()})` : `❌ Resposta incorreta! A correta é ${question.correta.toUpperCase()}`;
+            instantFeedback.className = isCorrect ? 'instant-feedback correct' : 'instant-feedback incorrect';
+            instantFeedback.style.display = 'block';
+            setTimeout(() => instantFeedback.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+        }
+
+        function updateProgressBar() {
+            const progress = currentTestQuestions.length > 0 ? (answeredQuestions / currentTestQuestions.length) * 100 : 0;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function updateNavigationButtons() {
+            prevBtn.disabled = currentQuestionIndex === 0;
+            const questionId = currentTestQuestions[currentQuestionIndex]?.id;
+            const answeredCurrent = userAnswers[questionId] !== undefined;
+            
+            if (currentQuestionIndex === currentTestQuestions.length - 1) { // Se é a última questão
+                nextBtn.style.display = 'none';
+                finishBtn.style.display = 'block';
+                finishBtn.disabled = !answeredCurrent; // Habilita finalizar apenas se a última foi respondida
+            } else { // Não é a última questão
+                nextBtn.style.display = 'block';
+                finishBtn.style.display = 'none';
+                nextBtn.disabled = !answeredCurrent; // Habilita próxima apenas se a atual foi respondida
+            }
+            if(currentQuestionIndex > 0) prevBtn.disabled = false; // Se não for a primeira, botão anterior sempre habilitado
+        }
+
+        function nextQuestion() {
+            showInstantFeedback(); 
+
+            if (showFeedbackOnNext) { 
+                showBlockFeedback(); 
+            } else {
+                if (currentQuestionIndex < currentTestQuestions.length - 1) {
+                    setTimeout(() => { 
+                        currentQuestionIndex++;
+                        displayCurrentQuestion();
+                    }, 300); // Delay apenas se não houver feedback de bloco
+                }
+            }
+        }
+
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayCurrentQuestion();
+            }
+        }
+        
+        function finishTest() {
+            const currentQuestionId = currentTestQuestions[currentQuestionIndex]?.id;
+            if(userAnswers[currentQuestionId] === undefined && currentQuestionIndex === currentTestQuestions.length -1) {
+                alert("Por favor, responda à questão atual antes de finalizar.");
+                return; 
+            }
+
+            showInstantFeedback(); 
+
+            if (showFeedbackOnNext && currentQuestionIndex === currentTestQuestions.length - 1) {
+                showBlockFeedback(); 
+            } else {
+                actuallyFinishTest(); 
+            }
+        }
+
+        function actuallyFinishTest() {
+             if (hasFinishedCurrentTestProcessing) {
+                console.warn("actuallyFinishTest: Processamento já realizado para esta tentativa. Exibindo resultados existentes.");
+                const lastAttempt = testStatistics.attemptsHistory && testStatistics.attemptsHistory.length > 0 
+                                     ? testStatistics.attemptsHistory[testStatistics.attemptsHistory.length -1]
+                                     : null;
+                if(lastAttempt && typeof lastAttempt.total === 'number' && lastAttempt.total > 0) { 
+                    showResultsPage(parseFloat(lastAttempt.score), (lastAttempt.correct / lastAttempt.total) * 100, lastAttempt.correct, lastAttempt.total);
+                } else { 
+                    showResultsPage(0, 0, 0, 0); 
+                }
+                return;
+            }
+
+
+            const delay = userAnswers[currentTestQuestions[currentQuestionIndex]?.id] !== undefined ? 300 : 0;
+            setTimeout(() => {
+                // currentFileId é sempre EMBEDDED_QUIZ_ID, não precisa checar se é null
+                
+                testStatistics.correct = [];
+                testStatistics.incorrect = [];
+                testStatistics.performanceByArea = {}; 
+                
+                currentTestQuestions.forEach((question) => {
+                    const userAnswer = userAnswers[question.id]; 
+                    if (userAnswer === undefined) return; 
+
+                    if (question.area) {
+                        if (!testStatistics.performanceByArea[question.area]) {
+                            testStatistics.performanceByArea[question.area] = { correct: 0, total: 0 };
+                        }
+                        testStatistics.performanceByArea[question.area].total++;
+                    }
+
+                    if (userAnswer === question.correta) {
+                        testStatistics.correct.push(question.id);
+                        if (question.area) {
+                            testStatistics.performanceByArea[question.area].correct++;
+                        }
+                    } else {
+                        testStatistics.incorrect.push(question.id);
+                        testStatistics.questionMistakes[question.id] = (testStatistics.questionMistakes[question.id] || 0) + 1;
+                    }
+                });
+                
+                const correctCount = testStatistics.correct.length;
+                const totalAnsweredInTest = correctCount + testStatistics.incorrect.length;
+                
+                const correctPercentage = totalAnsweredInTest > 0 ? ((correctCount / totalAnsweredInTest) * 100) : 0; 
+                const finalScore = totalAnsweredInTest > 0 ? ((correctCount / totalAnsweredInTest) * 10) : 0; 
+                
+                if (totalAnsweredInTest > 0) { // Salva no histórico apenas se houver respostas
+                    if (!testStatistics.attemptsHistory) testStatistics.attemptsHistory = [];
+                    testStatistics.attemptsHistory.push({
+                        date: new Date().toLocaleString(),
+                        correct: correctCount,
+                        total: totalAnsweredInTest,
+                        score: finalScore.toFixed(1),
+                        attemptNumber: testStatistics.attemptCount, 
+                        questionIdsInAttempt: currentTestQuestions.map(q => q.id),
+                        userAnswersInAttempt: {...userAnswers} 
+                    });
+                }
+                
+                saveStats(testStatistics); // Salva estatísticas atualizadas
+                hasFinishedCurrentTestProcessing = true; 
+                showResultsPage(finalScore, correctPercentage, correctCount, totalAnsweredInTest);
+            }, delay);
+        }
+
+        function showResultsPage(score, percentage, correctCount, totalAttempted) {
+            quizPage.style.display = 'none';
+            resultsPage.style.display = 'block';
+
+            const resultsMainBox = document.getElementById('results-main-box');
+            resultsMainBox.classList.remove('results-box-bad', 'results-box-average', 'results-box-good');
+            if (score < 6) {
+                resultsMainBox.classList.add('results-box-bad');
+            } else if (score < 8) {
+                resultsMainBox.classList.add('results-box-average');
+            } else {
+                resultsMainBox.classList.add('results-box-good');
+            }
+
+            const finalScoreBox = document.getElementById('finalScoreText');
+            finalScoreBox.textContent = `${score.toFixed(1)}`;
+            finalScoreBox.className = 'final-score-value-box'; 
+            if (score < 6) {
+                finalScoreBox.classList.add('score-bad');
+            } else if (score < 8) {
+                finalScoreBox.classList.add('score-average');
+            } else {
+                finalScoreBox.classList.add('score-good');
+            }
+            
+            finalPercentageText.innerHTML = `Você acertou <strong>${correctCount}</strong> de <strong>${totalAttempted}</strong> questões respondidas (<strong>${percentage.toFixed(1)}%</strong>)`;
+            
+            destroyCharts();
+            generateCharts(); 
+            generateQuestionsAnalysis(); 
+            resetStatsBtn.disabled = false; // Habilita o botão de reset, pois há um resultado para o simulado
+            
+            const resultsTitleEl = document.getElementById('resultsTitle');
+            if(resultsTitleEl) {
+                resultsTitleEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function destroyCharts() { 
+            Object.keys(charts).forEach(key => {
+                if (charts[key] && typeof charts[key].destroy === 'function') {
+                    charts[key].destroy();
+                }
+                charts[key] = null;
+            });
+        }
+        
+        function updateCharts() { 
+            destroyCharts(); 
+            setTimeout(() => {
+                generateCharts();
+            }, 50);
+        }
+
+        function generateCharts() {
+            // currentFileId é sempre EMBEDDED_QUIZ_ID, não precisa checar
+            destroyCharts(); 
+            
+            const textColor = getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
+            const borderColorCSS = getComputedStyle(document.body).getPropertyValue('--border-color').trim();
+            const correctColor = getComputedStyle(document.body).getPropertyValue('--accent-color').trim();
+            const incorrectColor = getComputedStyle(document.body).getPropertyValue('--danger-color').trim();
+            const primaryColor = getComputedStyle(document.body).getPropertyValue('--primary-color').trim();
+            const bgCardColor = getComputedStyle(document.body).getPropertyValue('--bg-card').trim();
+
+            const correctAnswersCount = testStatistics.correct.length;
+            const incorrectAnswersCount = testStatistics.incorrect.length;
+
+            // Gráfico de Desempenho Geral (Pizza)
+            if (correctAnswersCount > 0 || incorrectAnswersCount > 0) { // Só mostra se houver dados
+                charts.performance = new Chart(document.getElementById('performanceChart').getContext('2d'), {
+                    type: 'pie',
+                    data: {
+                        labels: ['Acertos', 'Erros'],
+                        datasets: [{
+                            data: [correctAnswersCount, incorrectAnswersCount],
+                            backgroundColor: [correctColor, incorrectColor],
+                            borderColor: bgCardColor, borderWidth: 2
+                        }]
+                    },
+                    options: getChartOptions('Desempenho na Prova Atual', textColor)
+                });
+            }
+
+
+            // Gráfico de Progresso nas Tentativas (Barras)
+            const attemptLabels = (testStatistics.attemptsHistory || []).map((a, i) => `Tent. ${a.attemptNumber || i + 1}`);
+            const attemptScores = (testStatistics.attemptsHistory || []).map(a => parseFloat(a.score));
+            if (attemptLabels.length > 0) { // Só mostra se houver histórico
+                charts.progress = new Chart(document.getElementById('progressChart').getContext('2d'), {
+                    type: 'bar', 
+                    data: {
+                        labels: attemptLabels,
+                        datasets: [{
+                            label: 'Nota (0-10)', 
+                            data: attemptScores, 
+                            backgroundColor: primaryColor + 'B3', 
+                            borderColor: primaryColor,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: getChartOptions('Progresso nas Tentativas (Neste Simulado)', textColor, {
+                        scales: { 
+                            y: { beginAtZero: true, max: 10, ticks: { color: textColor, stepSize: 1 }, grid: { color: borderColorCSS + '80' } },
+                            x: { ticks: { color: textColor }, grid: { color: borderColorCSS + '80' } } 
+                        },
+                        animation: { // Para mostrar o valor em cima da barra
+                            onComplete: function() {
+                                const chartInstance = this;
+                                const ctx = chartInstance.ctx;
+                                const fontFam = getComputedStyle(document.body).getPropertyValue('--font-main').split(',')[0].trim() || 'Poppins';
+                                ctx.font = `600 11px ${fontFam}`;
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'bottom';
+                                ctx.fillStyle = textColor;
+
+                                this.data.datasets.forEach(function(dataset, i) {
+                                    const meta = chartInstance.getDatasetMeta(i);
+                                    if (!meta.hidden) {
+                                        meta.data.forEach(function(bar, index) {
+                                            const data = dataset.data[index];
+                                            if (data !== null && data !== undefined) {
+                                                const score = parseFloat(data).toFixed(1);
+                                                ctx.fillText(score, bar.x, bar.y - 6); 
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    })
+                });
+            }
+            
+            // Gráfico de Acertos por Área (Barras Horizontais)
+            const areaLabels = Object.keys(testStatistics.performanceByArea || {});
+            const areaPerformance = areaLabels.map(area => {
+                const data = testStatistics.performanceByArea[area];
+                return data.total > 0 ? (data.correct / data.total) * 100 : 0;
+            });
+            
+            const areasChartCard = document.getElementById('areasChartCard');
+            if (areasChartCard && areaLabels.length > 0) { // Só mostra se houver áreas e dados
+                areasChartCard.style.display = 'block'; 
+                charts.areas = new Chart(document.getElementById('areasChart').getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: areaLabels,
+                        datasets: [{
+                            label: '% Acerto por Área (Prova Atual)', data: areaPerformance, backgroundColor: primaryColor + 'B3',
+                            borderColor: primaryColor, borderWidth: 1
+                        }]
+                    },
+                    options: getChartOptions('Desempenho por Área (Prova Atual)', textColor, {
+                        indexAxis: 'y',
+                        scales: { 
+                            y: { ticks: { color: textColor }, grid: { color: borderColorCSS + '80' } },
+                            x: { beginAtZero: true, max: 100, ticks: { color: textColor, callback: function(value) { return value + "%" } }, grid: { color: borderColorCSS + '80' } }
+                        }
+                    })
+                });
+            } else if (areasChartCard) {
+                areasChartCard.style.display = 'none'; 
+            }
+
+            // Gráfico de Questões Mais Erradas (Barras)
+            const mistakeCountsOverall = {};
+            Object.entries(testStatistics.questionMistakes || {}).forEach(([qId, count]) => {
+                if (count > 0) {
+                    const originalQuestionIndex = allQuestions.findIndex(q => q.id === qId); 
+                    if (originalQuestionIndex !== -1) { 
+                        mistakeCountsOverall[`Q${originalQuestionIndex + 1}`] = count;
+                    }
+                }
+            });
+            const sortedMistakesOverall = Object.entries(mistakeCountsOverall)
+                                                 .sort(([,a],[,b]) => b-a) // Ordena por mais erradas
+                                                 .slice(0,10); // Pega o Top 10
+            
+            if (sortedMistakesOverall.length > 0) { // Só mostra se houver erros
+                charts.mistakes = new Chart(document.getElementById('mistakesChart').getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: sortedMistakesOverall.map(item => item[0]),
+                        datasets: [{
+                            label: 'Vezes Erradas (Top 10 - Este Simulado)', data: sortedMistakesOverall.map(item => item[1]),
+                            backgroundColor: incorrectColor + 'B3', borderColor: incorrectColor, borderWidth: 1
+                        }]
+                    },
+                    options: getChartOptions('Questões Mais Erradas (Este Simulado)', textColor, {
+                        scales: { 
+                            y: { beginAtZero: true, ticks: { color: textColor, stepSize: 1 }, grid: { color: borderColorCSS + '80' } },
+                            x: { ticks: { color: textColor }, grid: { color: borderColorCSS + '80' } } 
+                        },
+                        onClick: (event, elements) => { 
+                            if (elements.length > 0) {
+                                const chartElement = elements[0];
+                                const index = chartElement.index;
+                                const questionLabel = charts.mistakes.data.labels[index]; 
+                                const questionNumberStr = questionLabel.substring(1); 
+                                const questionNumber = parseInt(questionNumberStr); 
+                                if (!isNaN(questionNumber) && questionNumber > 0 && questionNumber <= allQuestions.length) {
+                                    const questionData = allQuestions[questionNumber - 1]; 
+                                    displayQuestionInPopup(questionData);
+                                } else {
+                                    console.error("Não foi possível encontrar a questão para o label:", questionLabel);
+                                }
+                            }
+                        }
+                    })
+                });
+            }
+            generateAdditionalCharts();
+        }
+
+        function generateAdditionalCharts() {
+            const textColor = getComputedStyle(document.body).getPropertyValue('--text-primary').trim();
+            const borderColorCSS = getComputedStyle(document.body).getPropertyValue('--border-color').trim();
+            const bgCardColor = getComputedStyle(document.body).getPropertyValue('--bg-card').trim();
+
+            // Gráfico de Tamanho da Questão
+            const SMALL_Q_THRESHOLD_NEW = 400; 
+            const MEDIUM_Q_THRESHOLD_NEW = 800; 
+            let smallQ = 0, mediumQ = 0, longQ = 0;
+            
+            currentTestQuestions.forEach(q => {
+                let totalLength = q.enunciado ? q.enunciado.length : 0;
+                if (q.alternativas) {
+                    Object.values(q.alternativas).forEach(altText => {
+                        if (altText) totalLength += altText.length;
+                    });
+                }
+                if (totalLength < SMALL_Q_THRESHOLD_NEW) smallQ++;
+                else if (totalLength < MEDIUM_Q_THRESHOLD_NEW) mediumQ++;
+                else longQ++;
+            });
+
+            const qSizeColors = [
+                'rgba(75, 192, 192, 0.7)',  
+                'rgba(255, 206, 86, 0.7)', 
+                'rgba(255, 99, 132, 0.7)'   
+            ];
+            const qSizeBorderColors = [
+                'rgba(75, 192, 192, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(255, 99, 132, 1)'
+            ];
+
+            if (smallQ > 0 || mediumQ > 0 || longQ > 0) {
+                charts.questionSizeChart = new Chart(document.getElementById('questionSizeChart').getContext('2d'), {
+                    type: 'bar', 
+                    data: {
+                        labels: [`Pequenas (<${SMALL_Q_THRESHOLD_NEW}c)`, `Médias (${SMALL_Q_THRESHOLD_NEW}-${MEDIUM_Q_THRESHOLD_NEW}c)`, `Longas (>${MEDIUM_Q_THRESHOLD_NEW}c)`],
+                        datasets: [{ 
+                            label: 'Quantidade de Questões', 
+                            data: [smallQ, mediumQ, longQ],
+                            backgroundColor: qSizeColors,
+                            borderColor: qSizeBorderColors,
+                            borderWidth: 1 
+                        }]
+                    },
+                    options: getChartOptions('Tamanho de Questão (Enunciado + Alternativas)', textColor, {
+                        indexAxis: 'y', 
+                        scales: { 
+                            x: { beginAtZero: true, ticks: { color: textColor, stepSize: Math.max(1, Math.ceil(Math.max(1, smallQ,mediumQ,longQ) / 5)) }, grid: { color: borderColorCSS + '80' } }, 
+                            y: { ticks: { color: textColor }, grid: { display: false } } 
+                        },
+                        plugins: { legend: { display: false } }
+                    })
+                });
+            }
+
+
+            // Gráfico de Tempo por Questão (Simulado - dados fictícios por enquanto)
+            const timeLabels = currentTestQuestions.slice(0,10).map((q,i) => { // Mostra para as 10 primeiras da prova atual
+                const globalIndex = allQuestions.findIndex(aq => aq.id === q.id);
+                return `Q${globalIndex !== -1 ? globalIndex + 1 : i + 1}`; // Usa o índice global se possível
+            });
+            // TODO: Implementar medição real de tempo por questão se desejado.
+            // Por agora, dados aleatórios apenas para visualização.
+            const timeData = Array.from({length: timeLabels.length}, () => Math.floor(Math.random() * 90) + 30); 
+            
+            if (timeLabels.length > 0) {
+                charts.timePerQuestion = new Chart(document.getElementById('timePerQuestionChart').getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: timeLabels,
+                        datasets: [{ 
+                            label: 'Tempo (s)', 
+                            data: timeData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.7)', 
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1 
+                        }]
+                    },
+                    options: getChartOptions('Tempo por Questão (Simulado - Amostra)', textColor, {
+                        scales: { 
+                            y: { beginAtZero: true, ticks: { color: textColor }, grid: { color: borderColorCSS + '80' } },
+                            x: { ticks: { color: textColor }, grid: { color: borderColorCSS + '80' } } 
+                        },
+                        plugins: { legend: { display: false } }
+                    })
+                });
+            }
+        }
+
+        function getChartOptions(title, textColor, customOptions = {}) {
+            const gridColor = getComputedStyle(document.body).getPropertyValue('--border-color').trim() + '60'; // Grid mais sutil
+
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: textColor, font: { family: 'Poppins', size: 12 } }
+                    },
+                    title: { display: true, text: title, color: textColor, font: { family: 'Poppins', size: 14, weight: '600' }, padding: {bottom: 10} }
+                },
+                scales: customOptions.scales ? { // Configuração de eixos se fornecida
+                    y: {
+                        ...(customOptions.scales.y || {}),
+                        ticks: { ...(customOptions.scales.y?.ticks || {}), color: textColor },
+                        grid: { ...(customOptions.scales.y?.grid || {}), color: gridColor, drawBorder: false }
+                    },
+                    x: {
+                        ...(customOptions.scales.x || {}),
+                        ticks: { ...(customOptions.scales.x?.ticks || {}), color: textColor },
+                        grid: { ...(customOptions.scales.x?.grid || {}), color: gridColor, drawBorder: false }
+                    }
+                } : undefined, // Se não houver custom scales, não define a propriedade scales (útil para gráficos de pizza)
+                ...customOptions // Permite sobrescrever ou adicionar outras opções
+            };
+        }
+        
+        function displayQuestionInPopup(question) {
+            let imageHtml = question.imagem && question.imagem !== 'null' ? `<img src="${question.imagem}" alt="Imagem da questão" class="question-image" style="max-height: 200px; margin-bottom: 15px;">` : '';
+            
+            let optionsHtml = '<div class="options" style="gap: 8px; pointer-events: none;">'; // Desabilita cliques nas opções do popup
+            Object.entries(question.alternativas).forEach(([letter, text]) => {
+                let optClass = 'option';
+                let optInnerStyle = 'margin-bottom: 8px; border-width: 1px; padding: 10px;';
+                
+                if (letter === question.correta) {
+                    optClass += ' correct'; 
+                    // Estilo para destacar a correta no popup
+                    optInnerStyle += `background-color: var(--accent-light); border-left-color: var(--accent-color); border-left-width: 4px;`;
+                } else {
+                     optInnerStyle += `background-color: transparent;`; 
+                }
+
+                optionsHtml += `<div class="${optClass}" style="${optInnerStyle}">
+                                     <span class="option-letter-styled">${letter.toUpperCase()})</span>
+                                     <span class="option-actual-text" style="color: var(--text-primary);">${text}</span>
+                                 </div>`;
+            });
+            optionsHtml += '</div>';
+
+            const formattedEnunciado = formatEnunciado(question.enunciado);
+            const formattedExplicacao = question.explicacao ? formatEnunciado(question.explicacao) : '';
+
+            questionDetailContent.innerHTML = `
+                <div class="question-container" style="border: none; box-shadow: none; padding:0; margin-bottom:0;">
+                    <h4 style="color: var(--primary-color); text-align:left; margin-bottom:10px;">Detalhe da Questão</h4>
+                    <div class="question-text" style="margin-bottom:15px; font-size: 1rem;">${formattedEnunciado}</div>
+                    ${imageHtml}
+                    ${optionsHtml}
+                    ${formattedExplicacao ? `<div class="explanation" style="display:block; margin-top: 15px; padding:10px; background-color: var(--bg-main); border-radius: 6px;"><strong style="color:var(--text-secondary);">Explicação:</strong><br>${formattedExplicacao}</div>` : ''}
+                </div>
+            `;
+            questionDetailPopup.classList.add('active');
+        }
+
+        function closeQuestionDetailPopup() {
+            questionDetailPopup.classList.remove('active');
+            questionDetailContent.innerHTML = ''; 
+        }
+
+        function generateQuestionsAnalysis() {
+            questionsAnalysis.innerHTML = ''; 
+            currentTestQuestions.forEach((question, index) => {
+                const userAnswer = userAnswers[question.id]; 
+                if (userAnswer === undefined) return; // Só analisa questões respondidas na tentativa atual
+
+                const isCorrect = userAnswer === question.correta;
+                const questionDiv = document.createElement('div');
+                
+                questionDiv.className = `question-container ${isCorrect ? 'correct' : 'incorrect'}`;
+                questionDiv.style.marginBottom = '20px';
+
+                let imageHtml = question.imagem && question.imagem !== 'null' ? `<img src="${question.imagem}" alt="Imagem da questão" class="question-image">` : '';
+                
+                let optionsHtml = Object.entries(question.alternativas).map(([letter, text]) => {
+                    let optClass = 'option'; 
+                    let optStyle = 'pointer-events: none; transform: none; margin-bottom: 8px; border-width: 1px;'; 
+
+                    if (letter === question.correta) optClass += ' correct'; 
+                    if (letter === userAnswer && !isCorrect) optClass += ' selected incorrect'; 
+                    else if (letter === userAnswer && isCorrect) optClass += ' selected';
+
+                    return `<div class="${optClass}" style="${optStyle}">
+                                 <span class="option-letter-styled">${letter.toUpperCase()})</span>
+                                 <span class="option-actual-text" style="color: var(--text-primary);">${text}</span>
+                             </div>`;
+                }).join('');
+
+                let correctAnswerBox = '';
+                if (!isCorrect) { // Mostra a caixa de resposta correta apenas se o usuário errou
+                    correctAnswerBox = `<div class="analysis-correct-answer">
+                        <strong>Resposta Correta: ${question.correta.toUpperCase()})</strong> ${question.alternativas[question.correta]}
+                    </div>`;
+                }
+
+                const formattedEnunciado = formatEnunciado(question.enunciado);
+                const formattedExplicacao = question.explicacao ? formatEnunciado(question.explicacao) : '';
+
+                questionDiv.innerHTML = `
+                    <div class="question-number">Questão ${index + 1} - ${isCorrect ? 'Acertou' : 'Errou'}</div>
+                    <div class="question-text" style="margin-bottom:15px;">${formattedEnunciado}</div>
+                    ${imageHtml}
+                    <div class="options" style="gap: 0;">${optionsHtml}</div>
+                    ${correctAnswerBox} 
+                    ${formattedExplicacao ? `<div class="explanation" style="display:block; margin-top: 15px;">${formattedExplicacao}</div>` : ''}`;
+                questionsAnalysis.appendChild(questionDiv);
+            });
+        }
+        
+        function startNewAttempt(isMistakesQuizForce = false) {
+            if (allQuestions.length === 0) { 
+                alert("Nenhuma questão carregada. Verifique a configuração das questões embutidas.");
+                return;
+            }
+            
+             if (quizStartOptionsPopup.classList.contains('active')) {
+                closeQuizOptionsPopup();
+            }
+            
+            if (isMistakesQuizForce) {
+                const distinctMistakesCount = Object.values(testStatistics.questionMistakes || {}).filter(count => count > 0).length;
+                if (distinctMistakesCount > 0) { 
+                    initializeTest(true, 10); 
+                } else {
+                     alert("Não há questões erradas para revisar neste simulado. Iniciando prova normal.");
+                    initializeTest(false, Math.min(40, allQuestions.length));
+                }
+            } else {
+                initializeTest(false, Math.min(40, allQuestions.length));
+            }
+        }
+
+        // REMOVIDA: function loadNewFile() { location.reload(); }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            quizPage.style.display = 'none'; 
+            resultsPage.style.display = 'none'; // Esconde a página de resultados inicialmente
+            
+            loadEmbeddedQuizAndShowOptions(); // Carrega o simulado embutido e mostra opções
+
+            if (document.body.classList.contains('dark-mode')) {
+                darkModeText.textContent = 'Modo Claro';
+                darkModeTextResults.textContent = 'Modo Claro';
+            } else {
+                darkModeText.textContent = 'Modo Escuro';
+                darkModeTextResults.textContent = 'Modo Escuro';
+            }
+        });
+
+    </script>
+</body>
+</html>
