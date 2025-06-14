@@ -295,9 +295,7 @@
                         <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor"><path d="M17 3H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V5C19 3.89543 18.1046 3 17 3Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 7H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> <path d="M9 11H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         Etapa 1
                     </h2>
-                    <button type="button" class="button" data-target-id="btnTutoriaM1">Tutoria M1</button>
-                    <button type="button" class="button" data-target-id="btnMorfoM1_A">Morfologia M1 (Prova A)</button>
-                    <button type="button" class="button" data-target-id="btnMorfoM1_B">Morfologia M1 (Prova B)</button>
+                    <button type="button" class="button" data-target-id="btnMorfoM1_A">1 etapa (Morfo M1)</button>
                 </section>
                 
                 <section class="theme-section">
@@ -305,10 +303,8 @@
                         <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor"><path d="M17 3H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V5C19 3.89543 18.1046 3 17 3Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 7H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> <path d="M9 11H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         Etapa 2
                     </h2>
-                    <button type="button" class="button" data-target-id="btnTutoriaM2_2GG">Tutoria M2 (2GG)</button>
-                    <button type="button" class="button" data-target-id="btnMorfoM2_2GG">Morfologia M2 (2GG)</button>
-                    <button type="button" class="button" data-target-id="btnTutoriaM2_3etp">Tutoria M2 (3ª Etapa)</button>
-                    <button type="button" class="button" data-target-id="btnMorfoM2_3etp">Morfologia M2 (3ª Etapa)</button>
+                    <button type="button" class="button" data-target-id="btnTutoriaM2_2GG">2 etapa(Tutoria M2)</button>
+                    <button type="button" class="button" data-target-id="btnMorfoM2_2GG">2 etapa(Morfo M2)</button>
                 </section>
 
                 <section class="theme-section">
@@ -316,15 +312,12 @@
                         <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor"><path d="M17 3H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V5C19 3.89543 18.1046 3 17 3Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 7H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> <path d="M9 11H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         Etapa 3
                     </h2>
-                     <button type="button" class="button" data-target-id="btnMorfoM3">Morfologia M3</button>
-                </section>
-                
-                <section class="theme-section">
-                    <h2 class="theme-title">
-                        <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor"><path d="M17 3H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V5C19 3.89543 18.1046 3 17 3Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 7H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> <path d="M9 11H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        Geral
-                    </h2>
-                     <button type="button" class="button" data-target-id="btnTutoriaGeral">Tutoria Geral (Turma 36)</button>
+                    <button type="button" class="button" data-target-id="btnTutoriaM2_3etp">3 etapa (Tutoria M2)</button>
+                    <button type="button" class="button" data-target-id="btnMorfoM2_3etp">3 etapa (Morfo M2)</button>
+                    <button type="button" class="button" data-target-id="btnTutoriaM1">3 etapa(Tutoria M1)</button>
+                    <button type="button" class="button" data-target-id="btnMorfoM1_B">3 etapa(Morfo M1)</button>
+                    <button type="button" class="button" data-target-id="btnTutoriaGeral">3 etapa(Tutoria M3)</button>
+                    <button type="button" class="button" data-target-id="btnMorfoM3">3 etapa(Morfo M3)</button>
                 </section>
                 
                 <section class="theme-section">
@@ -393,8 +386,8 @@
         const localStorageKeyAccess = 'accessGranted_luciana';
         const localStorageKeyAvatar = 'studyAppSelectedAvatar_v3';
         
-        // PIN de acesso exclusivo para Luciana
-        const validPins = ["LU2025C"]; 
+        // PIN de acesso exclusivo para Luciana "LU2025C"
+        const validPins = []; 
         
         const avatarImageLinks = [
             "https://i.imgur.com/rJXV7uR.png", "https://i.imgur.com/DaNsN4q.png",
@@ -405,21 +398,23 @@
         ];
         const defaultAvatar = avatarImageLinks[0];
 
-        // URLs dos botões para Luciana, agora organizadas
+        // URLs dos botões para Luciana
         const targetUrls = {
             // Etapa 1
-            btnTutoriaM1: "https://inaciomaximoo.github.io/treino/turma36/3EtpM1tutoriaaagfs.html",
             btnMorfoM1_A: "https://inaciomaximoo.github.io/treino/turma36/1etpM1morfooo.html",
-            btnMorfoM1_B: "https://inaciomaximoo.github.io/treino/turma36/3ETPm1MORFOgg.html",
+            
             // Etapa 2
             btnTutoriaM2_2GG: "https://inaciomaximoo.github.io/treino/turma36/2ETPm2ggTutoria.html",
             btnMorfoM2_2GG: "https://inaciomaximoo.github.io/treino/turma36/2etpM2morfoggg.html",
+
+            // Etapa 3
             btnTutoriaM2_3etp: "https://inaciomaximoo.github.io/treino/turma36/3etpM2tutoriaasd.html",
             btnMorfoM2_3etp: "https://inaciomaximoo.github.io/treino/turma36/3etpM2MORFOGGG.html",
-            // Etapa 3
-            btnMorfoM3: "https://inaciomaximoo.github.io/treino/turma36/3ETPm3MORFOgg.html",
-            // Gerais
+            btnTutoriaM1: "https://inaciomaximoo.github.io/treino/turma36/3EtpM1tutoriaaagfs.html",
+            btnMorfoM1_B: "https://inaciomaximoo.github.io/treino/turma36/3ETPm1MORFOgg.html",
             btnTutoriaGeral: "https://inaciomaximoo.github.io/treino/turma36/tutoriat36.html",
+            btnMorfoM3: "https://inaciomaximoo.github.io/treino/turma36/3ETPm3MORFOgg.html",
+            
             // Ferramentas
             btnCalculadora: "https://inaciomaximoo.github.io/treino/calculadora.html",
         };
