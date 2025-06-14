@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Estudos - Luciana</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS :root e Reset com o novo tema */
+        :root {
+            --bg-main: #f0f2f5;
+            --bg-card: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #555555;
+            --primary-color: #3a86ff;
+            --primary-light: #69a5ff;
+            --primary-dark: #005cbb;
+            --accent-color: #2ecc71;
+            --accent-light: rgba(46, 204, 113, 0.1);
+            --danger-color: #e74c3c;
+            --danger-light: rgba(231, 76, 60, 0.1);
+            --border-color: #d1d9e6;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        body.dark-mode {
+            --bg-main: #1e1e2f;
+            --bg-card: #2a2a3a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #9e9e9e;
+            --primary-color: #7c4dff;
+            --primary-light: #9d7bff;
+            --primary-dark: #5e35b1;
+            --accent-color: #00e676;
+            --accent-light: rgba(0, 230, 118, 0.1);
+            --danger-color: #ff5252;
+            --danger-light: rgba(255, 82, 82, 0.1);
+            --border-color: #424242;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 15px;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        .main-container { max-width: 850px; width: 100%; padding: 30px 15px; }
+
+        .homepage-card {
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            padding: 35px;
+            animation: slideUpFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            opacity: 0;
+            width: 100%;
+            position: relative;
+            border: 1px solid var(--border-color);
+            transition: background-color var(--transition-speed), box-shadow var(--transition-speed), border-color var(--transition-speed);
+        }
+        
+        /* Botão de Modo Noturno Atualizado */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            box-shadow: 0 2px 5px var(--shadow-color);
+            overflow: hidden;
+            width: 44px;
+            height: 44px;
+            justify-content: center;
+        }
+        .dark-mode-toggle:hover {
+            border-color: var(--primary-color);
+        }
+        .icon-container { position: relative; width: 24px; height: 24px; }
+        .moon-icon, .sun-icon {
+            position: absolute;
+            top:0; left:0;
+            font-size: 1.5rem;
+            transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        .sun-icon { opacity: 0; transform: translateY(100%) rotate(90deg); }
+        .moon-icon { opacity: 1; transform: translateY(0) rotate(0deg); }
+        body.dark-mode .sun-icon { opacity: 1; transform: translateY(0) rotate(0deg); }
+        body.dark-mode .moon-icon { opacity: 0; transform: translateY(-100%) rotate(-90deg); }
+
+        .app-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            transition: border-color var(--transition-speed);
+        }
+        
+        .header-avatar-container { margin-bottom: 20px; cursor: pointer; transition: transform 0.2s ease; }
+        .header-avatar-container:hover { transform: scale(1.05); }
+        #selectedAvatarDisplay {
+            width: 100px; height: 100px; border-radius: 50%;
+            border: 4px solid var(--primary-color);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            object-fit: cover; background-color: var(--bg-card);
+            transition: all var(--transition-speed);
+        }
+
+        .app-title {
+            font-size: 2.2rem; font-weight: 700; color: var(--primary-dark);
+            text-align: center; transition: color var(--transition-speed);
+        }
+        body.dark-mode .app-title { color: var(--primary-light); }
+
+        .app-menu { display: flex; flex-direction: column; gap: 25px; }
+
+        .theme-section {
+            padding: 25px; background-color: var(--bg-main);
+            border-radius: 12px; border: 1px solid var(--border-color);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            transition: all var(--transition-speed);
+        }
+        body.dark-mode .theme-section { background-color: var(--bg-card); }
+        
+        .theme-title {
+            font-size: 1.5rem; font-weight: 600; color: var(--primary-color);
+            margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);
+            text-align: center; display: flex; align-items: center; justify-content: center;
+            transition: color var(--transition-speed), border-color var(--transition-speed);
+        }
+        .section-icon { width: 26px; height: 26px; margin-right: 10px; color: var(--primary-color); transition: color var(--transition-speed); }
+
+        .theme-section .button {
+            display: block; width: 100%; margin-bottom: 15px; text-align: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white; padding: 12px 30px; border: none; border-radius: 8px;
+            cursor: pointer; font-weight: 600; font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-decoration: none;
+        }
+        .theme-section .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px var(--shadow-color);
+        }
+        .theme-section .button:disabled {
+            background: var(--border-color); color: var(--text-secondary);
+            cursor: not-allowed; box-shadow: none; transform: none;
+        }
+        .theme-section .button:last-child { margin-bottom: 0; }
+
+        /* Estilos de Modais e Overlays */
+        .pin-modal-container, .avatar-modal-overlay, #iframeViewer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000; animation: fadeIn 0.3s ease;
+        }
+        .pin-modal-content, .avatar-modal-content-box, .iframe-window {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 8px 30px var(--shadow-color);
+            text-align: center;
+            animation: slideUpFadeInModal 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            opacity: 0;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+        .pin-modal-content h2, .avatar-modal-content-box h2 {
+             color: var(--primary-color);
+             transition: color var(--transition-speed);
+             margin-bottom: 15px;
+        }
+        .pin-modal-content p { color: var(--text-secondary); transition: color var(--transition-speed); margin-bottom: 20px; }
+        
+        #pinInput {
+            width: 100%; padding: 12px; font-size: 1.2rem; text-align: center;
+            background-color: var(--bg-main); color: var(--text-primary);
+            border: 2px solid var(--border-color); border-radius: 8px;
+            margin-bottom: 20px; transition: all var(--transition-speed);
+        }
+        #pinInput:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+        #submitPinButton {
+            width: 100%; padding: 12px; background: var(--primary-color);
+            color: white; border: none; border-radius: 8px; font-size: 1rem;
+            font-weight: 600; cursor: pointer; transition: background-color var(--transition-speed);
+        }
+        #submitPinButton:hover { background-color: var(--primary-dark); }
+        #pinErrorMessage { color: var(--danger-color); margin-top: 15px; visibility: hidden; }
+
+        /* Iframe Viewer */
+        #iframeViewer { z-index: 3000; padding: 2vh; }
+        .iframe-window {
+            width: 100%; height: 100%; padding: 0;
+            display: flex; flex-direction: column;
+        }
+        .iframe-header {
+            padding: 8px 15px; text-align: right;
+            background-color: var(--bg-main);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0; transition: all var(--transition-speed);
+        }
+        #closeIframeButton {
+            font-size: 1.8rem; font-weight: bold; cursor: pointer;
+            border: none; background: transparent; color: var(--text-secondary);
+            transition: color var(--transition-speed);
+        }
+        #closeIframeButton:hover { color: var(--text-primary); }
+        #contentIframe { width: 100%; flex-grow: 1; border: none; }
+
+        /* Avatar Modal */
+        .avatar-modal-overlay { z-index: 4000; }
+        .avatar-modal-content-box { max-width: 500px; }
+        .avatar-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 15px; margin-bottom: 25px; max-height: 50vh; overflow-y: auto;
+            padding: 10px; background-color: var(--bg-main);
+            border-radius: 8px; border: 1px solid var(--border-color);
+            transition: all var(--transition-speed);
+        }
+        .avatar-option {
+            width: 100%; padding-top: 100%; position: relative; border-radius: 8px;
+            overflow: hidden; cursor: pointer; border: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .avatar-option img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .avatar-option:hover { transform: scale(1.05); }
+        .avatar-option.selected-preview { border-color: var(--accent-color); }
+        #closeAvatarModalBtn {
+            display: inline-block; background-color: var(--text-secondary); color: white;
+            padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer;
+            font-weight: 600; font-size: 0.9rem; transition: background-color 0.3s ease;
+        }
+        #closeAvatarModalBtn:hover { background-color: var(--text-primary); }
+        
+        @keyframes slideUpFadeIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUpFadeInModal { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        @media (max-width: 768px) {
+            .main-container { padding: 20px 10px; }
+            .homepage-card, .pin-modal-content { padding: 25px; }
+            #selectedAvatarDisplay { width: 80px; height: 80px; }
+            .app-title { font-size: 1.9rem; }
+            .theme-title { font-size: 1.4rem; }
+        }
+         @media (max-width: 480px) {
+            .app-title { font-size: 1.7rem; }
+            .theme-title { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="homepage-card" style="display: none;">
+            <div id="darkModeToggle" class="dark-mode-toggle" title="Alternar Modo Noturno">
+                <div class="icon-container">
+                    <span class="moon-icon">🌙</span>
+                    <span class="sun-icon">☀️</span>
+                </div>
+            </div>
+            <header class="app-header">
+                <div class="header-avatar-container" id="headerAvatarContainer" title="Clique para mudar o avatar">
+                    <img id="selectedAvatarDisplay" src="https://i.imgur.com/rJXV7uR.png" alt="Avatar">
+                </div>
+                <h1 class="app-title">Plataforma de Luciana</h1>
+            </header>
+
+            <main class="app-menu">
+                <section class="theme-section">
+                    <h2 class="theme-title">
+                        <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor">
+                            <path d="M17 3H7C5.89543 3 5 3.89543 5 5V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V5C19 3.89543 18.1046 3 17 3Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 7H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/> <path d="M9 11H15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Simulados e Provas
+                    </h2>
+                    <button type="button" class="button" data-target-id="btn1">Prova 1 (Tutoria M2)</button>
+                    <button type="button" class="button" data-target-id="btn2">Prova 2 (Morfo M2)</button>
+                    <button type="button" class="button" data-target-id="btn3">Prova 3 (Morfo M1)</button>
+                    <button type="button" class="button" data-target-id="btn4">Prova 4 (Tutoria M1)</button>
+                    <button type="button" class="button" data-target-id="btn5">Prova 5 (Morfo M1)</button>
+                    <button type="button" class="button" data-target-id="btn6">Prova 6 (Tutoria 2GG)</button>
+                    <button type="button" class="button" data-target-id="btn7">Prova 7 (Morfo 2GG)</button>
+                    <button type="button" class="button" data-target-id="btn8">Prova 8 (Tutoria T36)</button>
+                    <button type="button" class="button" data-target-id="btn9">Prova 9 (Morfo M3)</button>
+                </section>
+                <section class="theme-section">
+                    <h2 class="theme-title">
+                         <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor">
+                            <rect x="5" y="3" width="14" height="18" rx="2" stroke-width="2"/>
+                            <rect x="7" y="6" width="10" height="4.5" rx="1" stroke-width="1.5"/>
+                            <circle cx="8.5" cy="13.5" r="1" fill="currentColor"/><circle cx="12" cy="13.5" r="1" fill="currentColor"/><circle cx="15.5" cy="13.5" r="1" fill="currentColor"/>
+                            <circle cx="8.5" cy="17.5" r="1" fill="currentColor"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/><circle cx="15.5" cy="17.5" r="1" fill="currentColor"/>
+                        </svg>
+                        Ferramentas
+                    </h2>
+                    <button type="button" class="button" data-target-id="btnCalculadora">Calculadora Acadêmica</button>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <div id="pinModalContainer" class="pin-modal-container" style="display: flex;">
+        <div class="pin-modal-content">
+            <h2>Acesso Restrito</h2>
+            <p>Por favor, insira seu PIN para continuar:</p>
+            <input type="password" id="pinInput" placeholder="Seu PIN">
+            <button type="button" id="submitPinButton">Acessar</button>
+            <p id="pinErrorMessage"></p>
+        </div>
+    </div>
+
+    <div id="iframeViewer" style="display: none;">
+        <div class="iframe-window">
+            <div class="iframe-header">
+                <button id="closeIframeButton" title="Fechar">&times;</button>
+            </div>
+            <iframe id="contentIframe" title="Conteúdo Externo" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+        </div>
+    </div>
+
+    <div id="avatarModalOverlay" class="avatar-modal-overlay" style="display: none;">
+        <div class="avatar-modal-content-box">
+            <h2>Escolha seu Avatar</h2>
+            <div id="avatarGrid" class="avatar-grid"></div>
+            <button id="closeAvatarModalBtn">Fechar</button>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const homepageCard = document.querySelector('.homepage-card');
+        const pinModalContainer = document.getElementById('pinModalContainer');
+        const pinInput = document.getElementById('pinInput');
+        const submitPinButton = document.getElementById('submitPinButton');
+        const pinErrorMessage = document.getElementById('pinErrorMessage');
+        const mainContentButtons = document.querySelectorAll('.app-menu .button');
+        const iframeViewer = document.getElementById('iframeViewer');
+        const contentIframe = document.getElementById('contentIframe');
+        const closeIframeButton = document.getElementById('closeIframeButton');
+        const headerAvatarContainer = document.getElementById('headerAvatarContainer');
+        const selectedAvatarDisplay = document.getElementById('selectedAvatarDisplay');
+        const avatarModalOverlay = document.getElementById('avatarModalOverlay');
+        const avatarGrid = document.getElementById('avatarGrid');
+        const closeAvatarModalBtn = document.getElementById('closeAvatarModalBtn');
+        const darkModeToggleButton = document.getElementById('darkModeToggle');
+        const bodyElement = document.body;
+
+        const darkModeKey = 'userDarkModePreference_v4';
+        const localStorageKeyAccess = 'accessGranted_luciana';
+        const localStorageKeyAvatar = 'studyAppSelectedAvatar_v3';
+        
+        // PIN de acesso exclusivo para Luciana
+        const validPins = ["LU2025C"]; 
+        
+        const avatarImageLinks = [
+            "https://i.imgur.com/rJXV7uR.png", "https://i.imgur.com/DaNsN4q.png",
+            "https://i.imgur.com/DXkoPU0.png", "https://i.imgur.com/5jDryIk.png",
+            "https://i.imgur.com/ya6quMM.png", "https://i.imgur.com/1G7xknr.png",
+            "https://i.imgur.com/Il4owIz.png", "https://i.imgur.com/P95Sxw6.png",
+            "https://i.imgur.com/ISp1O9O.png"
+        ];
+        const defaultAvatar = avatarImageLinks[0];
+
+        // URLs dos botões para Luciana
+        const targetUrls = {
+            btn1: "https://inaciomaximoo.github.io/treino/turma36/3etpM2tutoriaasd.html",
+            btn2: "https://inaciomaximoo.github.io/treino/turma36/3etpM2MORFOGGG.html",
+            btn3: "https://inaciomaximoo.github.io/treino/turma36/1etpM1morfooo.html",
+            btn4: "https://inaciomaximoo.github.io/treino/turma36/3EtpM1tutoriaaagfs.html",
+            btn5: "https://inaciomaximoo.github.io/treino/turma36/3ETPm1MORFOgg.html",
+            btn6: "https://inaciomaximoo.github.io/treino/turma36/2ETPm2ggTutoria.html",
+            btn7: "https://inaciomaximoo.github.io/treino/turma36/2etpM2morfoggg.html",
+            btn8: "https://inaciomaximoo.github.io/treino/turma36/tutoriat36.html",
+            btn9: "https://inaciomaximoo.github.io/treino/turma36/3ETPm3MORFOgg.html",
+            btnCalculadora: "https://inaciomaximoo.github.io/treino/calculadora.html",
+        };
+
+        function applyDarkMode(isDark) {
+            bodyElement.classList.toggle('dark-mode', isDark);
+            localStorage.setItem(darkModeKey, isDark);
+        }
+
+        function toggleDarkModePreference() {
+            applyDarkMode(!bodyElement.classList.contains('dark-mode'));
+        }
+        
+        const savedDarkMode = localStorage.getItem(darkModeKey);
+        if (savedDarkMode !== null) {
+            applyDarkMode(savedDarkMode === 'true');
+        } else {
+            applyDarkMode(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        }
+        darkModeToggleButton.addEventListener('click', toggleDarkModePreference);
+
+        function showPinModal() {
+            homepageCard.style.display = 'none';
+            pinModalContainer.style.display = 'flex';
+            pinInput.focus();
+            pinErrorMessage.style.visibility = 'hidden';
+        }
+
+        function showHomepageContent() {
+            pinModalContainer.style.display = 'none';
+            homepageCard.style.display = 'block';
+            mainContentButtons.forEach(button => {
+                button.disabled = false;
+                if (!button.hasAttribute('data-listener-added')) {
+                    button.addEventListener('click', handleMainButtonClick);
+                    button.setAttribute('data-listener-added', 'true');
+                }
+            });
+            loadAndDisplaySelectedAvatar();
+        }
+        
+        function grantAccess() {
+            localStorage.setItem(localStorageKeyAccess, 'true');
+            showHomepageContent();
+        }
+
+        function handlePinSubmit() {
+            const enteredPin = pinInput.value.trim().toUpperCase();
+            if (validPins.includes(enteredPin)) {
+                grantAccess();
+            } else {
+                pinErrorMessage.textContent = 'PIN inválido. Tente novamente.';
+                pinErrorMessage.style.visibility = 'visible';
+                pinInput.value = '';
+                pinInput.focus();
+            }
+        }
+
+        function handleMainButtonClick(event) {
+            const targetId = event.currentTarget.dataset.targetId;
+            const url = targetUrls[targetId];
+            if (url) {
+                homepageCard.style.display = 'none';
+                contentIframe.src = url;
+                iframeViewer.style.display = 'flex';
+            }
+        }
+
+        closeIframeButton.addEventListener('click', () => {
+            iframeViewer.style.display = 'none';
+            contentIframe.src = 'about:blank';
+            homepageCard.style.display = 'block';
+        });
+
+        function loadAndDisplaySelectedAvatar() {
+            const savedAvatarUrl = localStorage.getItem(localStorageKeyAvatar) || defaultAvatar;
+            selectedAvatarDisplay.src = savedAvatarUrl;
+        }
+
+        function populateAvatarGrid() {
+            avatarGrid.innerHTML = '';
+            avatarImageLinks.forEach(url => {
+                const avatarWrapper = document.createElement('div');
+                avatarWrapper.className = 'avatar-option';
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = 'Opção de Avatar';
+                img.addEventListener('click', () => {
+                    localStorage.setItem(localStorageKeyAvatar, url);
+                    selectedAvatarDisplay.src = url;
+                    document.querySelectorAll('.avatar-option.selected-preview').forEach(el => el.classList.remove('selected-preview'));
+                    img.parentElement.classList.add('selected-preview');
+                    setTimeout(closeAvatarSelectionModal, 300);
+                });
+                avatarWrapper.appendChild(img);
+                avatarGrid.appendChild(avatarWrapper);
+            });
+        }
+
+        function openAvatarSelectionModal() {
+            populateAvatarGrid();
+            const currentSrc = selectedAvatarDisplay.src;
+            avatarGrid.querySelectorAll('img').forEach(img => {
+                img.parentElement.classList.toggle('selected-preview', img.src === currentSrc);
+            });
+            avatarModalOverlay.style.display = 'flex';
+        }
+
+        function closeAvatarSelectionModal() {
+            avatarModalOverlay.style.display = 'none';
+        }
+
+        headerAvatarContainer.addEventListener('click', openAvatarSelectionModal);
+        closeAvatarModalBtn.addEventListener('click', closeAvatarSelectionModal);
+
+        if (localStorage.getItem(localStorageKeyAccess) === 'true') {
+            showHomepageContent();
+        } else {
+            showPinModal();
+            mainContentButtons.forEach(button => button.disabled = true);
+            submitPinButton.addEventListener('click', handlePinSubmit);
+            pinInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') handlePinSubmit();
+            });
+        }
+    });
+    </script>
+</body>
+</html>
