@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthCare Connect - Sistema de Credenciamento</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== VARIÁVEIS DE CORES ===== */
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #004d99;
+            --primary-light: #e6f2ff;
+            --secondary: #00a859;
+            --secondary-dark: #008744;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --success: #2ecc71;
+            --info: #3498db;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --white: #ffffff;
+            --gray-light: #e9ecef;
+            --gray: #6c757d;
+            --gray-dark: #495057;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f5f7fa;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        /* ===== TYPOGRAPHY ===== */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            color: var(--primary-dark);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+        }
+
+        h3 {
+            font-size: 1.75rem;
+        }
+
+        h4 {
+            font-size: 1.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        .text-muted {
+            color: var(--gray);
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* ===== LAYOUT & CONTAINERS ===== */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 280px;
+            background-color: var(--white);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            z-index: 100;
+            position: relative;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            color: var(--primary);
+            font-size: 2rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-title {
+            padding: 10px 20px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gray);
+            font-weight: 600;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            margin: 5px 0;
+            color: var(--gray-dark);
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            border-left-color: var(--primary);
+        }
+
+        .menu-item i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .menu-badge {
+            margin-left: auto;
+            background-color: var(--primary);
+            color: white;
+            font-size: 0.7rem;
+            padding: 3px 6px;
+            border-radius: 10px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            background-color: #f5f7fa;
+            overflow-y: auto;
+        }
+
+        .header {
+            background-color: var(--white);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-sidebar {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray-dark);
+            cursor: pointer;
+            margin-right: 20px;
+            display: none;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .user-name {
+            font-weight: 500;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .notification-bell {
+            position: relative;
+            color: var(--gray-dark);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== CONTENT AREA ===== */
+        .content {
+            padding: 30px;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .breadcrumb i {
+            font-size: 0.7rem;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin: 0;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--gray-light);
+            background-color: #f8f9fa;
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.primary {
+            background-color: var(--primary);
+        }
+
+        .stat-card.success {
+            background-color: var(--success);
+        }
+
+        .stat-card.warning {
+            background-color: var(--warning);
+        }
+
+        .stat-card.danger {
+            background-color: var(--danger);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-right: 20px;
+            opacity: 0.8;
+        }
+
+        .stat-info h3 {
+            color: white;
+            margin-bottom: 5px;
+            font-size: 1.5rem;
+        }
+
+        .stat-info p {
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        /* ===== OPERATOR CARD ===== */
+        .operator-card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .operator-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .operator-logo {
+            width: 80px;
+            height: 80px;
+            background-color: var(--primary-light);
+            border-radius: var(--border-radius);
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .operator-details h3 {
+            margin-bottom: 5px;
+        }
+
+        .operator-meta {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .meta-item i {
+            color: var(--primary);
+        }
+
+        /* ===== STATUS BADGES ===== */
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-primary {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .badge-success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: var(--warning);
+        }
+
+        .badge-danger {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+        }
+
+        .badge-info {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--info);
+        }
+
+        /* ===== DOCUMENTS LIST ===== */
+        .documents-list {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .document-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--gray-light);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .document-item:last-child {
+            border-bottom: none;
+        }
+
+        .document-item:hover {
+            background-color: var(--primary-light);
+        }
+
+        .document-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-light);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .document-info {
+            flex: 1;
+        }
+
+        .document-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+
+        .document-meta {
+            font-size: 0.8rem;
+            color: var(--gray);
+            display: flex;
+            gap: 10px;
+        }
+
+        .document-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            gap: 8px;
+        }
+
+        .btn i {
+            font-size: 0.9rem;
+        }
+
+        .btn-sm {
+            padding: 7px 15px;
+            font-size: 0.85rem;
+        }
+
+        .btn-lg {
+            padding: 12px 25px;
+            font-size: 1rem;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline-primary {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: var(--secondary-dark);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-light {
+            background-color: var(--gray-light);
+            color: var(--dark);
+        }
+
+        .btn-light:hover {
+            background-color: #d6d8db;
+        }
+
+        /* ===== FORMS ===== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.2);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23495057' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px 12px;
+        }
+
+        /* ===== FILE UPLOAD ===== */
+        .file-upload {
+            border: 2px dashed var(--gray-light);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary);
+        }
+
+        .file-upload i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .file-upload p {
+            margin-bottom: 15px;
+            color: var(--gray);
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            transform: translateY(-50px);
+            transition: var(--transition);
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* ===== TABLES ===== */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .table th {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table tr:hover td {
+            background-color: var(--primary-light);
+        }
+
+        /* ===== ALERTS ===== */
+        .alert {
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .alert i {
+            font-size: 1.5rem;
+        }
+
+        .alert-success {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-warning {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--warning);
+            border-left: 4px solid var(--warning);
+        }
+
+        .alert-danger {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        .alert-info {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: var(--info);
+            border-left: 4px solid var(--info);
+        }
+
+        /* ===== TIMELINE ===== */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--gray-light);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -30px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7rem;
+        }
+
+        .timeline-content {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .timeline-date {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .timeline-text {
+            margin: 0;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                bottom: 0;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .toggle-sidebar {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .operator-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .operator-logo {
+                margin-bottom: 15px;
+            }
+
+            .operator-meta {
+                flex-wrap: wrap;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* ===== NOTIFICATIONS ===== */
+        .notifications-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 350px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: var(--transition);
+        }
+
+        .notifications-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .notifications-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notifications-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .notifications-body {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 15px;
+            border-bottom: 1px solid var(--gray-light);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item:hover {
+            background-color: var(--primary-light);
+        }
+
+        .notification-item.unread {
+            background-color: rgba(0, 102, 204, 0.05);
+        }
+
+        .notification-message {
+            margin-bottom: 5px;
+        }
+
+        .notification-time {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .notifications-footer {
+            padding: 10px;
+            text-align: center;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        /* ===== USER DROPDOWN ===== */
+        .user-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 200px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: var(--transition);
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-dropdown-item {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .user-dropdown-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .user-dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-dropdown-divider {
+            height: 1px;
+            background-color: var(--gray-light);
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-heartbeat logo-icon"></i>
+                    <span class="logo-text">HealthCare Connect</span>
+                </div>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-title">Menu Principal</div>
+                <ul>
+                    <li class="menu-item active" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </li>
+                    <li class="menu-item" data-section="accreditations">
+                        <i class="fas fa-file-signature"></i>
+                        <span>Credenciamentos</span>
+                        <span class="menu-badge">5</span>
+                    </li>
+                    <li class="menu-item" data-section="documents">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Documentos</span>
+                    </li>
+                    <li class="menu-item" data-section="operators">
+                        <i class="fas fa-hospital"></i>
+                        <span>Operadoras</span>
+                    </li>
+                    <li class="menu-item" data-section="scheduling">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Agendamentos</span>
+                    </li>
+                    <li class="menu-item" data-section="reports">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Relatórios</span>
+                    </li>
+                </ul>
+                
+                <div class="menu-title">Configurações</div>
+                <ul>
+                    <li class="menu-item" data-section="users">
+                        <i class="fas fa-users"></i>
+                        <span>Usuários</span>
+                    </li>
+                    <li class="menu-item" data-section="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Configurações</span>
+                    </li>
+                    <li class="menu-item" data-section="help">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Ajuda</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-left">
+                    <button class="toggle-sidebar" id="toggle-sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 class="page-title">Dashboard</h2>
+                </div>
+                <div class="header-right">
+                    <div class="notification-bell" id="notification-bell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                        <div class="notifications-dropdown" id="notifications-dropdown">
+                            <div class="notifications-header">
+                                <h4 class="notifications-title">Notificações</h4>
+                                <button class="btn btn-sm btn-light">Marcar todas como lidas</button>
+                            </div>
+                            <div class="notifications-body">
+                                <div class="notification-item unread">
+                                    <div class="notification-message">Novo documento aprovado pela Unimed</div>
+                                    <div class="notification-time">Há 2 horas</div>
+                                </div>
+                                <div class="notification-item unread">
+                                    <div class="notification-message">Amil solicitou revisão do contrato</div>
+                                    <div class="notification-time">Hoje, 09:30</div>
+                                </div>
+                                <div class="notification-item">
+                                    <div class="notification-message">Credenciamento com SulAmérica aprovado</div>
+                                    <div class="notification-time">Ontem, 16:45</div>
+                                </div>
+                            </div>
+                            <div class="notifications-footer">
+                                <a href="#">Ver todas as notificações</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="user-profile" id="user-profile">
+                        <div class="user-avatar">AD</div>
+                        <div>
+                            <div class="user-name">Admin User</div>
+                            <div class="user-role">Administrador</div>
+                        </div>
+                        <div class="user-dropdown" id="user-dropdown">
+                            <div class="user-dropdown-item">
+                                <i class="fas fa-user"></i>
+                                <span>Meu Perfil</span>
+                            </div>
+                            <div class="user-dropdown-item">
+                                <i class="fas fa-cog"></i>
+                                <span>Configurações</span>
+                            </div>
+                            <div class="user-dropdown-divider"></div>
+                            <div class="user-dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Sair</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <div class="content-header">
+                    <div class="breadcrumb">
+                        <a href="#">Home</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" id="new-accreditation-btn">
+                            <i class="fas fa-plus"></i> Novo Credenciamento
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card primary" id="operators-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-hospital"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>12</h3>
+                            <p>Operadoras Ativas</p>
+                        </div>
+                    </div>
+                    <div class="stat-card success" id="accredited-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>8</h3>
+                            <p>Credenciados</p>
+                        </div>
+                    </div>
+                    <div class="stat-card warning" id="analysis-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>3</h3>
+                            <p>Em Análise</p>
+                        </div>
+                    </div>
+                    <div class="stat-card danger" id="pending-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>1</h3>
+                            <p>Pendentes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operator Card -->
+                <div class="card operator-card" id="operator-details">
+                    <div class="card-header">
+                        <h3 class="card-title">Unimed Rio</h3>
+                        <span class="badge badge-warning">Em Análise</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="operator-info">
+                            <div class="operator-logo">UR</div>
+                            <div class="operator-details">
+                                <h3>Unimed Rio</h3>
+                                <p>Processo de credenciamento em andamento com a operadora Unimed Rio.</p>
+                                <div class="operator-meta">
+                                    <div class="meta-item">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <span>Iniciado em: 15/03/2023</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Prazo: 25/03/2023</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>
+                                <strong>Ação necessária:</strong> Enviar documentação complementar solicitada em 20/03/2023
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <button class="btn btn-primary" id="take-action-btn">
+                                <i class="fas fa-paper-plane"></i> Realizar Ação
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents and Actions -->
+                <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <!-- Documents Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Documentos Necessários</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="documents-list">
+                                <div class="document-item" data-doc="contract">
+                                    <div class="document-icon">
+                                        <i class="fas fa-file-contract"></i>
+                                    </div>
+                                    <div class="document-info">
+                                        <div class="document-name">Contrato Social</div>
+                                        <div class="document-meta">
+                                            <span>Enviado em: 18/03/2023</span>
+                                        </div>
+                                    </div>
+                                    <div class="document-actions">
+                                        <button class="btn btn-sm btn-outline-primary view-doc-btn">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="document-item" data-doc="certificate">
+                                    <div class="document-icon">
+                                        <i class="fas fa-certificate"></i>
+                                    </div>
+                                    <div class="document-info">
+                                        <div class="document-name">Certificado ANS</div>
+                                        <div class="document-meta">
+                                            <span>Enviado em: 18/03/2023</span>
+                                        </div>
+                                    </div>
+                                    <div class="document-actions">
+                                        <button class="btn btn-sm btn-outline-primary view-doc-btn">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="document-item" data-doc="project">
+                                    <div class="document-icon">
+                                        <i class="fas fa-project-diagram"></i>
+                                    </div>
+                                    <div class="document-info">
+                                        <div class="document-name">Projeto Assistencial</div>
+                                        <div class="document-meta">
+                                            <span>Status: Rejeitado</span>
+                                        </div>
+                                    </div>
+                                    <div class="document-actions">
+                                        <button class="btn btn-sm btn-danger fix-doc-btn">
+                                            <i class="fas fa-edit"></i> Corrigir
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="document-item" data-doc="address">
+                                    <div class="document-icon">
+                                        <i class="fas fa-home"></i>
+                                    </div>
+                                    <div class="document-info">
+                                        <div class="document-name">Comprovante de Endereço</div>
+                                        <div class="document-meta">
+                                            <span>Status: Pendente</span>
+                                        </div>
+                                    </div>
+                                    <div class="document-actions">
+                                        <button class="btn btn-sm btn-primary upload-doc-btn">
+                                            <i class="fas fa-upload"></i> Enviar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary btn-block" id="send-all-btn">
+                                <i class="fas fa-paper-plane"></i> Enviar Todos Pendentes
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Ações Rápidas</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <button class="btn btn-primary btn-block" id="check-status-btn">
+                                    <i class="fas fa-search"></i> Consultar Status na ANS
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-success btn-block" id="send-message-btn">
+                                    <i class="fas fa-envelope"></i> Enviar Mensagem para Operadora
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-info btn-block" id="download-docs-btn">
+                                    <i class="fas fa-file-download"></i> Baixar Documentação Completa
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-light btn-block" id="history-btn">
+                                    <i class="fas fa-history"></i> Histórico de Comunicação
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Histórico do Processo</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-dot">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">20/03/2023</div>
+                                    <p class="timeline-text">Operadora solicitou documentação complementar: Projeto Assistencial revisado e Comprovante de Endereço.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">18/03/2023</div>
+                                    <p class="timeline-text">Documentação inicial enviada: Contrato Social e Certificado ANS.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-date">15/03/2023</div>
+                                    <p class="timeline-text">Processo de credenciamento iniciado com a operadora Unimed Rio.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Upload Modal -->
+    <div class="modal" id="document-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Enviar Documento</h3>
+                <button class="modal-close" id="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="file-upload" id="file-upload">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Arraste e solte o arquivo aqui ou</p>
+                    <button class="btn btn-primary" id="select-file-btn">
+                        <i class="fas fa-folder-open"></i> Selecionar Arquivo
+                    </button>
+                    <input type="file" id="file-input" style="display: none;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tipo de Documento</label>
+                    <select class="form-control form-select" id="doc-type">
+                        <option value="">Selecione o tipo de documento</option>
+                        <option value="contract">Contrato Social</option>
+                        <option value="certificate">Certificado ANS</option>
+                        <option value="project">Projeto Assistencial</option>
+                        <option value="address">Comprovante de Endereço</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea class="form-control" id="doc-notes" rows="3" placeholder="Adicione observações sobre o documento..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-light" id="cancel-upload-btn">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn btn-primary" id="confirm-upload-btn">
+                    <i class="fas fa-upload"></i> Enviar Documento
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Document Modal -->
+    <div class="modal" id="view-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Visualizar Documento</h3>
+                <button class="modal-close" id="view-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="document-viewer" style="width: 100%; height: 500px; background-color: #f5f5f5; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border-radius: var(--border-radius);">
+                    <i class="fas fa-file-pdf" style="font-size: 3rem; color: var(--gray);"></i>
+                </div>
+                <div class="document-info">
+                    <h4 id="view-doc-title">Contrato Social.pdf</h4>
+                    <div class="document-meta">
+                        <span>Enviado em: 18/03/2023</span>
+                        <span>Tamanho: 2.4 MB</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-light" id="close-view-btn">
+                    <i class="fas fa-times"></i> Fechar
+                </button>
+                <button class="btn btn-primary" id="download-doc-btn">
+                    <i class="fas fa-download"></i> Baixar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Accreditation Modal -->
+    <div class="modal" id="new-accreditation-modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Novo Processo de Credenciamento</h3>
+                <button class="modal-close" id="close-accreditation-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Operadora de Saúde</label>
+                    <select class="form-control form-select" id="operator-select">
+                        <option value="">Selecione uma operadora</option>
+                        <option value="unimed">Unimed</option>
+                        <option value="amil">Amil</option>
+                        <option value="sulamerica">SulAmérica</option>
+                        <option value="bradesco">Bradesco Saúde</option>
+                        <option value="other">Outra operadora</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="other-operator-group" style="display: none;">
+                    <label class="form-label">Nome da Operadora</label>
+                    <input type="text" class="form-control" id="other-operator-name" placeholder="Digite o nome da operadora">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Documentos Necessários</label>
+                    <div class="documents-checklist">
+                        <div class="form-check" style="margin-bottom: 10px;">
+                            <input type="checkbox" class="form-check-input" id="doc1" checked>
+                            <label class="form-check-label" for="doc1">Contrato Social</label>
+                        </div>
+                        <div class="form-check" style="margin-bottom: 10px;">
+                            <input type="checkbox" class="form-check-input" id="doc2" checked>
+                            <label class="form-check-label" for="doc2">Certificado ANS</label>
+                        </div>
+                        <div class="form-check" style="margin-bottom: 10px;">
+                            <input type="checkbox" class="form-check-input" id="doc3" checked>
+                            <label class="form-check-label" for="doc3">Projeto Assistencial</label>
+                        </div>
+                        <div class="form-check" style="margin-bottom: 10px;">
+                            <input type="checkbox" class="form-check-input" id="doc4" checked>
+                            <label class="form-check-label" for="doc4">Comprovante de Endereço</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea class="form-control" id="accreditation-notes" rows="3" placeholder="Adicione observações sobre o credenciamento..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-light" id="cancel-accreditation-btn">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn btn-primary" id="start-accreditation-btn">
+                    <i class="fas fa-play"></i> Iniciar Processo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados do sistema
+        const operators = [
+            {
+                id: 1,
+                name: "Unimed Rio",
+                logo: "UR",
+                status: "pending",
+                startDate: "15/03/2023",
+                nextAction: "Enviar documentação complementar solicitada em 20/03/2023",
+                deadline: "25/03/2023",
+                documents: [
+                    { name: "Contrato Social", status: "approved", date: "18/03/2023" },
+                    { name: "Certificado ANS", status: "approved", date: "18/03/2023" },
+                    { name: "Projeto Assistencial", status: "rejected", date: "" },
+                    { name: "Comprovante de Endereço", status: "pending", date: "" }
+                ],
+                history: [
+                    { date: "20/03/2023", action: "Operadora solicitou documento complementar" },
+                    { date: "18/03/2023", action: "Documentação inicial enviada" },
+                    { date: "15/03/2023", action: "Processo iniciado" }
+                ]
+            },
+            {
+                id: 2,
+                name: "Amil",
+                logo: "AM",
+                status: "approved",
+                startDate: "10/02/2023",
+                nextAction: "Renovação em 10/08/2023",
+                deadline: "10/08/2023",
+                documents: [
+                    { name: "Contrato Social", status: "approved", date: "12/02/2023" },
+                    { name: "Certificado ANS", status: "approved", date: "12/02/2023" },
+                    { name: "Projeto Assistencial", status: "approved", date: "12/02/2023" },
+                    { name: "Comprovante de Endereço", status: "approved", date: "12/02/2023" }
+                ],
+                history: [
+                    { date: "20/02/2023", action: "Credenciamento aprovado" },
+                    { date: "15/02/2023", action: "Documentação revisada" },
+                    { date: "10/02/2023", action: "Processo iniciado" }
+                ]
+            }
+        ];
+
+        // Elementos da interface
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebar = document.getElementById('toggle-sidebar');
+        const menuItems = document.querySelectorAll('.menu-item');
+        const notificationBell = document.getElementById('notification-bell');
+        const notificationsDropdown = document.getElementById('notifications-dropdown');
+        const userProfile = document.getElementById('user-profile');
+        const userDropdown = document.getElementById('user-dropdown');
+        const documentModal = document.getElementById('document-modal');
+        const viewModal = document.getElementById('view-modal');
+        const newAccreditationModal = document.getElementById('new-accreditation-modal');
+        const fileUpload = document.getElementById('file-upload');
+        const fileInput = document.getElementById('file-input');
+        const selectFileBtn = document.getElementById('select-file-btn');
+        const docType = document.getElementById('doc-type');
+        const docNotes = document.getElementById('doc-notes');
+        const confirmUploadBtn = document.getElementById('confirm-upload-btn');
+        const cancelUploadBtn = document.getElementById('cancel-upload-btn');
+        const modalClose = document.getElementById('modal-close');
+        const viewModalClose = document.getElementById('view-modal-close');
+        const closeViewBtn = document.getElementById('close-view-btn');
+        const downloadDocBtn = document.getElementById('download-doc-btn');
+        const viewDocTitle = document.getElementById('view-doc-title');
+        const newAccreditationBtn = document.getElementById('new-accreditation-btn');
+        const closeAccreditationModal = document.getElementById('close-accreditation-modal');
+        const cancelAccreditationBtn = document.getElementById('cancel-accreditation-btn');
+        const startAccreditationBtn = document.getElementById('start-accreditation-btn');
+        const operatorSelect = document.getElementById('operator-select');
+        const otherOperatorGroup = document.getElementById('other-operator-group');
+        const otherOperatorName = document.getElementById('other-operator-name');
+        const accreditationNotes = document.getElementById('accreditation-notes');
+        const takeActionBtn = document.getElementById('take-action-btn');
+        const checkStatusBtn = document.getElementById('check-status-btn');
+        const sendMessageBtn = document.getElementById('send-message-btn');
+        const downloadDocsBtn = document.getElementById('download-docs-btn');
+        const historyBtn = document.getElementById('history-btn');
+        const sendAllBtn = document.getElementById('send-all-btn');
+        const viewDocBtns = document.querySelectorAll('.view-doc-btn');
+        const fixDocBtns = document.querySelectorAll('.fix-doc-btn');
+        const uploadDocBtns = document.querySelectorAll('.upload-doc-btn');
+        const documentItems = document.querySelectorAll('.document-item');
+        const statsCards = document.querySelectorAll('.stat-card');
+
+        // Variáveis de estado
+        let currentDocument = null;
+        let currentOperator = operators[0];
+
+        // Funções
+        function toggleModal(modal) {
+            modal.classList.toggle('show');
+        }
+
+        function updateDocumentStatus(docName, status) {
+            const doc = currentOperator.documents.find(d => d.name === docName);
+            if (doc) {
+                doc.status = status;
+                if (status === 'approved') {
+                    doc.date = new Date().toLocaleDateString('pt-BR');
+                }
+                renderOperatorDetails();
+            }
+        }
+
+        function renderOperatorDetails() {
+            // Atualiza a interface com os dados do operador atual
+            const operatorCard = document.getElementById('operator-details');
+            const operator = currentOperator;
+            
+            // Atualiza o status
+            const statusBadge = operatorCard.querySelector('.badge');
+            statusBadge.className = 'badge ' + 
+                (operator.status === 'pending' ? 'badge-warning' : 
+                 operator.status === 'approved' ? 'badge-success' : 'badge-danger');
+            statusBadge.textContent = 
+                operator.status === 'pending' ? 'Em Análise' : 
+                operator.status === 'approved' ? 'Aprovado' : 'Rejeitado';
+            
+            // Atualiza os documentos
+            const documentsList = document.querySelector('.documents-list');
+            documentsList.innerHTML = '';
+            
+            operator.documents.forEach(doc => {
+                const docItem = document.createElement('div');
+                docItem.className = 'document-item';
+                docItem.setAttribute('data-doc', doc.name.toLowerCase().replace(' ', '-'));
+                
+                const docIcon = document.createElement('div');
+                docIcon.className = 'document-icon';
+                
+                const icon = document.createElement('i');
+                if (doc.name.includes('Contrato')) {
+                    icon.className = 'fas fa-file-contract';
+                } else if (doc.name.includes('Certificado')) {
+                    icon.className = 'fas fa-certificate';
+                } else if (doc.name.includes('Projeto')) {
+                    icon.className = 'fas fa-project-diagram';
+                } else {
+                    icon.className = 'fas fa-home';
+                }
+                
+                docIcon.appendChild(icon);
+                docItem.appendChild(docIcon);
+                
+                const docInfo = document.createElement('div');
+                docInfo.className = 'document-info';
+                
+                const docName = document.createElement('div');
+                docName.className = 'document-name';
+                docName.textContent = doc.name;
+                docInfo.appendChild(docName);
+                
+                const docMeta = document.createElement('div');
+                docMeta.className = 'document-meta';
+                
+                if (doc.status === 'approved') {
+                    docMeta.innerHTML = `<span>Enviado em: ${doc.date}</span>`;
+                } else {
+                    docMeta.innerHTML = `<span>Status: ${doc.status === 'pending' ? 'Pendente' : 'Rejeitado'}</span>`;
+                }
+                
+                docInfo.appendChild(docMeta);
+                docItem.appendChild(docInfo);
+                
+                const docActions = document.createElement('div');
+                docActions.className = 'document-actions';
+                
+                const actionBtn = document.createElement('button');
+                if (doc.status === 'approved') {
+                    actionBtn.className = 'btn btn-sm btn-outline-primary view-doc-btn';
+                    actionBtn.innerHTML = '<i class="fas fa-eye"></i>';
+                    actionBtn.addEventListener('click', () => viewDocument(doc.name));
+                } else if (doc.status === 'rejected') {
+                    actionBtn.className = 'btn btn-sm btn-danger fix-doc-btn';
+                    actionBtn.innerHTML = '<i class="fas fa-edit"></i> Corrigir';
+                    actionBtn.addEventListener('click', () => uploadDocument(doc.name));
+                } else {
+                    actionBtn.className = 'btn btn-sm btn-primary upload-doc-btn';
+                    actionBtn.innerHTML = '<i class="fas fa-upload"></i> Enviar';
+                    actionBtn.addEventListener('click', () => uploadDocument(doc.name));
+                }
+                
+                docActions.appendChild(actionBtn);
+                docItem.appendChild(docActions);
+                
+                documentsList.appendChild(docItem);
+            });
+            
+            // Atualiza o alerta de ação necessária
+            const alertBox = operatorCard.querySelector('.alert');
+            if (operator.status === 'pending') {
+                alertBox.style.display = 'flex';
+                alertBox.querySelector('div').innerHTML = `
+                    <strong>Ação necessária:</strong> ${operator.nextAction}
+                `;
+            } else {
+                alertBox.style.display = 'none';
+            }
+        }
+
+        function uploadDocument(docName) {
+            currentDocument = docName;
+            document.getElementById('modal-title').textContent = `Enviar ${docName}`;
+            docType.value = docName.toLowerCase().replace(' ', '-');
+            toggleModal(documentModal);
+        }
+
+        function viewDocument(docName) {
+            currentDocument = docName;
+            viewDocTitle.textContent = `${docName}.pdf`;
+            toggleModal(viewModal);
+        }
+
+        function startNewAccreditation() {
+            toggleModal(newAccreditationModal);
+        }
+
+        // Event Listeners
+        toggleSidebar.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+        });
+
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                menuItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                
+                const section = item.getAttribute('data-section');
+                document.querySelector('.page-title').textContent = 
+                    section === 'dashboard' ? 'Dashboard' :
+                    section === 'accreditations' ? 'Credenciamentos' :
+                    section === 'documents' ? 'Documentos' :
+                    section === 'operators' ? 'Operadoras' :
+                    section === 'scheduling' ? 'Agendamentos' :
+                    section === 'reports' ? 'Relatórios' :
+                    section === 'users' ? 'Usuários' :
+                    section === 'settings' ? 'Configurações' : 'Ajuda';
+                
+                // Simular mudança de seção
+                alert(`Seção ${section} carregada`);
+            });
+        });
+
+        notificationBell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notificationsDropdown.classList.toggle('show');
+        });
+
+        userProfile.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('show');
+        });
+
+        // Fechar dropdowns ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!notificationBell.contains(e.target)) {
+                notificationsDropdown.classList.remove('show');
+            }
+            
+            if (!userProfile.contains(e.target)) {
+                userDropdown.classList.remove('show');
+            }
+        });
+
+        // Upload de documentos
+        selectFileBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileUpload.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                fileUpload.innerHTML = `
+                    <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                    <p>${fileInput.files[0].name}</p>
+                    <button class="btn btn-light" id="change-file-btn">
+                        <i class="fas fa-sync-alt"></i> Alterar Arquivo
+                    </button>
+                `;
+                
+                document.getElementById('change-file-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    fileInput.click();
+                });
+            }
+        });
+
+        confirmUploadBtn.addEventListener('click', () => {
+            if (!fileInput.files.length) {
+                alert('Selecione um arquivo para enviar');
+                return;
+            }
+            
+            if (!docType.value) {
+                alert('Selecione o tipo de documento');
+                return;
+            }
+            
+            updateDocumentStatus(currentDocument, 'approved');
+            toggleModal(documentModal);
+            alert('Documento enviado com sucesso!');
+            
+            // Resetar o formulário
+            fileInput.value = '';
+            docType.value = '';
+            docNotes.value = '';
+            fileUpload.innerHTML = `
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Arraste e solte o arquivo aqui ou</p>
+                <button class="btn btn-primary" id="select-file-btn">
+                    <i class="fas fa-folder-open"></i> Selecionar Arquivo
+                </button>
+            `;
+        });
+
+        cancelUploadBtn.addEventListener('click', () => {
+            toggleModal(documentModal);
+            fileInput.value = '';
+            docType.value = '';
+            docNotes.value = '';
+        });
+
+        modalClose.addEventListener('click', () => {
+            toggleModal(documentModal);
+        });
+
+        viewModalClose.addEventListener('click', () => {
+            toggleModal(viewModal);
+        });
+
+        closeViewBtn.addEventListener('click', () => {
+            toggleModal(viewModal);
+        });
+
+        downloadDocBtn.addEventListener('click', () => {
+            alert(`Download do documento ${currentDocument} iniciado`);
+        });
+
+        // Novo credenciamento
+        newAccreditationBtn.addEventListener('click', startNewAccreditation);
+
+        operatorSelect.addEventListener('change', () => {
+            if (operatorSelect.value === 'other') {
+                otherOperatorGroup.style.display = 'block';
+            } else {
+                otherOperatorGroup.style.display = 'none';
+            }
+        });
+
+        startAccreditationBtn.addEventListener('click', () => {
+            if (!operatorSelect.value) {
+                alert('Selecione uma operadora');
+                return;
+            }
+            
+            if (operatorSelect.value === 'other' && !otherOperatorName.value) {
+                alert('Digite o nome da operadora');
+                return;
+            }
+            
+            const operatorName = operatorSelect.value === 'other' ? 
+                otherOperatorName.value : 
+                operatorSelect.options[operatorSelect.selectedIndex].text;
+            
+            toggleModal(newAccreditationModal);
+            alert(`Novo processo de credenciamento iniciado com ${operatorName}`);
+            
+            // Resetar o formulário
+            operatorSelect.value = '';
+            otherOperatorName.value = '';
+            accreditationNotes.value = '';
+            otherOperatorGroup.style.display = 'none';
+        });
+
+        closeAccreditationModal.addEventListener('click', () => {
+            toggleModal(newAccreditationModal);
+        });
+
+        cancelAccreditationBtn.addEventListener('click', () => {
+            toggleModal(newAccreditationModal);
+        });
+
+        // Ações rápidas
+        takeActionBtn.addEventListener('click', () => {
+            alert('Ação realizada com sucesso! O status será atualizado em breve.');
+            currentOperator.status = 'approved';
+            renderOperatorDetails();
+        });
+
+        checkStatusBtn.addEventListener('click', () => {
+            alert('Consultando status na ANS...\nStatus: Em análise');
+        });
+
+        sendMessageBtn.addEventListener('click', () => {
+            alert('Mensagem enviada para a operadora:\n"Prezados, gostaria de atualizações sobre nosso processo de credenciamento."');
+        });
+
+        downloadDocsBtn.addEventListener('click', () => {
+            alert('Download da documentação completa iniciado');
+        });
+
+        historyBtn.addEventListener('click', () => {
+            alert('Histórico de comunicação carregado');
+        });
+
+        sendAllBtn.addEventListener('click', () => {
+            alert('Documentos pendentes enviados para a operadora!');
+            currentOperator.documents.forEach(doc => {
+                if (doc.status === 'pending') {
+                    doc.status = 'approved';
+                    doc.date = new Date().toLocaleDateString('pt-BR');
+                }
+            });
+            renderOperatorDetails();
+        });
+
+        // Cards de estatísticas
+        statsCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const type = card.id.replace('-card', '');
+                alert(`Filtrando por ${type === 'operators' ? 'operadoras ativas' : 
+                      type === 'accredited' ? 'credenciados' : 
+                      type === 'analysis' ? 'em análise' : 'pendentes'}`);
+            });
+        });
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            renderOperatorDetails();
+            
+            // Adicionar eventos dinâmicos para documentos
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('view-doc-btn') {
+                    const docItem = e.target.closest('.document-item');
+                    const docName = docItem.querySelector('.document-name').textContent;
+                    viewDocument(docName);
+                }
+                
+                if (e.target.classList.contains('upload-doc-btn') {
+                    const docItem = e.target.closest('.document-item');
+                    const docName = docItem.querySelector('.document-name').textContent;
+                    uploadDocument(docName);
+                }
+                
+                if (e.target.classList.contains('fix-doc-btn')) {
+                    const docItem = e.target.closest('.document-item');
+                    const docName = docItem.querySelector('.document-name').textContent;
+                    uploadDocument(docName);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
