@@ -167,13 +167,13 @@
         .theme-section .button:last-child { margin-bottom: 0; }
 
         /* Estilos de Modais e Overlays */
-        .pin-modal-container, .avatar-modal-overlay, #iframeViewer {
+        .avatar-modal-overlay, #iframeViewer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0,0,0,0.8);
             display: flex; justify-content: center; align-items: center;
             z-index: 2000; animation: fadeIn 0.3s ease;
         }
-        .pin-modal-content, .avatar-modal-content-box, .iframe-window {
+        .avatar-modal-content-box, .iframe-window {
             background-color: var(--bg-card);
             color: var(--text-primary);
             border-radius: 12px;
@@ -186,30 +186,11 @@
             opacity: 0;
             transition: background-color var(--transition-speed), color var(--transition-speed);
         }
-        .pin-modal-content h2, .avatar-modal-content-box h2 {
+        .avatar-modal-content-box h2 {
              color: var(--primary-color);
              transition: color var(--transition-speed);
              margin-bottom: 15px;
         }
-        .pin-modal-content p { color: var(--text-secondary); transition: color var(--transition-speed); margin-bottom: 20px; }
-        
-        #pinInput {
-            width: 100%; padding: 12px; font-size: 1.2rem; text-align: center;
-            background-color: var(--bg-main); color: var(--text-primary);
-            border: 2px solid var(--border-color); border-radius: 8px;
-            margin-bottom: 20px; transition: all var(--transition-speed);
-        }
-        #pinInput:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px var(--accent-light);
-        }
-        #submitPinButton {
-            width: 100%; padding: 12px; background: var(--primary-color);
-            color: white; border: none; border-radius: 8px; font-size: 1rem;
-            font-weight: 600; cursor: pointer; transition: background-color var(--transition-speed);
-        }
-        #submitPinButton:hover { background-color: var(--primary-dark); }
-        #pinErrorMessage { color: var(--danger-color); margin-top: 15px; visibility: hidden; }
 
         /* Iframe Viewer */
         #iframeViewer { z-index: 3000; padding: 2vh; }
@@ -275,7 +256,7 @@
 </head>
 <body>
     <div class="main-container">
-        <div class="homepage-card" style="display: none;">
+        <div class="homepage-card">
             <div id="darkModeToggle" class="dark-mode-toggle" title="Alternar Modo Noturno">
                 <div class="icon-container">
                     <span class="moon-icon">🌙</span>
@@ -323,26 +304,16 @@
                 <section class="theme-section">
                     <h2 class="theme-title">
                          <svg class="section-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor">
-                             <rect x="5" y="3" width="14" height="18" rx="2" stroke-width="2"/>
-                             <rect x="7" y="6" width="10" height="4.5" rx="1" stroke-width="1.5"/>
-                             <circle cx="8.5" cy="13.5" r="1" fill="currentColor"/><circle cx="12" cy="13.5" r="1" fill="currentColor"/><circle cx="15.5" cy="13.5" r="1" fill="currentColor"/>
-                             <circle cx="8.5" cy="17.5" r="1" fill="currentColor"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/><circle cx="15.5" cy="17.5" r="1" fill="currentColor"/>
+                              <rect x="5" y="3" width="14" height="18" rx="2" stroke-width="2"/>
+                              <rect x="7" y="6" width="10" height="4.5" rx="1" stroke-width="1.5"/>
+                              <circle cx="8.5" cy="13.5" r="1" fill="currentColor"/><circle cx="12" cy="13.5" r="1" fill="currentColor"/><circle cx="15.5" cy="13.5" r="1" fill="currentColor"/>
+                              <circle cx="8.5" cy="17.5" r="1" fill="currentColor"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/><circle cx="15.5" cy="17.5" r="1" fill="currentColor"/>
                          </svg>
                          Ferramentas
                     </h2>
                     <button type="button" class="button" data-target-id="btnCalculadora">Calculadora Acadêmica</button>
                 </section>
             </main>
-        </div>
-    </div>
-
-    <div id="pinModalContainer" class="pin-modal-container" style="display: flex;">
-        <div class="pin-modal-content">
-            <h2>Acesso Restrito</h2>
-            <p>Por favor, insira seu PIN para continuar:</p>
-            <input type="password" id="pinInput" placeholder="Seu PIN">
-            <button type="button" id="submitPinButton">Acessar</button>
-            <p id="pinErrorMessage"></p>
         </div>
     </div>
 
@@ -366,10 +337,6 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const homepageCard = document.querySelector('.homepage-card');
-        const pinModalContainer = document.getElementById('pinModalContainer');
-        const pinInput = document.getElementById('pinInput');
-        const submitPinButton = document.getElementById('submitPinButton');
-        const pinErrorMessage = document.getElementById('pinErrorMessage');
         const mainContentButtons = document.querySelectorAll('.app-menu .button');
         const iframeViewer = document.getElementById('iframeViewer');
         const contentIframe = document.getElementById('contentIframe');
@@ -383,12 +350,8 @@
         const bodyElement = document.body;
 
         const darkModeKey = 'userDarkModePreference_v4';
-        const localStorageKeyAccess = 'accessGranted_luciana';
         const localStorageKeyAvatar = 'studyAppSelectedAvatar_v3';
         
-        // PIN de acesso para Luciana. "BC8765M"
-        const validPins = [ ];
-
         const avatarImageLinks = [
             "https://i.imgur.com/rJXV7uR.png", "https://i.imgur.com/DaNsN4q.png",
             "https://i.imgur.com/DXkoPU0.png", "https://i.imgur.com/5jDryIk.png",
@@ -401,22 +364,22 @@
         // URLs dos botões para Luciana
         const targetUrls = {
             // Etapa 1
-            btnMorfoM1_A: "https://inaciomaximoo.github.io/treino/turma36/1etpM1morfooo.html",
+            btnMorfoM1_A: "https://inaciomaximoo.github.io/tre/turma36/1etpM1morfooo.html",
             
             // Etapa 2
-            btnTutoriaM2_2GG: "https://inaciomaximoo.github.io/treino/turma36/2ETPm2ggTutoria.html",
-            btnMorfoM2_2GG: "https://inaciomaximoo.github.io/treino/turma36/2etpM2morfoggg.html",
+            btnTutoriaM2_2GG: "https://inaciomaximoo.github.io/tre/turma36/2ETPm2ggTutoria.html",
+            btnMorfoM2_2GG: "https://inaciomaximoo.github.io/tre/turma36/2etpM2morfoggg.html",
 
             // Etapa 3
-            btnTutoriaM2_3etp: "https://inaciomaximoo.github.io/treino/turma36/3etpM2tutoriaasd.html",
-            btnMorfoM2_3etp: "https://inaciomaximoo.github.io/treino/turma36/3etpM2MORFOGGG.html",
-            btnTutoriaM1: "https://inaciomaximoo.github.io/treino/turma36/3EtpM1tutoriaaagfs.html",
-            btnMorfoM1_B: "https://inaciomaximoo.github.io/treino/turma36/3ETPm1MORFOgg.html",
-            btnTutoriaGeral: "https://inaciomaximoo.github.io/treino/turma36/tutoriat36.html",
-            btnMorfoM3: "https://inaciomaximoo.github.io/treino/turma36/3ETPm3MORFOgg.html",
+            btnTutoriaM2_3etp: "https://inaciomaximoo.github.io/tre/turma36/3etpM2tutoriaasd.html",
+            btnMorfoM2_3etp: "https://inaciomaximoo.github.io/tre/turma36/3etpM2MORFOGGG.html",
+            btnTutoriaM1: "https://inaciomaximoo.github.io/tre/turma36/3EtpM1tutoriaaagfs.html",
+            btnMorfoM1_B: "https://inaciomaximoo.github.io/tre/turma36/3ETPm1MORFOgg.html",
+            btnTutoriaGeral: "https://inaciomaximoo.github.io/tre/turma36/tutoriat36.html",
+            btnMorfoM3: "https://inaciomaximoo.github.io/tre/turma36/3ETPm3MORFOgg.html",
             
             // Ferramentas
-            btnCalculadora: "https://inaciomaximoo.github.io/treino/calculadora.html",
+            btnCalculadora: "https://inaciomaximoo.github.io/tre/calculadora.html",
         };
 
         function applyDarkMode(isDark) {
@@ -436,15 +399,7 @@
         }
         darkModeToggleButton.addEventListener('click', toggleDarkModePreference);
 
-        function showPinModal() {
-            homepageCard.style.display = 'none';
-            pinModalContainer.style.display = 'flex';
-            pinInput.focus();
-            pinErrorMessage.style.visibility = 'hidden';
-        }
-
         function showHomepageContent() {
-            pinModalContainer.style.display = 'none';
             homepageCard.style.display = 'block';
             mainContentButtons.forEach(button => {
                 button.disabled = false;
@@ -456,23 +411,6 @@
             loadAndDisplaySelectedAvatar();
         }
         
-        function grantAccess() {
-            localStorage.setItem(localStorageKeyAccess, 'true');
-            showHomepageContent();
-        }
-
-        function handlePinSubmit() {
-            const enteredPin = pinInput.value.trim().toUpperCase();
-            if (validPins.includes(enteredPin)) {
-                grantAccess();
-            } else {
-                pinErrorMessage.textContent = 'PIN inválido. Tente novamente.';
-                pinErrorMessage.style.visibility = 'visible';
-                pinInput.value = '';
-                pinInput.focus();
-            }
-        }
-
         function handleMainButtonClick(event) {
             const targetId = event.currentTarget.dataset.targetId;
             const url = targetUrls[targetId];
@@ -530,16 +468,8 @@
         headerAvatarContainer.addEventListener('click', openAvatarSelectionModal);
         closeAvatarModalBtn.addEventListener('click', closeAvatarSelectionModal);
 
-        if (localStorage.getItem(localStorageKeyAccess) === 'true') {
-            showHomepageContent();
-        } else {
-            showPinModal();
-            mainContentButtons.forEach(button => button.disabled = true);
-            submitPinButton.addEventListener('click', handlePinSubmit);
-            pinInput.addEventListener('keypress', (event) => {
-                if (event.key === 'Enter') handlePinSubmit();
-            });
-        }
+        // Mostra o conteúdo da página inicial diretamente.
+        showHomepageContent();
     });
     </script>
 </body>
