@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECG Quiz Prático com Imagens</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        #loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">ECG Quiz Prático com Imagens</h1>
+            <p class="text-md text-gray-600 mt-2">Faça o upload do seu PDF para começar a praticar.</p>
+        </header>
+
+        <!-- Seção de Upload -->
+        <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-center">Carregar Arquivo PDF</h2>
+            <div class="flex flex-col items-center">
+                <input type="file" id="pdfUpload" accept=".pdf" class="block w-full max-w-xs text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100
+                "/>
+                <p class="text-xs text-gray-500 mt-2">O PDF deve ter uma página de imagem (questão) seguida por uma página de imagem (resposta).</p>
+            </div>
+        </div>
+
+        <!-- Loader -->
+        <div id="loader-container" class="text-center my-10 hidden">
+            <div id="loader" class="mx-auto"></div>
+            <p id="loader-text" class="mt-4 text-gray-600">Processando PDF...</p>
+        </div>
+        
+        <!-- Container do Quiz -->
+        <main id="quiz-container">
+             <div id="start-message" class="text-center text-gray-500 bg-white p-10 rounded-xl shadow-md">
+                <p>Aguardando o upload de um arquivo PDF para gerar o quiz.</p>
+            </div>
+        </main>
+
+    </div>
+
+    <script>
+        // Configuração do worker para o pdf.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js`;
+
+        const quizContainer = document.getElementById('quiz-container');
+        const pdfUpload = document.getElementById('pdfUpload');
+        const loaderContainer = document.getElementById('loader-container');
+        const loaderText = document.getElementById('loader-text');
+        const startMessage = document.getElementById('start-message');
+
+        /**
+         * Renderiza o quiz na tela a partir de um array de dados.
+         * Cada item no array contém a imagem da questão e a imagem da resposta.
+         * @param {Array} quizData - Array de objetos, cada um contendo 'questionImage' e 'answerImage'.
+         */
+        function renderQuiz(quizData) {
+            quizContainer.innerHTML = ''; // Limpa o conteúdo inicial
+            if (!quizData || quizData.length === 0) {
+                 quizContainer.innerHTML = `<div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg" role="alert">
+                    <p class="font-bold">Nenhuma questão encontrada!</p>
+                    <p>Não foi possível extrair pares de páginas (questão/resposta) do PDF. Verifique o formato do arquivo.</p>
+                </div>`;
+                return;
+            }
+
+            quizData.forEach((item, index) => {
+                const questionEl = document.createElement('div');
+                questionEl.className = 'bg-white p-6 rounded-xl shadow-md mb-6';
+                questionEl.innerHTML = `
+                    <h2 class="text-xl font-semibold mb-4">Questão ${index + 1}: Analise o ECG a seguir.</h2>
+                    <div class="mb-4 bg-gray-50 p-2 rounded-lg border">
+                        <img src="${item.questionImage}" alt="ECG da Questão ${index + 1}" class="w-full h-auto rounded">
+                    </div>
+                    <button class="toggle-answer-btn bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200">
+                        Mostrar Resposta
+                    </button>
+                    <div class="answer-content mt-4 p-2 bg-gray-100 rounded-lg border" style="display: none;">
+                         <img src="${item.answerImage}" alt="Resposta da Questão ${index + 1}" class="w-full h-auto rounded">
+                    </div>
+                `;
+                quizContainer.appendChild(questionEl);
+            });
+
+            // Adiciona os event listeners para os novos botões
+            document.querySelectorAll('.toggle-answer-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const answerContent = button.nextElementSibling;
+                    const isVisible = answerContent.style.display === 'block';
+                    answerContent.style.display = isVisible ? 'none' : 'block';
+                    button.textContent = isVisible ? 'Mostrar Resposta' : 'Ocultar Resposta';
+                });
+            });
+        }
+        
+        /**
+         * Lida com o upload do arquivo PDF, processando as páginas em pares.
+         */
+        pdfUpload.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            if(startMessage) startMessage.remove();
+            quizContainer.innerHTML = '';
+            loaderContainer.classList.remove('hidden');
+            loaderText.textContent = "Lendo o arquivo...";
+
+            try {
+                const fileReader = new FileReader();
+                fileReader.readAsArrayBuffer(file);
+                
+                fileReader.onload = async (e) => {
+                    const typedarray = new Uint8Array(e.target.result);
+                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                    const quizData = [];
+                    
+                    loaderText.textContent = `Processando ${pdf.numPages} páginas...`;
+
+                    // Itera pelas páginas em pares (uma para questão, uma para resposta), começando da página 2.
+                    for (let i = 2; i < pdf.numPages; i += 2) {
+                        const questionPageNum = i;
+                        const answerPageNum = i + 1;
+
+                        // Renderiza a página da questão
+                        const qPage = await pdf.getPage(questionPageNum);
+                        const qViewport = qPage.getViewport({ scale: 1.5 });
+                        const qCanvas = document.createElement('canvas');
+                        const qContext = qCanvas.getContext('2d');
+                        qCanvas.height = qViewport.height;
+                        qCanvas.width = qViewport.width;
+                        await qPage.render({ canvasContext: qContext, viewport: qViewport }).promise;
+                        const questionImage = qCanvas.toDataURL('image/jpeg', 0.9); // Usando jpeg para melhor compressão
+
+                        // Renderiza a página da resposta
+                        const aPage = await pdf.getPage(answerPageNum);
+                        const aViewport = aPage.getViewport({ scale: 1.5 });
+                        const aCanvas = document.createElement('canvas');
+                        const aContext = aCanvas.getContext('2d');
+                        aCanvas.height = aViewport.height;
+                        aCanvas.width = aViewport.width;
+                        await aPage.render({ canvasContext: aContext, viewport: aViewport }).promise;
+                        const answerImage = aCanvas.toDataURL('image/jpeg', 0.9);
+
+                        quizData.push({
+                            questionImage: questionImage,
+                            answerImage: answerImage
+                        });
+                    }
+                    renderQuiz(quizData);
+                };
+
+            } catch (error) {
+                console.error('Erro ao processar o PDF:', error);
+                quizContainer.innerHTML = `<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert">
+                    <p class="font-bold">Erro!</p>
+                    <p>Ocorreu um problema ao processar o arquivo PDF. Tente novamente.</p>
+                </div>`;
+            } finally {
+                loaderContainer.classList.add('hidden');
+            }
+        });
+        
+    </script>
+
+</body>
+</html>
+
