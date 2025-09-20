@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicativo de Flashcards de Semiologia</title>
+    <style>
+        /* Documentação do CSS (Atualizado):
+           - Paleta de cores renovada para um visual mais moderno (azul-ardósia e verde-azulado).
+           - Adicionado um gradiente sutil ao fundo do corpo da página.
+           - .flashcard: Adicionado um efeito de escala suave ao passar o mouse para melhor feedback visual.
+           - .card-front, .card-back: Estilo atualizado com uma borda superior de destaque na cor primária.
+           - .highlight: Estilo aprimorado para melhor legibilidade.
+           - .answer-item: Nova classe para estruturar e espaçar melhor as respostas no verso do card.
+           - .flashcard-display-area: Container para o card único, garantindo altura consistente.
+           - .study-controls: Container para os botões e o contador.
+           - .flip-button: Estilo para o novo botão de virar o card.
+        */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+        :root {
+            --bg-color: #111827;
+            --card-bg: #1F2937;
+            --primary-color: #14B8A6;
+            --secondary-color: #374151;
+            --font-color: #E5E7EB;
+            --highlight-bg: #0E7490;
+            --highlight-font: #ffffff;
+            --border-color: #4B5563;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.1) 100%);
+            color: var(--font-color);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+        
+        h2 {
+            color: var(--font-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            background-color: var(--secondary-color);
+            color: var(--font-color);
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .tab-button:hover {
+            background-color: #4B5563;
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 0 15px rgba(20, 184, 166, 0.5);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .flashcard-container {
+           display: none; /* Esconde o container original de cards */
+        }
+        
+        .flashcard-display-area {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .flashcard {
+            background-color: transparent;
+            width: 100%;
+            perspective: 1000px;
+            cursor: pointer;
+            margin-bottom: 2rem;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            transition: transform 0.7s;
+            transform-style: preserve-3d;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            border-radius: 15px;
+            display: grid;
+        }
+
+        .flashcard.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            grid-area: 1 / 1;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            min-height: 550px;
+        }
+
+        .card-front p {
+            margin-bottom: 0.75rem;
+        }
+        .card-front p:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            justify-content: flex-start;
+            padding-top: 2rem;
+        }
+
+        .answer-item {
+            margin-bottom: 1rem;
+        }
+        .answer-item:last-child {
+            margin-bottom: 0;
+        }
+        .answer-item strong {
+            color: var(--primary-color);
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-back p {
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+         .card-back p:last-child {
+            margin-bottom: 0;
+        }
+
+        .highlight {
+            background-color: var(--highlight-bg);
+            color: var(--highlight-font);
+            padding: 4px 9px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 4px;
+        }
+        
+        .card-front img, .card-back img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .study-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .next-button, .flip-button {
+            padding: 1rem 2rem;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        
+        .flip-button {
+            background-color: var(--secondary-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .flip-button:hover {
+            background-color: #4B5563;
+            transform: translateY(-3px);
+        }
+
+        .next-button {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(20, 184, 166, 0.4);
+        }
+
+        .next-button:hover {
+            background-color: #10a391;
+            transform: translateY(-3px);
+        }
+
+        .counter {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--font-color);
+             width: 120px; /* Largura fixa para o contador */
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Flashcards de Semiologia Médica</h1>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('coluna-quadril')">Coluna e Quadril</button>
+            <button class="tab-button" onclick="showTab('membros-superiores')">Membros Superiores</button>
+            <button class="tab-button" onclick="showTab('membros-inferiores')">Membros Inferiores</button>
+            <button class="tab-button" onclick="showTab('ecg')">Eletrocardiograma</button>
+        </div>
+
+        <!-- Conteúdo: Coluna e Quadril -->
+        <section id="coluna-quadril" class="tab-content active">
+            <h2>Coluna e Quadril</h2>
+            <div id="display-area-coluna-quadril" class="flashcard-display-area"></div>
+            <div class="study-controls">
+                <div id="counter-coluna-quadril" class="counter"></div>
+                <button class="flip-button" onclick="flipCurrentCard()">Virar Card</button>
+                <button class="next-button" onclick="showNextCard('coluna-quadril')">Próximo Card</button>
+            </div>
+            <div class="flashcard-container">
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Uma mulher de 29 anos trabalha como profissional de tecnologia de informação (TI) e queixa de cervicalgia há três meses com piora progressiva. Relata dor cervical posterior de tipo pontada com forte intensidade que estende para ombro esquerdo irradiando até a mão, melhora parcialmente com dipirona, piora ao movimentar o pescoço e sem fatores que acompanham. Nega trauma e doenças pregressas.</p>
+                            <p>a) Qual a manobra semiológica mais apropriada a ser realizada neste caso?</p>
+                            <p>b) Qual o significado clínico, se o teste for positivo?</p>
+                            <p>c) Descreva sucintamente essa manobra semiológica.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">MANOBRA DE SPURLING</span></div>
+                            <div class="answer-item"><strong>b)</strong> <span class="highlight">COMPRESSÃO DE RAIZ NERVOSA CERVICAL A ESQUERDA</span></div>
+                            <div class="answer-item"><strong>c)</strong><p>REALIZA-SE UMA COMPRESSÃO AXIAL COM INCLINAÇÃO CERVICAL PROMOVENDO CERVICOBRAQUIALGIA PARA O LADO INCLINADO, NESTE CASO A ESQUERDA.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Uma mulher de 42 anos, após um grave acidente automobilístico foi submetida por inúmeras cirurgias na bacia e evoluiu com dificuldade de andar devido lesão do músculo glúteo médio direito. Responda:</p>
+                            <p>a) Qual a manobra semiológica mais apropriada a ser realizada?</p>
+                            <p>b) O que acontecerá se o teste for positivo?</p>
+                            <p>c) Descreva sucintamente essa manobra semiológica.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">TRENDELEMBURG</span></div>
+                            <div class="answer-item"><strong>b)</strong><p>OBSERVA-SE A <span class="highlight">QUEDA DA CRISTA ILÍACA (ou GLÚTEO ou NÁDEGA) ESQUERDA</span> EM RELAÇÃO AO DIREITO (LADO AFETADO)</p></div>
+                            <div class="answer-item"><strong>c)</strong><p>COM O PACIENTE EM PÉ SOLICITA-SE QUE ERGA A PERNA ESQUERDA COM JOELHO FLETIDO E OBSERVA-SE O DESNIVELAMENTO DAS CRISTAS ILÍACAS.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Homem de 32 anos chega no pronto-socorro de SAMU. Queixa estar "travado desde hoje cedo". Refere dor lombar bilateral há 04 meses com piora progressiva, mas hoje ao carregar uma mesa ficou sem se mexer, devido lombalgia lancinante de forte intensidade com irradiação para membro inferior esquerdo até pé, pouca melhora em decúbito lateral com flexão do quadril e joelhos, piora com movimento de rotação e flexão do tronco e acompanha parestesia em membro inferior esquerdo.</p>
+                             <p>a) Qual manobra semiológica deverá ser feita para elucidar o diagnóstico?</p>
+                             <p>b) Qual a principal hipótese diagnóstica? Justifique sua resposta.</p>
+                             <p>c) Descreva sucintamente essa manobra semiológica.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">MANOBRA DE LASÈGUÈ</span></div>
+                            <div class="answer-item"><strong>b)</strong> <span class="highlight">HÉRNIA DE DISCO</span>.</div>
+                            <div class="answer-item"><strong>c)</strong><p>O PACIENTE EM DECÚBITO DORSAL (ou POSIÇÃO SUPINA) DEVE FLETIR O QUADRIL A 30º COM JOELHO EM EXTENSÃO.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Uma paciente de 35 anos está em investigação de lombalgia de caráter inflamatória e pode-se usar várias manobras semiológicas para investigar a articulação sacro-ilíaca.</p>
+                             <p>a) Cite duas manobras semiológicas a serem realizadas nesta situação?</p>
+                             <p>b) Descreva sucintamente essas manobras semiológicas. Diga como diferenciá-las.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">PATRICK</span> e <span class="highlight">GAENSLEN</span></div>
+                            <div class="answer-item"><strong>b)</strong>
+                                <p><strong>MANOBRA DE PATRICK:</strong> Com o paciente em decúbito dorsal, o joelho do lado testado é flexionado noventa graus e o pé é apoiado sobre o joelho da perna oposta. Segurando a pelve firmemente contra a mesa de exame, o joelho testado é empurrado em direção à mesa, realizando, portanto, rotação externa e abdução da coxa na articulação do quadril.</p>
+                                <p><strong>MANOBRA DE GAENSLEN:</strong> Com o paciente em decúbito dorsal beira da maca, a perna não testada é mantida em extensão, enquanto a perna testada é colocada em flexão máxima. Em seguida, o examinador coloca uma mão na parte anterior da coxa da perna não testada e a outra mão sobre o joelho da perna testada para aplicar uma pressão para flexão máxima. O teste é considerado positivo quando essa tração (distensão) reproduz a dor lombar.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Um homem de 44 anos queixa de cervicalgia há 03 semanas de tipo lancinante com irradiação para o braço direito acompanhado de parestesia até antebraço. Baseado nessas informações responda:</p>
+                             <p>a) Qual a manobra semiológica mais apropriada a ser realizada? (1,0 ponto)</p>
+                             <p>b) O que está sendo avaliado nesse teste? (1,0 ponto)</p>
+                             <p>c) Descreva como realizar essa manobra semiológica. (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">Manobra de Spurling</span></div>
+                            <div class="answer-item"><strong>b)</strong> <span class="highlight">Compressão no ligamento cervicobraquial</span></div>
+                            <div class="answer-item"><strong>c)</strong><p>Inclinação da cervical para o lado afetado (direito) e compressão axial da cervical. Se positivo, a paciente relata dor na cervical que irradia para o braço.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Uma jogadora profissional de futebol com 23 anos relata que há quatro meses sentia uma "fisgada" lombar direita ao flexionar o quadril para chutar a bola, mas há duas semanas ao realizar o mesmo movimento observou dor intensa na virilha direita que foi se agravando durante os treinos.</p>
+                             <p>a) Qual a manobra propedêutica mais adequada para elucidação diagnóstica? (2,0 pontos)</p>
+                             <p>b) Qual hipótese diagnóstica, se essa manobra for "positiva"? Explique. (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">Teste de Ludloff.</span></div>
+                            <div class="answer-item"><strong>b)</strong> <span class="highlight">Tendinite ou lesão no músculo ileopsoas.</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                             <p>Paciente de 47 anos com histórico de lombalgia há um ano em acompanhamento na neurocirurgia e fisioterapia, recusou tratamento cirúrgico previamente indicado. Chegou ao pronto-socorro trazido pelo SAMU na maca devido lombalgia intensa há duas horas de tipo lancinante, forte intensidade com irradiação para a face posterior do membro inferior direito acompanhado de hemiparesia (força motora grau 4), sem melhora com morfina e sem fatores de piora. Não consegue ficar em pé ou sentado.</p>
+                             <p>a) Que manobra semiológica você deve realizar? (1,0 ponto)</p>
+                             <p>b) Qual a principal hipótese diagnóstica se a manobra acima for positiva? (1,0 ponto)</p>
+                             <p>c) Descreva como essa manobra é realizada. (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">Manobra de Lasegue</span></div>
+                            <div class="answer-item"><strong>b)</strong> <span class="highlight">Compressão de Raiz nervosa por hérnia de disco.</span></div>
+                            <div class="answer-item"><strong>c)</strong>
+                                <p>Paciente em decúbito dorsal com os membros inferiores estendidos.</p>
+                                <p>O examinador eleva a perna direita; a manobra será positiva se houver dor a partir de um ângulo de 30 graus (e nesse caso será positiva).</p>
+                                <p>Em seguida, a manobra é realizada no membro contralateral (esquerdo) para comparar os lados.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Conteúdo: Membros Superiores -->
+        <section id="membros-superiores" class="tab-content">
+            <h2>Membros Superiores</h2>
+            <div id="display-area-membros-superiores" class="flashcard-display-area"></div>
+            <div class="study-controls">
+                <div id="counter-membros-superiores" class="counter"></div>
+                 <button class="flip-button" onclick="flipCurrentCard()">Virar Card</button>
+                <button class="next-button" onclick="showNextCard('membros-superiores')">Próximo Card</button>
+            </div>
+            <div class="flashcard-container">
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Uma jovem de 21 anos relata que, após queda com a mão espalmada no chão há 02 dias, começou com instabilidade e desconforto no "lado de fora" do cotovelo esquerdo. Responda:</p>
+                             <p>a) Qual a principal hipótese diagnóstica?</p>
+                             <p>b) Qual a manobra semiológica mais apropriada a ser realizada neste caso?</p>
+                             <p>c) Descreva sucintamente essa manobra semiológica.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">LESÃO DO LIGAMENTO COLATERAL LATERAL</span></div>
+                            <div class="answer-item"><strong>b)</strong> <span class="highlight">STRESS VARO (ou VARO FORÇADO)</span></div>
+                            <div class="answer-item"><strong>c)</strong>
+                                <p>O COTOVELO ESQUERDO (AFETADO) SERÁ COLOCADO EM 30º DE FLEXÃO COM O ÚMERO EM ROTAÇÃO MEDIAL E O ANTEBRAÇO EM POSIÇÃO NEUTRA.</p>
+                                <p>O EXAMINADOR PALPA A INTERLINHA ARTICULAR LATERAL.</p>
+                                <p>EM SEGUIDA APLICA-SE UMA FORÇA EM VARO AO COTOVELO.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                             <p>Uma senhora de 55 anos trabalha como profissional de limpeza e faz repetidamente movimentos de varrer e torcer pano. Ela desenvolveu dor na face lateral do punho que piora com esses movimentos. Nega parestesia ou perda de força.</p>
+                             <p>a) Qual manobra semiológica deve ser realizado para elucidar esse diagnóstico? Por quê?</p>
+                             <p>b) Quais as estruturas lesadas, se a manobra for positiva?</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">MANOBRA DE FINKELSTEIN</span>, PORQUE O QUADRO CLÍNICO É SUGESTIVO DE <span class="highlight">TENOSSINOVITE</span>.</div>
+                            <div class="answer-item"><strong>b)</strong><p>LESÃO NO <span class="highlight">TENDÃO DO ABDUTOR LONGO DO POLEGAR</span> E <span class="highlight">TENDÃO DO EXTENSOR CURTO DO POLEGAR</span>.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                             <p>Um jovem de 25 anos estava jogando handebol quando caiu no chão sobre o ombro direito há duas horas, refere dor lancinante de forte intensidade. Recebeu analgesia e foi submetido a recolocação posterior glenoumeral. Responda:</p>
+                             <p>a) Qual a manobra semiológica mais apropriada a ser realizada?</p>
+                             <p>b) Descreva sucintamente essa manobra semiológica.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">MANOBRA DE FUKUDA</span></div>
+                            <div class="answer-item"><strong>b)</strong>
+                                <p>FAZ-SE UMA ADUÇÃO EM ROTAÇÃO MEDIAL DO OMBRO DIREITO COM O BRAÇO ELEVADO A 90º.</p>
+                                <p>EM SEGUIDA O BRAÇO DEVE SER COMPRIMIDO EM DIREÇÃO POSTERIOR ENQUANTO O EXAMINADOR APOIA COM A MÃO A ESCÁPULA.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                             <p>Uma mulher de 30 anos, portadora de artrite reumatoide, encontra-se com deformidades nos dedos das mãos. Observam-se dedos do tipo botoeira e pescoço de cisne. Assim para diferenciá-los, responda:</p>
+                             <p>a) Quais as características observadas na inspeção do dedo em botoeira?</p>
+                             <p>b) Quais as características observadas na inspeção do dedo em pescoço de cisne?</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p>TRATA-SE DE UMA <span class="highlight">FLEXÃO NA ARTICULAÇÃO INTERFALANGIANA MÉDIA</span> E <span class="highlight">EXTENSÃO DA ARTICULAÇÃO INTERFALANGIANA DISTAL</span>.</p></div>
+                            <div class="answer-item"><strong>b)</strong><p>TRATA-SE DE UMA <span class="highlight">FLEXÃO DA ARTICULAÇÃO INTERFALANGIANA DISTAL</span> ACOMPANHADA DE UMA <span class="highlight">EXTENSÃO DA ARTICULAÇÃO INTERFALANGIANA MÉDIA</span> E <span class="highlight">FLEXÃO ARTICULAÇÃO INTERFALANGIANA PROXIMAL</span>.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                             <p>Um homem de 38 anos trabalha como auxiliar de cozinha e queixa de dor em ombro direito há quatro meses de tipo facada, moderada intensidade e sem irradiação que melhora com repouso e piora ao elevar o braço. Foi realizado testes semiológicos que evidenciaram compressão no manguito rotador. Responda:</p>
+                             <p>a) Qual a manobra semiológica mais apropriada a ser realizada neste caso?</p>
+                             <p>b) Qual a estrutura anatômica lesada, se o teste for positivo?</p>
+                             <p>c) Descreva sucintamente essa manobra semiológica.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">MANOBRA DE NEER</span> OU <span class="highlight">MANOBRA DE YOCUM</span> AS RESPOSTAS SÃO CORRETAS.</div>
+                            <div class="answer-item"><strong>b)</strong><p><span class="highlight">LIGAMENTO CORACOACROMIAL</span>, POIS OBSERVADO-SE UM IMPACTO DO TUBERCULO MAIOR CONTRA O ARCO CORACOACROMIAL PELO DESLOCADO DESSE LIGAMENTO.</p></div>
+                             <div class="answer-item"><strong>c)</strong>
+                                <p><strong>MANOBRA DE NEER:</strong> Avalia o impacto do tubérculo maior contra o arco coracoacromial. O examinador deve posicionar-se atrás do paciente, fixando-lhe a escápula com uma das mãos e erguer o braço avaliado, em rotação neutra, com a outra. O teste é positivo se o paciente referir dor no ombro examinado.</p>
+                                <p><strong>MANOBRA DE YOCUM:</strong> O paciente deve colocar a mão sobre o ombro oposto e fletir o braço elevando o cotovelo, que sofrerá resistência pelo examinador. Nesse movimento pode gerar o impacto do tubérculo maior que é deslocado sob o ligamento coracoacromial produzindo dor.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                             <p>Uma digitadora de 32 anos queixa de dor na região palmar da mão direita há duas semanas, latejante com irradiação para punho, melhora ao balançar a mão e acompanha parestesia nos 1º, 2º e 3º quirodáctilos.</p>
+                             <p>a) Quais as manobras semiológicas mais apropriadas a serem realizadas?</p>
+                             <p>b) Descreva sucintamente cada uma dessas manobras.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">MANOBRA DE PHALEN E TINEL</span></div>
+                            <div class="answer-item"><strong>b)</strong>
+                                <p><strong>MANOBRA DE PHALEN:</strong> O PACIENTE DEVE REALIZAR A ABDUÇÃO DOS OMBROS SEGUIDO DA FLEXÃO DOS COTOVELOS, EM SEGUIDA FAZ-SE A ADUÇÃO DOS OMBROS ATÉ ENCOSTAR O DORSO DAS MÃOS UMA CONTRA A OUTRA PARA PRESSIONAR O NERVO MEDIANO.</p>
+                                <p><strong>MANOBRA DE TINEL:</strong> DEVE-SE REALIZAR A PERCUSSÃO EM CIMA DO NERVO MEDIANO.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Um homem de 50 anos queixa de dor em ombro esquerdo há 2 meses, conta que em seu trabalho faz muitos movimentos de rotação interna e externa (ou medial e lateral) do ombro. Responda:</p>
+                             <p>a) Quais as manobras semiológicas mais apropriadas a serem realizadas, respectivamente?</p>
+                             <p>b) Descreva respectivamente de maneira sucinta essas manobras semiológicas.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">GERBER</span> e <span class="highlight">PATTE</span></div>
+                            <div class="answer-item"><strong>b)</strong>
+                                <p><strong>TESTE DE GERBER:</strong> o paciente deve colocar o dorso da mão ao nível da L5 e ativamente afastá-la das costas. Esse movimento pode sofrer resistência pela mão do examinador.</p>
+                                <p><strong>TESTE DE PATTE:</strong> o paciente com o braço junto ao corpo e o cotovelo fletido a 90º faz movimento de rotação lateral que deverá ser sentido pelo examinador que impõe uma resistência contra o movimento.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Uma senhora de 90 anos portadora de osteoartrite de mãos com deformidades típicas da doença apresenta nódulos interfalangianos.</p>
+                             <p>a) Quais nódulos podem ser palpados em suas articulações dos dedos das mãos?</p>
+                             <p>b) Descreva-os quanto a sua localização.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">NÓDULOS DE BOUCHARD E HEBERDEEN</span></div>
+                            <div class="answer-item"><strong>b)</strong>
+                                <p><strong>NÓDULOS DE BOUCHARD:</strong> localizados nas <span class="highlight">ARTICULAÇÕES INTERFALANGEANAS PROXIMAIS</span>.</p>
+                                <p><strong>NÓDULOS DE HEBERDEEN:</strong> localizados nas <span class="highlight">ARTICULAÇÕES INTERFALANGEANAS DISTAIS</span>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Uma diarista queixa de dor em ombro esquerdo há seis meses, mas há três semanas apresenta grande dificuldade para realizar o movimento de elevação do membro superior esquerdo devido piora expressiva do quadro álgico. Realizada avaliação clínica para diferenciar bursite de tendinite desse ombro. Quais manobras devem ser realizadas para esse diagnóstico diferencial? E quais manobras devem ser "positiva" e "negativa" para confirmar uma bursite sem lesão tendínea. (4,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item">
+                                <p>As manobras a serem realizadas são as de <span class="highlight">Neer, Jobe e Yocum</span>.</p>
+                                <p>Para o diagnóstico de bursite sem lesão tendínea, <span class="highlight">Neer e Yocum devem ser positivas</span>, enquanto <span class="highlight">Jobe negativa</span>.</p>
+                                <p>OBS: Considerar manobra positiva se ocorrer dor e negativa na ausência de dor.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Um atleta de 24 anos, durante um jogo de basquete, teve uma queda da própria altura sobre o braço esquerdo com a mão espalmada. Realizou exame de radiografia que descartou a existência de fraturas. No entanto, persiste com dor na região lateral e sensação de instabilidade no cotovelo.</p>
+                             <p>a) Qual o diagnóstico provável? (1,0 ponto)</p>
+                             <p>b) Qual manobra seria útil para elucidação diagnóstica? (1,0 ponto)</p>
+                             <p>c) Descreva sucintamente a manobra a ser utilizada. (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">Lesão do ligamento colateral lateral</span></div>
+                            <div class="answer-item"><strong>b)</strong> <span class="highlight">Estresse em varo</span></div>
+                            <div class="answer-item"><strong>c)</strong><p>Com o cotovelo flexionado a 30°, deve-se palpar as interlinhas e fazer uma força para fora (em varo) com a mão posicionada medialmente no cotovelo.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Mulher de 52 anos, lavadeira, vem à consulta queixando sensações de "alfinetadas e agulhadas" na mão direita, em face palmar do 1º, 2º e 3º quirodáctilos, iniciadas há 12 meses. Relata piora nos últimos cinco meses e conta que, frequentemente, acorda à noite por causa desses sintomas.</p>
+                             <p>a) Qual o diagnóstico mais provável? (1,0 ponto)</p>
+                             <p>b) Qual a estrutura acometida? (1,0 ponto)</p>
+                             <p>c) CITE duas manobras semiológicas úteis para a realização deste diagnóstico. (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">Síndrome do túnel do carpo</span></div>
+                            <div class="answer-item"><strong>b)</strong> <span class="highlight">Nervo mediano</span></div>
+                            <div class="answer-item"><strong>c)</strong> <span class="highlight">Phalen</span> e <span class="highlight">Tinel</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>O dedo em "pescoço de cisne" e o dedo em "martelo" têm morfologias semelhantes com etiologias distintas. Descreva comparativamente essas morfologia e a etiologia correspondente.</p>
+                             <p>a) Dedo em "pescoço de cisne" (2,0 pontos)</p>
+                             <p>b) Dedo em "martelo" (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a) Dedo em "pescoço de cisne"</strong>
+                                <p>Flexão da articulação interfalangiana proximal, extensão da articulação interfalangiana medial e flexão da articulação interfalangiana distal.</p>
+                                <p><strong>Etiologia:</strong> <span class="highlight">artrite reumatoide.</span></p>
+                            </div>
+                            <div class="answer-item"><strong>b) Dedo em "martelo"</strong>
+                                <p>Flexão da articulação interfalangiana distal.</p>
+                                <p><strong>Etiologia:</strong> <span class="highlight">lesão do tendão extensor da falange distal.</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Uma cabeleireira queixa de dor em ombro direito há seis meses, mas há três semanas apresenta grande dificuldade para realizar um movimento específico do membro superior direito devido piora expressiva do quadro álgico. A dor piora quando ela faz escova nas clientes, e quando faz movimentos repetitivos de rotação interna do ombro.</p>
+                             <p>a) Qual estrutura do manguito rotador está provavelmente lesada? (1,0 ponto)</p>
+                             <p>b) Qual manobra, dentre as estudadas, será positiva neste caso? (1,0 ponto)</p>
+                             <p>c) Descreva sucintamente essa manobra. (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">Músculo subescapular.</span></div>
+                            <div class="answer-item"><strong>b)</strong> <span class="highlight">Manobra de Gerber.</span></div>
+                            <div class="answer-item"><strong>c)</strong><p>Paciente em pé. Pede-se para posicionar o dorso da mão nas costas na altura de L5, e afastar o punho. Caso o paciente não consiga manter a mão afastada sem usar musculatura acessória o teste é positivo.</p></div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Uma profissional de limpeza com 54 anos relata estar sofrendo de dor no ombro direito há dez meses. Contudo, nas últimas duas semanas, ele experimentou uma deterioração significativa na sua capacidade de levantar o braço direito, devido a um aumento acentuado da dor. Para distinguir entre bursite e tendinite nesse ombro, foi realizada uma avaliação clínica.</p>
+                            <p>a) Quais manobras específicas devem ser empregadas para facilitar esse diagnóstico diferencial? (2,0 pontos)</p>
+                            <p>b) Quais resultados dessas manobras seriam considerados "positivas" (indicando dor) ou "negativas" (sem dor) para confirmar uma tendinopatia sem bursite? (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">Manobra de Neer, Manobra de Yocum e Manobra de Jobe</span></div>
+                            <div class="answer-item"><strong>b)</strong>
+                                <p>Para confirmar uma tendinopatia isolada (sem bursite), o resultado esperado seria:</p>
+                                <p><span class="highlight">Teste de Jobe POSITIVO</span>: Este teste é específico para lesão no tendão do músculo supraespinhal. A presença de dor ou incapacidade de manter o braço elevado indica tendinite.</p>
+                                <p><span class="highlight">Teste de Neer NEGATIVO</span>: Este teste avalia o impacto no espaço subacromial. Um resultado negativo sugere a ausência de um processo inflamatório significativo da bursa (bursite).</p>
+                                <p><span class="highlight">Teste de Yocum NEGATIVO</span>: Similar ao Neer, este teste também avalia o impacto. Um resultado negativo ajuda a descartar a bursite como causa principal da dor.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Um jovem de 19 anos sofreu uma queda, caindo sobre o seu membro superior direito com a mão espalmada durante uma partida de futebol há três semanas. Após o incidente, recebeu atendimento médico, quando foram realizadas radiografias, que descartaram a presença de fraturas. Contudo, ele continua referindo dor na região lateral do cotovelo, que é acompanhada de uma sensação de instabilidade nessa articulação.</p>
+                            <p>a) Qual o diagnóstico provável? (2,0 pontos)</p>
+                            <p>b) Qual manobra seria útil para elucidação diagnóstica? (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">Lesão no ligamento colateral lateral do cotovelo direito.</span></div>
+                            <div class="answer-item"><strong>b)</strong> <span class="highlight">Manobra de varo forçado.</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Conteúdo: Membros Inferiores -->
+        <section id="membros-inferiores" class="tab-content">
+            <h2>Membros Inferiores</h2>
+             <div id="display-area-membros-inferiores" class="flashcard-display-area"></div>
+            <div class="study-controls">
+                <div id="counter-membros-inferiores" class="counter"></div>
+                 <button class="flip-button" onclick="flipCurrentCard()">Virar Card</button>
+                <button class="next-button" onclick="showNextCard('membros-inferiores')">Próximo Card</button>
+            </div>
+            <div class="flashcard-container">
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Uma idosa de 80 anos é portadora de osteoartrite bilateral em joelhos e queixa ter a sensação que os joelhos estão "bambos" com perda da estabilidade no sentido látero-lateral. Responda:</p>
+                             <p>a) Qual(is) teste(s) pode(m) avaliar as estruturas envolvidas?</p>
+                             <p>b) Descreva sucintamente essa(s) manobra(s) semiológica(s).</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">STRESS EM VALGO E VARO (ou VALGO E VARO FORÇADO)</span></div>
+                            <div class="answer-item"><strong>b)</strong>
+                                <p><strong>STRESS EM VALGO (ABDUÇÃO):</strong> O EXAMINADOR COLOCA A MÃO NO LADO LATERAL DO JOELHO E APLICA-SE UMA FORÇA DE ABDUÇÃO, QUE A 0º TESTA O <span class="highlight">LIGAMENTO COLATERAL MEDIAL</span> E A CÁPSULA PÓSTERO-MEDIAL E A 30º TESTA SOMENTE O LIGAMENTO COLATERAL MEDIAL.</p>
+                                <p><strong>STRESS EM VARO (ADUÇÃO):</strong> O EXAMINADOR COLOCA A MÃO NO LADO MEDIAL DO JOELHO E APLICA-SE UMA FORÇA DE ADUÇÃO, A 0º TESTA O <span class="highlight">LIGAMENTO COLATERAL LATERAL</span> E A CÁPSULA PÓSTERO-LATERAL E A 30º TESTA SOMENTE O LIGAMENTO COLATERAL LATERAL.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>A Sra. Maria do Socorro trouxe sua filha de 9 anos porque observou desgaste lateral acentuado no calçado bilateral. O médico da UBS informou que a menina tem pé plano, desvio dos calcâneos e pisada "para fora". Responda:</p>
+                             <p>a) Que tipo de desvio há nos calcâneos? Explique.</p>
+                             <p>b) O que significa pisada "para fora"? Explique.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p>SE PISA PARA FORA POSSUI <span class="highlight">CALCÂNEO VARO</span>, POIS O ÂNGULO TIBIO-CALCÂNEO SERÁ MAIOR DE 90º.</p></div>
+                            <div class="answer-item"><strong>b)</strong><p>TRATA-SE DE UMA <span class="highlight">PISADA SUPINADA</span> PORQUE PISA PARA FORA, POIS TOCA PRIMEIRO O LADO INTERNO DO CALCANHAR NO CHÃO SEGUIDO DE LEVE ROTAÇÃO NO TORNOZELO PROMOVENDO O CONTATO DO LADO EXTERNO DO PÉ.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Um jovem de 21 anos sofreu queda ao chão durante jogo de futebol contundindo os joelhos. Apresentou dor intensa, sendo socorrido no campo e levado para atendimento médico. Suspeita-se de lesão dos meniscos. Responda:</p>
+                             <p>a) Quais as manobras a serem realizadas?</p>
+                             <p>b) Como diferenciar entre os meniscos lateral e medial do joelho direito nessas manobras?</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">APLEY</span> e <span class="highlight">MCMURRAY</span></div>
+                            <div class="answer-item"><strong>b)</strong>
+                                <p><strong>TESTE DE APLEY:</strong> PRIMEIRO TEMPO: COM O PACIENTE EM POSIÇÃO PRONA E O JOELHO FLETIDO, APLICA-SE FORÇA DE COMPRESSÃO E A ROTAÇÃO INTERNA (<span class="highlight">MENISCO LATERAL</span>) E EXTERNA (<span class="highlight">MENISCO MEDIAL</span>) À PERNA. SEGUNDO TEMPO: COM O PACIENTE EM POSIÇÃO PRONA E O JOELHO FLETIDO, APLICA-SE FORÇA DE TRAÇÃO POR MEIO DO JOELHO ASSOCIADA A ROTAÇÃO INTERNA (MENISCO LATERAL) E EXTERNA (MENISCO MEDIAL) À PERNA.</p>
+                                <p><strong>TESTE DE MCMURRAY:</strong> COM O PACIENTE EM DECÚBITO DORSAL COM QUADRIL FLETIDO A 90º E JOELHO EM FLEXÃO, O EXAMINADOR PALPA AS INTERLINHAS ARTICULARES COM UMA MÃO E APOIA O PÉ COM A OUTRA MÃO, REALIZANDO MOVIMENTOS DE ROTAÇÃO INTERNA E EXTERNA DA PERNA.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>A Sra. Hilda Conceição trouxe seu filho de 7 anos porque observou desgaste medial acentuado no calçado bilateral. O médico da UBS informou que a menina tem desvio dos calcâneos e pisada "para dentro". Responda:</p>
+                            <p>a) Que tipo de desvio há nos calcâneos? Explique.</p>
+                            <p>b) O que significa pisada "para dentro"? Explique.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p>SE PISA PARA DENTRO POSSUI <span class="highlight">CALCÂNEO VALGO</span>, POIS O ÂNGULO TIBIO-CALCÁNEO SERÁ MENOR DE 90º.</p></div>
+                            <div class="answer-item"><strong>b)</strong><p>TRATA-SE DE UMA <span class="highlight">PISADA PRONADA</span> PORQUE PISA PARA DENTRO, POIS TOCA PRIMEIRO O LADO EXTERNO DO CALCANHAR NO CHÃO SEGUIDO DE LEVE ROTAÇÃO NO TORNOZELO PROMOVENDO O CONTATO DO LADO INTERNO DO PÉ.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Uma mulher de 48 anos queixa que quebrou o salto do sapato num buraco na rua seguido de "torção no pé direito" há 04 horas e apresenta dor no retropé direito ao caminhar. O exame clínico apresenta tornozelo direito com cacifo ++/4, artralgia à flexão plantar e dorsiflexão, bem como artralgia à eversão e inversão do pé. Responda:</p>
+                            <p>a) Quais as articulações envolvidas, respectivamente?</p>
+                            <p>b) Qual manobra semiológica pode constatar uma possível luxação? Por quê?</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">TIBIOTALAR</span> (dorsiflexão / flexão plantar do pé) e <span class="highlight">TALOCALCÂNEA</span> (inversão/eversão do pé).</p></div>
+                            <div class="answer-item"><strong>b)</strong><p>INDEPENDENTE DE CONSTATAR LUXAÇÃO É FUNDAMENTAL O DIAGNÓSTICO DIFERENCIAL COM ENTORSE, LOGO DEVE REALIZAR OS DOIS TESTES: <span class="highlight">GAVETA ANTERIOR</span> e <span class="highlight">POSTERIOR</span>. NA GAVETA ANTERIOR PODEREMOS CONSTATAR UM ENTORSE E NA GAVETA POSTERIOR UMA LUXAÇÃO.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Uma criança de 8 anos possui os pés cavos em-valge com desvio dos calcâneos e pisada "para dentro". Responda:</p>
+                            <p>a) O que significa "pé cavo em valgo"? Explique.</p>
+                            <p>b) Que tipo de desvio há nos calcâneos? Explique.</p>
+                            <p>c) Qual é essa "pisada para dentro"? Explique.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">QUESTÃO ANULADA</span></div>
+                            <div class="answer-item"><strong>b)</strong> <span class="highlight">QUESTÃO ANULADA</span></div>
+                            <div class="answer-item"><strong>c)</strong> <span class="highlight">QUESTÃO ANULADA</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                             <p>Jovem de 19 anos sofreu uma queda ao chão enquanto jogava voleibol após pisar de "mal jeito", apresenta dor intensa no joelho direito. Ao exame físico observa-se instabilidade anterior do joelho.</p>
+                             <p>a) Quais as manobras a serem realizadas, neste caso?</p>
+                             <p>b) Qual a estrutura acometida nesse joelho?</p>
+                             <p>c) Descreva sucintamente essas manobras e como diferenciá-las?</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">GAVETA ANTERIOR OU LACHMAN</span></div>
+                            <div class="answer-item"><strong>b)</strong> <span class="highlight">LIGAMENTO CRUZADO ANTERIOR</span></div>
+                            <div class="answer-item"><strong>c)</strong>
+                                <p><strong>GAVETA ANTERIOR:</strong> Com o paciente em decúbito dorsal, o quadril deve ficar posicionado com flexão em torno de 45º, o joelho deve ficar posicionado em 90º de flexão. Em seguida deve realizar uma tração anterior.</p>
+                                <p><strong>LACHMAN:</strong> Com o paciente em decúbito dorsal e joelho fexionado em 30º, segura-se com uma das mãos o fêmur e com a outra desloca-se anteriormente a tíbia, provocando o deslizamento entre as superfícies articulares.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Um homem de 45 anos portador de pé plano apresenta desvio nos calcâneos que desgaste nas margens laterais dos calçados. Responda:</p>
+                            <p>a) Que tipo de desvio há nos calcâneos? Explique.</p>
+                            <p>b) Qual o tipo de pisada está associado a esse desvio calcâneo? Explique.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p>O PÉ PLANO POSSUI <span class="highlight">CALCÂNEO EM VALGO</span> QUE É CARACTERIZADO PELO CALCÁNEO DESVIADO MEDIALMENTE (PARA DENTRO).</p></div>
+                            <div class="answer-item"><strong>b)</strong><p><span class="highlight">PISADA SUPINA</span>, POIS O "DESGASTE NAS MARGENS LATERAIS DOS CALÇADOS" INDICA PISADA "PARA FORA".</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Um senhor de 58 anos tem osteoartrite de joelhos e desenvolveu desgaste de estruturas intra-articulares. Ele sente dor ao caminhar, piora ao agachar e ao descer escadas acompanhada por travamento, bloqueio à flexão total do joelho e sem instabilidade. Nega trauma local. Posicionada a paciente em decúbito ventral para examiná-lo, que queixa de dor ao rotacionar lateralmente e bilateral.</p>
+                             <p>a) Qual estrutura mais provavelmente lesada? (1,0 ponto)</p>
+                             <p>b) Qual o nome da manobra propedêutica realizada? (1,0 ponto)</p>
+                             <p>c) Descreva essa manobra realizada na paciente. (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">Menisco medial.</span></div>
+                            <div class="answer-item"><strong>b)</strong> <span class="highlight">Manobra de Apley.</span></div>
+                            <div class="answer-item"><strong>c)</strong>
+                                <p>A manobra é realizada em dois tempos com o paciente em decúbito ventral e joelho flexionado a 90°.</p>
+                                <p><strong>1º Tempo (Compressão):</strong> O examinador aplica uma força de compressão axial (para baixo) enquanto realiza a rotação medial (avalia menisco lateral) e rotação externa (avalia menisco medial) da tíbia. A presença de dor durante a rotação externa sugere lesão do menisco medial.</p>
+                                <p><strong>2º Tempo (Tração/Distração):</strong> O examinador aplica uma força de tração (para cima), estabilizando a coxa do paciente, e realiza novamente os movimentos de rotação. O alívio da dor durante este tempo reforça a suspeita de lesão meniscal.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Jovem de 24 anos procura pronto atendimento com quadro de dor intensa na região de tornozelo, com edema local, após torção do pé esquerdo. Médico suspeita de luxação do tornozelo. Pergunta-se:</p>
+                             <p>a) Qual a manobra de semiológica que que deverá ser utilizada para confirmar sua hipótese? (2,0 pontos)</p>
+                             <p>b) Descreva sucintamente essa manobra. (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">Gaveta posterior</span></div>
+                            <div class="answer-item"><strong>b)</strong><p>Tracionar posteriormente o tornozelo pesquisando luxação.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>O casal Felício e Eustáquio trouxeram sua filha de nove anos à consulta. A criança apresenta um desgaste medial no calçado bilateralmente e queixa de dor nos membros inferiores, principalmente, após atividade física há 02 meses. Baseado nessas informações responda:</p>
+                             <p>a) Que tipo de desvio há nos calcâneos da criança? Explique. (2,0 pontos)</p>
+                             <p>b) Que tipo de pisada tem essa criança? Por que ocorre esse tipo de pisada? (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">Desvio em valgo</span></div>
+                            <div class="answer-item"><strong>b)</strong><p><span class="highlight">Pisada pronada</span>, já que o ângulo tíbio-calcâneo é menor que 90°.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Uma senhora de 80 anos tem osteoartrite de joelhos de longa data e desenvolveu desgaste de estruturas intra-articulares. Ela sente dor ao caminhar, ao agachar e ao descer escadas com travamento e bloqueio à flexão total dos joelhos. Nega instabilidade e trauma local.</p>
+                             <p>a) Qual estrutura provavelmente está lesada? (1,0 ponto)</p>
+                             <p>b) Ao realizar o exame físico, a paciente não conseguia se manter em decúbito dorsal e pede para ficar deitada de "barriga para baixo". Qual o teste semiológico a ser aplicado? Nome do teste (1,0 ponto):</p>
+                             <p>Descreva essa manobra e explique como interpretá-la. (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">Lesão nos meniscos.</span></div>
+                            <div class="answer-item"><strong>b) Teste de Appley</strong>
+                                <p>Com o paciente em decúbito ventral, o teste será realizado em dois tempos.</p>
+                                <p><strong>1º Tempo:</strong> com o joelho fletido em um ângulo de 90°, o médico deve exercer uma força de compressão do pé em direção ao joelho juntamente com uma rotação interna (avalia menisco lateral) e rotação externa (menisco medial). Dor = positivo.</p>
+                                <p><strong>2º Tempo:</strong> Força contrária de tração juntamente à rotação externa e interna. Alívio da dor confirmatório.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Um jogador de futebol de 26 anos sofreu uma entrada violenta durante o jogo e o pé do jogador adversário colidiu com sua panturrilha. Na mesma hora ele sentiu dor intensa com volumoso edema e "arroxeamento". Foi vista lesão total do tendão calcâneo depois da avaliação inicial e exames complementares.</p>
+                             <p>a) Qual teste pode comprovar essa lesão? (1,0 ponto)</p>
+                             <p>b) Descreva-o sucintamente. (2,0 pontos)</p>
+                             <p>c) Qual alteração será observada caso haja lesão total do tendão calcâneo? (1,0 ponto)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">Teste de Thompson.</span></div>
+                            <div class="answer-item"><strong>b)</strong><p>Com o paciente em decúbito ventral e perna fletida em ângulo de 90°, realiza-se a compressão da panturrilha. Deve-se observar se há ou não a extensão do pé em resposta à compressão.</p></div>
+                            <div class="answer-item"><strong>c)</strong> <span class="highlight">Ausência de movimento (extensão) do pé</span> durante a compressão da panturrilha.</div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Em um atendimento na UBS o médico generalista diagnosticou uma criança de dez anos com "pé cavo", logo encaminhou para seguimento na ortopedia.</p>
+                            <p>a) Qual o tipo de desvio do osso calcâneo há nessa criança, mediante tal diagnóstico? Explique. (2,0 pontos)</p>
+                            <p>b) Como será a pisada dessa criança? Explique. (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p>O desvio do osso calcâneo é o <span class="highlight">calcâneo-varo</span>. No pé cavo, o arco plantar é acentuadamente elevado, o que frequentemente leva o calcanhar a se desviar para dentro (medialmente), caracterizando a deformidade em varo.</p></div>
+                            <div class="answer-item"><strong>b)</strong><p>O pé cavo-varo está diretamente associado à <span class="highlight">pisada supinada</span>. Nessa condição, o apoio do pé ao caminhar ou correr concentra-se na borda externa, devido ao desvio do calcanhar e à acentuação do arco plantar.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Mulher de 53 anos tem histórico de osteoartrite de joelho esquerdo, evoluindo com desgaste de estruturas intra-articulares. Ela sente dor ao caminhar, piora ao agachar e ao descer escadas acompanhada por travamento, bloqueio à flexão total do joelho e sem instabilidade. Nega trauma local. Posicionado o paciente em decúbito dorsal para examiná-la, executa manobra. Paciente refere dor à rotação externa.</p>
+                            <p>a) Qual estrutura provavelmente lesada? (1,0 ponto)</p>
+                            <p>b) Qual o nome da manobra propedêutica realizada? (1,0 ponto)</p>
+                            <p>c) Descreva essa manobra realizada na paciente. (2,0 pontos)</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">Menisco medial (corno posterior).</span></div>
+                            <div class="answer-item"><strong>b)</strong> <span class="highlight">Manobra de McMurray.</span></div>
+                            <div class="answer-item"><strong>c)</strong><p>Paciente em decúbito dorsal, o examinador faz uma flexão do quadril e do joelho (da paciente), e com uma das mãos do examinador sobre a interlinha articular e a outra mão na planta do pé, com a perna o examinador faz rotação medial e lateral, como a dor é na rotação externa é uma lesão no menisco medial, concomitante ao movimento de rotação, faz compressão com as mãos.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Conteúdo: Eletrocardiograma -->
+        <section id="ecg" class="tab-content">
+            <h2>Eletrocardiograma</h2>
+            <div id="display-area-ecg" class="flashcard-display-area"></div>
+            <div class="study-controls">
+                <div id="counter-ecg" class="counter"></div>
+                <button class="flip-button" onclick="flipCurrentCard()">Virar Card</button>
+                <button class="next-button" onclick="showNextCard('ecg')">Próximo Card</button>
+            </div>
+            <div class="flashcard-container">
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Por que aparece a onda QS na derivação aVR no eletrocardiograma? Explique.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><p>PORQUE A ONDA R É SEMPRE POSITIVA DEVIDO SER UM VETOR QUE ESTÁ NO SENTIDO PRINCIPAL DA DESPOLARIZAÇÃO (baixo para cima da direita para esquerda), NO ENTANTO A <span class="highlight">DERIVAÇÃO AVR ESTÁ EM SENTIDO OPOSTO A ESSE VETOR</span>, LOGO NÃO SE VISUALIZA A ONDA R FORMANDO O QUE É DENOMINADO <span class="highlight">ONDA QS</span>.</p></div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Por que a onda R "sempre" é positiva no eletrocardiograma? Explique.</p>
+                        </div>
+                        <div class="card-back">
+                             <div class="answer-item"><p>PORQUE A ONDA R É UM <span class="highlight">VETOR QUE ESTÁ NO SENTIDO PRINCIPAL DA DESPOLARIZAÇÃO</span>, OU SEJA, <span class="highlight">DE CIMA PARA BAIXO E DA DIREITA PARA ESQUERDA</span>.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Por que o complexo QRS é negativo a -150º no eletrocardiograma? Explique.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><p>A DERIVAÇÃO AVR ESTÁ A -150º CUJO SENTIDO DO VETOR ELÉTRICO É DE "BAIXO PARA CIMA", LOGO COMPLEXO QRS (ou COMPLEXO QS) APARECERÁ NEGATIVA NO ECG.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Por que a onda S "nunca" é positiva no eletrocardiograma? Explique.</p>
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><p>A ONDA S É A INTERPRETAÇÃO GRÁFICA DO VETOR ELÉTRICO DA DESPOLARIZAÇÃO VENTRICULAR ESQUERDA CUJO SENTIDO É DE "CIMA PARA BAIXO", LOGO APARECERÁ "SEMPRE" NEGATIVA NO ECG.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Considere o ECG 1 (8,0 pontos): Paciente de 58 anos chega à UBS para consulta de rotina, refere ser hipertenso de longa data. Sem anormalidades ao exame físico. Responda:</p>
+                             <p>a) Qual(is) o(s) diagnóstico(s) mais provável (is)?</p>
+                             <p>b) Descreva quais os critérios utilizados para esse(s) diagnóstico(s).</p>
+                            <img src="https://i.imgur.com/HXvsUs6.png" alt="ECG 1">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">SOBRECARGA VENTRICULAR DIREITA</span> (considerar hipertrofia ventricular direita)</div>
+                            <div class="answer-item"><strong>b)</strong><p>Onda R > onda S em V1<br>Onda s > 0,5mV (5 mm)<br>Eixo elétrico médio desviado para direita</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Considere o ECG 2 (8,0 pontos):</p>
+                             <p>a) Determine ritmo cardíaco. Justifique sua resposta.</p>
+                             <p>b) Determine o SÂQRS. Justifique sua resposta usando os eixos ao lado.</p>
+                            <img src="https://i.imgur.com/gBzDqeZ.png" alt="ECG 2">
+                            <img src="https://i.imgur.com/sj1frCU.png" alt="Eixo Cardíaco">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">RITMO SINUSAL</span>, presença de onda P positiva em D1, D2 e aVF.</p></div>
+                            <div class="answer-item"><strong>b)</strong><p><span class="highlight">SAQRS = Eixo entre -30º e-60º</span> / considerado-60º (se considerar aVR isodifásico)</p><p><strong>Justificativa:</strong> D1 (+) e aVF (-) → D2 (-) acima de aVL (desvio p/esq.) →aVR (-) abaixo de D3</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Considere o ECG 1 (8,0 pontos): Paciente de 48 anos chega à UBS para consulta de rotina, refere ser hipertenso de longa data. Sem anormalidades ao exame físico.</p>
+                            <p>a) Qual(is) o(s) diagnóstico(s) mais provável(is)?</p>
+                            <p>b) Descreva quais os critérios utilizados para esse(s) diagnóstico (s).</p>
+                            <img src="https://i.imgur.com/ylGvdsK.png" alt="ECG">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong> <span class="highlight">SOBRECARGA VENTRICULAR ESQUERDA</span></div>
+                            <div class="answer-item"><strong>b)</strong>
+                                <p><strong>SOKOLOW-LYON:</strong> S (V1 ou V2) + R (V5 ou V6) > 35mm</p>
+                                <p><strong>CORNELL:</strong> S (V3) + R (aVL) > 28m para homens e 20 para mulheres</p>
+                                <p><strong>PADRÃO DE STRAIN:</strong> AUMENTO DA AMPLITUDE DE ONDA R, INVERSÃO DE ONDA T E AUSÊNCIA DE ONDA S</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Considere o ECG 2 (8,0 pontos):</p>
+                            <p>a) Determine o ritmo cardíaco. Justifique sua resposta.</p>
+                            <p>b) Determine o SÂQRS. Justifique sua resposta usando os eixos ao lado.</p>
+                            <img src="https://i.imgur.com/6QtfRUS.png" alt="ECG">
+                            <img src="https://i.imgur.com/sj1frCU.png" alt="Eixo Cardíaco">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">RITMO NÃO SINUSAL</span>, DEVIDO ONDA P ESTAR NEGATIVA</p></div>
+                            <div class="answer-item"><strong>b)</strong><p><span class="highlight">SÂQRS = ENTRE +30º E +60º</span></p><p><strong>Justificativa:</strong> D1 (+) e aVF (+) aVL (+)→ acima de D2 →D3(-) abaixo de aVR</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Considere o ECG 1- Um paciente de 58 anos veio à consulta de rotina, sem queixas. Refere hipertensão e diabetes de longa data em uso de medicação regular. Sem anormalidades ao exame físico.</p>
+                            <p>a) Qual(is) o(s) diagnóstico(s) mais provável (is)?</p>
+                            <p>b) Descreva quais os critérios utilizados para esse diagnóstico.</p>
+                            <img src="https://i.imgur.com/YKyTIly.png" alt="ECG">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">SOBRECARGA VENTRICULAR DIREITA (SVD)</span><br><span class="highlight">SOBRECARGA BIATRIAL (SAD+SAE)</span></p></div>
+                            <div class="answer-item"><strong>b)</strong>
+                                <p><strong>SVD:</strong> R>S em V1, Onda S > 5mm em V5 e V6, SAQRS desviado para direita além de 90º</p>
+                                <p><strong>SAD:</strong> Aumento da amplitude de P (> 2,5mm em D2,D3,aVF) + Onda P pontiaguda</p>
+                                <p><strong>SAE:</strong> Onda P ≥ 0.12s em D1,D2,aVF com morfologia alargada e entalhada, Onda P ~ 0,04s em V1 e > 0,1mV com componente final negativo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Considere o ECG 2:</p>
+                            <p>a) Determine o ritmo cardíaco. Justifique sua resposta.</p>
+                            <p>b) Determine o SÂQRS. Justifique sua resposta usando os eixos ao lado.</p>
+                            <img src="https://i.imgur.com/bjS5yqz.png" alt="ECG">
+                            <img src="https://i.imgur.com/sj1frCU.png" alt="Eixo Cardíaco">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">RITMO SINUSAL</span>, presença de onda P positiva que antecede QRS em D1, D2 e aVF.</p></div>
+                            <div class="answer-item"><strong>b)</strong><p><span class="highlight">SÂQRS = eixo entre +120º e +150º</span></p><p><strong>Justificativa:</strong> D1 (-) e aVF (+) aVR (+) acima de D3 (desvio p/dir.) abaixo de aVL →D2 (+)</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Considere o ECG 1: Paciente de 58 anos chega à UBS para consulta de rotina, refere ser hipertenso de longa data. Sem anormalidades ao exame físico.</p>
+                            <p>a) Qual(is) o(s) diagnóstico(s) mais provável (is)?</p>
+                            <p>b) Descreva quais os critérios utilizados para esse diagnóstico.</p>
+                             <img src="https://i.imgur.com/9i8JWSe.png" alt="ECG">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">SOBRECARGA VENTRICULAR DIREITA</span> e <span class="highlight">SOBRECARGA ATRIAL ESQUERDA</span></p></div>
+                            <div class="answer-item"><strong>b)</strong>
+                                <p><strong>SVD:</strong> R>S em V1, SÂQRS desviado para direita além de 90º, Onda S > 5mm em V5 e V6</p>
+                                <p><strong>SAE:</strong> Onda P ≥ 0.12s em D1, D2 e aVF com morfologia alargada e entalhada (ou bífida)...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Considere o ECG 2:</p>
+                            <p>a) Determine o ritmo cardíaco. Justifique sua resposta.</p>
+                            <p>b) Determine o SÂQRS. Justifique sua resposta usando os eixos ao lado.</p>
+                            <img src="https://i.imgur.com/fWnmbvH.png" alt="ECG">
+                            <img src="https://i.imgur.com/sj1frCU.png" alt="Eixo Cardíaco">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">RITMO SINUSAL</span>, presença de onda P positiva que antecede QRS em D1, D2 e aVF</p></div>
+                            <div class="answer-item"><strong>b)</strong><p><span class="highlight">SAQRS = Entre -30º e -60º</span></p><p><strong>Justificativa:</strong> D1 (+) e aVF (-) → D2 (-) acima de aVL (desvio p/esq.) →aVR (-) abaixo de D3</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Analise o eletrocardiograma abaixo e responda as questões:</p>
+                            <p>a) Qual o ritmo cardíaco? Justifique. (2,0 pontos)</p>
+                            <p>b) Qual a frequência cardíaca? Justifique. (2,0 pontos)</p>
+                             <img src="https://i.imgur.com/3eaHAgf.png" alt="ECG">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">Ritmo não sinusal</span>, ausência de onda P.</p></div>
+                            <div class="answer-item"><strong>b)</strong><p><span class="highlight">Arrítmico.</span> Em 6 segundos, há 14 ciclos cardíacos. Portanto, em 1 minuto -> 14 x 10 = 140 bpm.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Analise o eletrocardiograma abaixo e responda as questões:</p>
+                            <p>a) O intervalo PR está normal? Diga SIM ou NÃO e justifique. (2,0 pontos)</p>
+                            <p>b) O intervalo QT está normal? Diga SIM ou NÃO e justifique. (2,0 pontos)</p>
+                             <img src="https://i.imgur.com/TwU6Mhj.png" alt="ECG">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">Não</span>, pois a duração está maior que o limite máximo (0,20 seg).</p></div>
+                            <div class="answer-item"><strong>b)</strong><p><span class="highlight">Sim</span>, pois tem duração inferior a 0,44s (ocorre antes da metade do intervalo RR).</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Analise o eletrocardiograma no verso (página 4) e responda as questões:</p>
+                            <p>a) A morfologia da onda P está normal? Diga SIM ou NÃO e justifique. (1,0 ponto)</p>
+                            <p>b) Determine o SÂQRS em intervalo de 30º. Justifique sua resposta usando os eixos abaixo.</p>
+                            <img src="https://i.imgur.com/zaMjuK1.png" alt="ECG">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">Não</span>, pois não está arredondada.</p></div>
+                            <div class="answer-item"><strong>b) SÂQRS = entre -30° e -60°</strong>
+                                <p>Esse SÂQRS está normal? <span class="highlight">Não</span>, pois está fora do intervalo de normalidade (entre -30° e +120°).</p>
+                                <img src="https://i.imgur.com/uMDwUHd.png" alt="Eixo Cardíaco">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Um homem de 32 anos veio à consulta para realizar de rotina. Sem queixas. Trouxe o ECG anexo.</p>
+                            <p>a) Qual o ritmo cardíaco? Justifique sua resposta. (1,0 ponto)</p>
+                            <p>b) Qual a frequência cardíaca? Justifique sua resposta. (1,0 ponto)</p>
+                            <p>c) Determine o SÂQRS. Justifique de maneira discursiva passo a passo e demonstre no sistema hexa-axial abaixo.</p>
+                            <img src="https://i.imgur.com/RQETTIE.png" alt="ECG">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">Ritmo sinusal.</span> Onda P positiva, precedendo o complexo QRS, em D1, D2 e aVF.</p></div>
+                            <div class="answer-item"><strong>b)</strong><p><span class="highlight">Entre 75 e 100 bpm.</span> Cálculo realizado da forma rápida dividindo 300 pelo nº de "quadradões" (300-150-100-75).</p></div>
+                            <div class="answer-item"><strong>c) SÂQRS = Entre -30° e -60°</strong>
+                                <p><strong>Justificativa:</strong> D1 (+), aVF (-), D2 (-) e aVR (+).</p>
+                                <img src="https://i.imgur.com/wKHMy5n.png" alt="Eixo Cardíaco">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p>Analise os traçados eletrocardiográficos com V=25mm/s. Responda as questões correspondentes:</p>
+                            <p><strong>ECG nº 1 - D2 longo</strong> a) Qual a frequência cardíaca? Justifique. (1,0 ponto)</p>
+                            <img src="https://i.imgur.com/ZKEqDJS.png" alt="ECG D2 Longo">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">130 bpm.</span> Foram identificados 13 complexos QRS no intervalo de 6 segundos (30 "quadradões"). Portanto 13 x 10 = 130 bpm.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p><strong>ECG nº 2 - D2 longo</strong> b) O intervalo QT está normal? Diga SIM ou NÃO e justifique. (1,0 ponto)</p>
+                            <img src="https://i.imgur.com/76vHATO.png" alt="ECG D2 Longo">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>b)</strong><p><span class="highlight">Não.</span> Ao traçar uma linha imaginária entre duas ondas "R", percebe-se que a onda T não se encontra totalmente à esquerda da linha.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p><strong>ECG nº 3</strong> c) A onda P está normal? Diga SIM ou NÃO e justifique. (1,0 ponto)</p>
+                            <img src="https://i.imgur.com/cPtxTth.png" alt="ECG">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>c)</strong><p><strong>Em D2:</strong> <span class="highlight">Não</span>, pois está apiculada e com duração e amplitude superior a 2,5 quadradinhos.</p><p><strong>Em V1:</strong> <span class="highlight">Não</span>, pois também está apiculada com amplitude superior a 2,5 quadradinhos.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p><strong>ECG nº 4</strong> d) O intervalo PR está normal? Diga SIM ou NÃO e justifique. (0,5 ponto)</p>
+                            <p>e) O segmento ST está normal? Diga SIM ou NÃO e justifique. (0,5 ponto)</p>
+                            <img src="https://i.imgur.com/GHZWwqm.png" alt="ECG">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>d)</strong><p><span class="highlight">Sim</span>, pois está com a duração dentro dos limites (5 quadradinhos ou 1 quadradão).</p></div>
+                            <div class="answer-item"><strong>e)</strong><p><span class="highlight">Sim.</span> O segmento ST está normal pois se encontra isoelétrico, ou seja, no mesmo nível da linha de base (segmento PR), que é a característica esperada em um ECG normal.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p><strong>I - Analise o eletrocardiograma e responda as questões (Derivação D2 longa):</strong></p>
+                            <p>a) Qual a frequência cardiaca? Justifique. (1,0 ponto)</p>
+                            <img src="https://i.imgur.com/sQWpE93.png" alt="ECG">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">FC = 140 bpm</span></p><p><strong>Justificativa:</strong> O intervalo RR irregular, portanto a frequência deve ser feita em 6 segundos (30 quadradões). Contar quantos complexos QRS tem em 6 segundos. A frequência será a quantidade de complexos QRS que tem em 6 segundos vezes 10.</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p><strong>II - Analise o eletrocardiograma e responda as questões (Derivação D2 longo):</strong></p>
+                            <p>a) O intervalo PR esta normal? Diga SIM ou NÃO e justifique. (1,5 ponto)</p>
+                            <p>b) O intervalo QT esta normal? Diga SIM ou NÃO e justifique. (1,5 ponto)</p>
+                            <img src="https://i.imgur.com/LYvheRm.png" alt="ECG">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">Não</span>, pois o intervalo PR está maior que os valores de normalidade que é 0,12s a 0,20s (3 a 5 quadradinhos).</p></div>
+                            <div class="answer-item"><strong>b)</strong><p><span class="highlight">Não</span>, o intervalo QT está alargado. A avaliação visual mostra que sua duração ultrapassa a metade do intervalo R-R anterior. Para confirmar, o cálculo do QT corrigido (QTc) pela fórmula de Bazett (QTc = QT / √RR)</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flashcard" onclick="flipCurrentCard()">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <p><strong>III - Analise o eletrocardiograma e responda as questões:</strong></p>
+                            <p>a) Determine o ritmo cardiaco? Justifique (0,5 ponto)</p>
+                            <p>b) Qual a frequência cardiaca? Justifique (0,5 ponto)</p>
+                            <p>c) Os complexos QRS das derivações precordiais estão normais? Diga SIM ou NÃO e justifique. (0,5 ponto)</p>
+                            <p>d) Determine o SÂQRS (resultado de 30º em 30º). Justifique sua resposta usando os eixos. (2,5 pontos)</p>
+                            <p>e) Esse SÂQRS está normal? Diga SIM ou NÃO e justifique.</p>
+                             <img src="https://i.imgur.com/7C4RUac.png" alt="ECG">
+                             <img src="https://i.imgur.com/sj1frCU.png" alt="Eixo Cardíaco">
+                        </div>
+                        <div class="card-back">
+                            <div class="answer-item"><strong>a)</strong><p><span class="highlight">Ritmo sinusal</span> pois a onda P está antecedendo o complexo QRS e positiva em D1, D2, aVF. com RR regular.</p></div>
+                            <div class="answer-item"><strong>b)</strong><p><span class="highlight">FC= 100 bpm</span>/Justificativa: Para ver frequência com intervalo RR regular, 300 dividido pela quantidade de quadrados que tem um intervalo RR. nesse caso 300 ÷ 3 = 100 bpm.</p></div>
+                            <div class="answer-item"><strong>c)</strong><p><span class="highlight">Não.</span> Pq as amplitudes estão maiores que 10mV, e com duração menor que 0,08s</p></div>
+                            <div class="answer-item"><strong>d) e e)</strong><p>As respostas para 'd' e 'e' não foram fornecidas no texto original.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    </div>
+
+    <script>
+        /*
+         * Documentação do JavaScript:
+         * Gerencia o modo de estudo focado com seleção aleatória de cards.
+         */
+        const studyDecks = {};
+        let currentTabId = 'coluna-quadril';
+
+        // Função para inicializar os baralhos de estudo
+        function initializeDecks() {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                const tabId = tab.id;
+                const cardContainer = tab.querySelector('.flashcard-container');
+                const cards = cardContainer.querySelectorAll('.flashcard');
+                
+                studyDecks[tabId] = {
+                    cards: Array.from(cards),
+                    unseenIndices: [],
+                    total: cards.length,
+                    currentCard: null
+                };
+                
+                // Remove os cards do container original para gerenciamento via script
+                cards.forEach(card => card.remove());
+            });
+        }
+
+        // Inicia uma sessão de estudo para uma matéria
+        function startStudySession(tabId) {
+            const deck = studyDecks[tabId];
+            // Reseta a lista de cards não vistos
+            deck.unseenIndices = Array.from(Array(deck.total).keys());
+            showNextCard(tabId);
+        }
+
+        // Mostra o próximo card aleatório
+        function showNextCard(tabId) {
+            const deck = studyDecks[tabId];
+            const displayArea = document.getElementById(`display-area-${tabId}`);
+            
+            // Se houver um card antigo, remove-o
+            if (deck.currentCard) {
+                deck.currentCard.remove();
+            }
+
+            // Se todos os cards foram vistos, reinicia o ciclo
+            if (deck.unseenIndices.length === 0) {
+                deck.unseenIndices = Array.from(Array(deck.total).keys());
+            }
+
+            // Seleciona um índice aleatório da lista de não vistos
+            const randomIndexInUnseen = Math.floor(Math.random() * deck.unseenIndices.length);
+            const cardIndexToShow = deck.unseenIndices[randomIndexInUnseen];
+
+            // Remove o índice da lista de não vistos
+            deck.unseenIndices.splice(randomIndexInUnseen, 1);
+
+            // Pega o card correspondente e o exibe
+            const cardToShow = deck.cards[cardIndexToShow];
+            deck.currentCard = cardToShow;
+            
+            // Garante que o card comece virado para frente
+            cardToShow.classList.remove('flipped');
+            // Anexa o novo card (ele é um elemento DOM vivo)
+            displayArea.appendChild(cardToShow);
+
+            // Atualiza o contador
+            const seenCount = deck.total - deck.unseenIndices.length;
+            const counter = document.getElementById(`counter-${tabId}`);
+            counter.textContent = `Card ${seenCount} / ${deck.total}`;
+        }
+
+        // Controla a troca de abas
+        function showTab(tabId) {
+            currentTabId = tabId;
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            // Inicia a sessão de estudo para a nova aba se for a primeira vez
+            if (studyDecks[tabId].unseenIndices.length === 0 || studyDecks[tabId].currentCard === null) {
+                 startStudySession(tabId);
+            }
+        }
+        
+        // Função para virar o card atual
+        function flipCurrentCard() {
+            const deck = studyDecks[currentTabId];
+            if (deck && deck.currentCard) {
+                deck.currentCard.classList.toggle('flipped');
+            }
+        }
+
+        // Inicializa tudo quando a página carrega
+        window.onload = () => {
+            initializeDecks();
+            startStudySession(currentTabId);
+        };
+
+    </script>
+
+</body>
+</html>
+
