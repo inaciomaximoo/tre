@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compilado de Manobras Semiológicas</title>
+    <style>
+        /* --- Configurações Gerais --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #3498db;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #bdc3c7;
+        }
+        h3 {
+            color: #2980b9;
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+
+        /* --- Estrutura dos Testes --- */
+        .test-block {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .keywords {
+            flex: 1;
+            min-width: 300px;
+        }
+        .video-container {
+            flex: 1;
+            min-width: 300px;
+            min-height: 250px;
+        }
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            min-height: 250px;
+            border: none;
+            border-radius: 5px;
+        }
+        
+        /* --- Estilos específicos para o Pé --- */
+        .foot-section {
+            padding: 10px;
+        }
+        .foot-section h4 {
+            color: #555;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Guia Rápido de Manobras Semiológicas</h1>
+
+        <section class="body-section">
+            <h2>Coluna Vertebral</h2>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Manobra de Spurling</h3>
+                    <ul>
+                        <li>Compressão de raiz nervosa cervical</li>
+                        <li>Doença radicular cervical</li>
+                        <li>Dor cervical</li>
+                        <li>Irradiação para o braço</li>
+                        <li>Parestesia</li>
+                        <li>Inclinação cervical</li>
+                        <li>Compressão axial</li>
+                        <li>Cervicobraquialgia</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/6Ggz90SIhrk" title="Spurling's Test" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Manobra de Lasègue</h3>
+                    <ul>
+                        <li>Dor lombar</li>
+                        <li>Ciatalgia (dor no nervo ciático)</li>
+                        <li>Irradiação para glúteo e posterior da coxa</li>
+                        <li>Decúbito dorsal</li>
+                        <li>Elevação da perna reta</li>
+                        <li>Joelho em extensão</li>
+                        <li>Tensão do nervo isquiático</li>
+                        <li>Dor entre 30 e 60 graus</li>
+                        <li>Compressão de raiz nervosa</li>
+                        <li>Hérnia de disco</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/3lJA8wCoFXM" title="Straight Leg Raise (Lasegue's Test)" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Adams</h3>
+                    <ul>
+                        <li>Escoliose</li>
+                        <li>Inclinação para frente</li>
+                        <li>Paciente em pé</li>
+                        <li>Braços pendentes</li>
+                        <li>Examinador observa a coluna</li>
+                        <li>Giba costal ou lombar (Gibosidade)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/vMNZ38nKP8w" title="Adam's Forward Bend Test" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Schober</h3>
+                    <ul>
+                        <li>Limitação da flexão lombar</li>
+                        <li>Paciente em pé</li>
+                        <li>Marcação em L5-S1 e 10 cm acima</li>
+                        <li>Flexão ventral (agachar)</li>
+                        <li>Distância aumenta > 5 cm (normal)</li>
+                        <li>Aumento inferior a 5 cm (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/OJ7IX57-AMI" title="Schober's Test" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="body-section">
+            <h2>Quadril</h2>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Trendelenburg</h3>
+                    <ul>
+                        <li>Músculo glúteo médio</li>
+                        <li>Insuficiência do glúteo médio</li>
+                        <li>Paciente em pé</li>
+                        <li>Elevar uma perna</li>
+                        <li>Avalia o lado apoiado</li>
+                        <li>Queda da crista ilíaca contralateral (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/gRecxP42kpQ" title="Trendelenburg Test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Ely</h3>
+                    <ul>
+                        <li>Contratura do músculo reto femoral</li>
+                        <li>Decúbito ventral</li>
+                        <li>Flexão passiva do joelho</li>
+                        <li>Flexão/elevação do quadril (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/watch?v=rH2atp3y7ec" title="Ely's Test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Ober</h3>
+                    <ul>
+                        <li>Contratura do trato ílio-tibial</li>
+                        <li>Decúbito lateral</li>
+                        <li>Abdução e extensão do quadril</li>
+                        <li>Joelho fletido a 90°</li>
+                        <li>Membro permanece abduzido (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/PfPYqZzLduU" title="Ober's Test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Thomas</h3>
+                    <ul>
+                        <li>Contratura em flexão do quadril</li>
+                        <li>Decúbito dorsal</li>
+                        <li>Abraçar um joelho contra o tronco</li>
+                        <li>Elevação da coxa contralateral da maca (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/MIaijqlbsvA" title="Thomas Test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Anvil (Percussão do Calcâneo)</h3>
+                    <ul>
+                        <li>Integridade do acetábulo/colo do fêmur</li>
+                        <li>Decúbito dorsal</li>
+                        <li>Elevação do membro estendido</li>
+                        <li>Punho percussão no calcanhar</li>
+                        <li>Dor (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/F8Yk87m9F90" title="Anvil Test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Patrick (FABERE)</h3>
+                    <ul>
+                        <li>Articulação sacro-ilíaca e coxofemoral</li>
+                        <li>Decúbito dorsal</li>
+                        <li>Posição em "quatro"</li>
+                        <li>Flexão, Abdução, Rotação Externa (FABERE)</li>
+                        <li>Dor anterior/inguinal: lesão coxofemoral</li>
+                        <li>Dor posterior: lesão sacro-ilíaca</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/gRvmXN4GSyo" title="FABER Test (Patrick's Test)" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Ludloff</h3>
+                    <ul>
+                        <li>Músculo iliopsoas</li>
+                        <li>Paciente sentado</li>
+                        <li>Levantar a perna contra resistência</li>
+                        <li>Dor (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/rahhJUxWV-A" title="Ludloff's sign" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="body-section">
+            <h2>Ombro</h2>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Manobra de Fukuda (Apreensão Posterior)</h3>
+                    <ul>
+                        <li>Instabilidade posterior glenoumeral</li>
+                        <li>Braço elevado a 90°</li>
+                        <li>Adução e rotação medial</li>
+                        <li>Compressão posterior do braço</li>
+                        <li>Subluxação/Apreensão (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/MqvJw_ayCBs" title="Posterior Apprehension Test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Manobra de Yocum</h3>
+                    <ul>
+                        <li>Impacto subacromial</li>
+                        <li>Mão sobre o ombro oposto</li>
+                        <li>Elevar o cotovelo contra resistência</li>
+                        <li>Dor (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/1-Hgd5hO2sQ" title="Yocum's Test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Neer (Impacto)</h3>
+                    <ul>
+                        <li>Impacto subacromial</li>
+                        <li>Fixar a escápula</li>
+                        <li>Elevação passiva do braço em rotação neutra</li>
+                        <li>Dor (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/S7NOP1eZz-s" title="Neer's Test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Jobe (Lata Vazia)</h3>
+                    <ul>
+                        <li>Músculo supraespinhal</li>
+                        <li>Ombro elevado a 90° no plano da escápula</li>
+                        <li>Rotação medial (polegar para baixo)</li>
+                        <li>Força para baixo (resistência)</li>
+                        <li>Dor ou fraqueza (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/8vLoLUWBRHg" title="Empty Can Test (Jobe Test)" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Patte</h3>
+                    <ul>
+                        <li>Músculos infraespinhal e redondo menor</li>
+                        <li>Cotovelo fletido a 90°</li>
+                        <li>Rotação lateral contra resistência</li>
+                        <li>Dor ou incapacidade de movimento (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/gPl4A7EvTes" title="Patte test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Gerber (Lift-off)</h3>
+                    <ul>
+                        <li>Músculo subescapular</li>
+                        <li>Dorso da mão nas costas</li>
+                        <li>Afastar ativamente a mão das costas</li>
+                        <li>Incapacidade de afastar a mão (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/hbxRYGr308o" title="Gerber's Lift Off Test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Speed</h3>
+                    <ul>
+                        <li>Cabo longo do músculo bíceps braquial</li>
+                        <li>Braço em supinação, cotovelo estendido</li>
+                        <li>Resistência contra a elevação do braço</li>
+                        <li>Dor no sulco intertubercular (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/xH0-TOuR5gA" title="Speed's Test" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="body-section">
+            <h2>Cotovelo</h2>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Cozen e Mills (Cotovelo de Tenista)</h3>
+                    <ul>
+                        <li>Epicondilite lateral</li>
+                        <li>Extensão do punho contra resistência</li>
+                        <li><b>Cozen:</b> Cotovelo fletido a 90°</li>
+                        <li><b>Mills:</b> Cotovelo em extensão</li>
+                        <li>Dor no epicôndilo lateral (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/OglTgs4FsFM" title="Cozen's and Mill's Tests" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste do Cotovelo de Golfista</h3>
+                    <ul>
+                        <li>Epicondilite medial</li>
+                        <li>Antebraço em supinação, punho em extensão</li>
+                        <li>Flexão do punho contra resistência</li>
+                        <li>Dor no epicôndilo medial (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/vKISrAXMjkc" title="Golfer's Elbow Test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Estresse em Valgo e Varo (Cotovelo)</h3>
+                    <ul>
+                        <li><b>Valgo:</b> Testa ligamento colateral medial</li>
+                        <li><b>Varo:</b> Testa ligamento colateral lateral</li>
+                        <li>Cotovelo fletido a 15-30°</li>
+                        <li>Forçar valgo ou varo</li>
+                        <li>Dor ou instabilidade (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/8eXLgScH3Dk" title="Elbow Valgus & Varus Stress Tests" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="body-section">
+            <h2>Punho e Mão</h2>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Phalen</h3>
+                    <ul>
+                        <li>Nervo mediano</li>
+                        <li>Síndrome do túnel do carpo</li>
+                        <li>Pressionar o dorso das mãos</li>
+                        <li>Manter por 60 segundos</li>
+                        <li>Parestesia (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/vukZ0gKymFs" title="Phalen's Test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Sinal de Tinel</h3>
+                    <ul>
+                        <li>Nervo mediano</li>
+                        <li>Síndrome do túnel do carpo</li>
+                        <li>Percussão sobre o nervo no punho</li>
+                        <li>Dor ou parestesia (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/pv-exsmL4rc" title="Tinel's Sign" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Finkelstein</h3>
+                    <ul>
+                        <li>Tenossinovite de De Quervain</li>
+                        <li>Abdutor Longo e Extensor Curto do Polegar</li>
+                        <li>Polegar fletido na palma da mão</li>
+                        <li>Desvio ulnar do punho</li>
+                        <li>Dor na face lateral do punho (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/kBfD5U7OfRs" title="Finkelstein's Test" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Watson vs. Pistonagem</h3>
+                    <ul>
+                        <li><b>Watson:</b> Subluxação do osso escafoide</li>
+                        <li><b>Semiotécnica Watson:</b> Desvio ulnar e radial do punho com pressão sobre o escafoide</li>
+                        <li><b>Pistonagem:</b> Fratura do osso escafoide</li>
+                        <li><b>Semiotécnica Pistonagem:</b> Movimento de pistão (compressão axial) no polegar</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/6buHXEOFhxY" title="Watson's Test and Piston Test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Condições Específicas da Mão</h3>
+                    <ul>
+                        <li><b>Mão Caída:</b> Lesão do Nervo Radial</li>
+                        <li><b>Dedo em Botoeira:</b> Lesão do tendão extensor central do dedo</li>
+                        <li><b>Dedo em Martelo:</b> Lesão do tendão extensor da falange distal</li>
+                        <li><b>Dedo em Pescoço de Cisne:</b> Artrite Reumatoide</li>
+                        <li><b>Dedo em Gatilho:</b> Espessamento do tendão flexor</li>
+                        <li><b>Nódulos de Heberden:</b> Osteoartrite (Interfalangianas distais)</li>
+                        <li><b>Nódulos de Bouchard:</b> Osteoartrite (Interfalangianas proximais)</li>
+                        <li><b>Tofo Gotoso:</b> Gota</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/videoseries?list=PL_83yq0aM_z0W2y2p0h0v3p0x1y1z1x1" title="Various Hand Conditions" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="body-section">
+            <h2>Joelho</h2>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Sinal da Tecla (Rechaço Patelar)</h3>
+                    <ul>
+                        <li>Derrame articular (grande)</li>
+                        <li>Compressão da bolsa suprapatelar</li>
+                        <li>Empurrar patela contra fêmur</li>
+                        <li>Rebote da patela (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/l-yFVA3AIPw" title="Patellar Tap Test (Ballottement)" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Sinal da Onda (Abaulamento)</h3>
+                    <ul>
+                        <li>Derrame articular (pequeno)</li>
+                        <li>Deslocar líquido para a face lateral</li>
+                        <li>Empurrar líquido de volta para a face medial</li>
+                        <li>Sentir onda de líquido (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/Mk6cyJfDQ3o" title="Bulge Sign / Test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Apley</h3>
+                    <ul>
+                        <li>Avaliação dos meniscos</li>
+                        <li>Decúbito ventral, joelho fletido a 90°</li>
+                        <li><b>Compressão + Rotação:</b> Dor (positivo)</li>
+                        <li><b>Tração + Rotação:</b> Alívio da dor (confirmatório)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/J8LS8ALOCXs" title="Apley's Test" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de McMurray</h3>
+                    <ul>
+                        <li>Avaliação dos meniscos (corno posterior)</li>
+                        <li>Decúbito dorsal, quadril e joelho fletidos</li>
+                        <li>Rotação externa + Extensão (testa menisco medial)</li>
+                        <li>Rotação interna + Extensão (testa menisco lateral)</li>
+                        <li>Dor ou estalido (positivo)</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/jzpMKxRafvA" title="McMurray's Test" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste da Gaveta Anterior e Posterior (Joelho)</h3>
+                    <ul>
+                        <li>Posição: Decúbito dorsal, joelho fletido a 90°</li>
+                        <li><b>Gaveta Anterior:</b> Testa Lig. Cruzado Anterior (LCA)</li>
+                        <li><b>Ação Anterior:</b> Tração anterior da tíbia</li>
+                        <li><b>Gaveta Posterior:</b> Testa Lig. Cruzado Posterior (LCP)</li>
+                        <li><b>Ação Posterior:</b> Tração posterior da tíbia</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/ol_qk29zlvA" title="Anterior and Posterior Drawer Tests" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Lachman</h3>
+                    <ul>
+                        <li>Avaliação: Ligamento Cruzado Anterior (LCA)</li>
+                        <li>Posição: Decúbito dorsal, joelho fletido a 30°</li>
+                        <li>Ação: Segurar o fêmur e deslocar a tíbia anteriormente</li>
+                        <li>Indicação: Mais sensível que a gaveta anterior</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/4LYjOsv1NPE" title="Lachman's Test" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste de Estresse em Valgo e Varo (Joelho)</h3>
+                    <ul>
+                        <li><b>Valgo:</b> Testa Lig. Colateral Medial (LCM)</li>
+                        <li><b>Varo:</b> Testa Lig. Colateral Lateral (LCL)</li>
+                        <li>Ação: Forçar valgo (para dentro) ou varo (para fora)</li>
+                        <li><b>Teste a 30°:</b> Isola os ligamentos</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/8swCGlUq8oI" title="Varus & Valgus Stress Tests of the Knee" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section class="body-section">
+            <h2>Tornozelo e Pé</h2>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste da Gaveta Anterior (Tornozelo)</h3>
+                    <ul>
+                        <li>Estrutura: Ligamento talofibular anterior (TFA)</li>
+                        <li>Diagnóstico: Entorse, instabilidade anterior</li>
+                        <li>Ação: Estabilizar a tíbia e tracionar o pé para frente</li>
+                        <li>Sinal Positivo: Dor, deslocamento anterior, "sinal do vácuo"</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/9fKk1gfv_3c" title="Anterior Drawer Test of the Ankle" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Teste da Gaveta Posterior da Fíbula (Cotton Test)</h3>
+                    <ul>
+                        <li>Estrutura: Sindesmose tibiofibular</li>
+                        <li>Avaliação: Instabilidade do tornozelo (luxação)</li>
+                        <li>Ação: Mão medial empurra para trás, mão lateral puxa para frente</li>
+                        <li>Sinal Positivo: Maléolo lateral move-se para frente</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/gRDaBjkjdkE" title="Cotton Test Ankle" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="test-block">
+                <div class="keywords">
+                    <h3>Sinal de Thompson</h3>
+                    <ul>
+                        <li>Avaliação: Ruptura do tendão calcâneo (de Aquiles)</li>
+                        <li>Posição: Decúbito ventral</li>
+                        <li>Ação: Compressão do músculo da panturrilha</li>
+                        <li>Resposta Normal: Ocorre flexão plantar do pé</li>
+                        <li>Sinal Positivo: Ausência de flexão plantar</li>
+                    </ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/MTuyFJ5rrvw" title="Thompson's Test" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+            <div class="test-block">
+                <div class="keywords foot-section">
+                    <h3>Exame Físico do Pé (Resumo)</h3>
+                    <h4>Movimentos</h4>
+                    <ul><li>Flexão plantar, dorsoflexão, eversão, inversão</li></ul>
+                    <h4>Deformidades Comuns</h4>
+                    <ul><li>Hálux valgo, pé plano (arco diminuído), pé cavo (arco elevado)</li></ul>
+                    <h4>Tipos de Pisada e Calcâneo</h4>
+                    <ul>
+                        <li><b>Neutra:</b> Normal</li>
+                        <li><b>Pronada:</b> "Para dentro", associada ao calcâneo valgo</li>
+                        <li><b>Supinada:</b> "Para fora", associada ao calcâneo varo</li>
+                    </ul>
+                    <h4>Complicações</h4>
+                    <ul><li>Desgaste medial/lateral do calçado, dor</li></ul>
+                </div>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/0l9DMzP34Ws" title="Foot and Ankle Examination" allowfullscreen></iframe>
+                </div>
+            </div>
+            
+        </section>
+
+    </div>
+
+</body>
+</html>
